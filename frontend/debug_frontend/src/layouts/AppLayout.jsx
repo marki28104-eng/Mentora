@@ -175,7 +175,7 @@ function AppLayout() {
                   textOverflow: 'ellipsis',
                 })}
               >
-                TeachAI
+                Mentora
               </Title>
             </Group>
             
