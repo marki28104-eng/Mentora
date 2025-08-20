@@ -99,7 +99,7 @@ class UserPasswordUpdate(BaseModel):
             raise ValueError('Password must contain at least one special character')
         return v
 
-class User(UserBase): # Your existing User schema for responses
+class User(UserBase):
     id: str
     is_active: bool
     is_admin: bool
