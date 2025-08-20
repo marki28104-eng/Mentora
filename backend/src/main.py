@@ -14,7 +14,7 @@ from .schemas import token as token_schema
 
 from .utils import auth
 from .db.database import engine, get_db
-from .routers import users,courses # Your existing users router
+from .routers import users,courses,files # Your existing users router
 
 
 from fastapi import APIRouter, Depends, HTTPException, status, Request
@@ -63,6 +63,7 @@ async def read_users_me(current_user: user_model.User = Depends(auth.get_current
 # Include your existing routers under this api_router
 api_router.include_router(users.router)
 api_router.include_router(courses.router)
+api_router.include_router(files.router)
 
 # If you had other routers (e.g., items_router), you would include them here too:
 # api_router.include_router(items_router, prefix="/items", tags=["items"])
