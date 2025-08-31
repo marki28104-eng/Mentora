@@ -10,6 +10,7 @@ import shutil
 
 
 class ESLintValidator:
+    """A class to validate JSX code using ESLint in a self-contained Node.js environment."""
     def __init__(self):
         """
         Initializes the validator. The configuration files are expected to be
@@ -32,7 +33,7 @@ class ESLintValidator:
         if not os.path.exists(self.package_json_path):
             raise FileNotFoundError(f"Required file not found: {self.package_json_path}")
 
-    def validate_jsx(self, jsx_code):
+    def validate_jsx(self, jsx_code: str):
         """
         Validates JSX by creating a temporary file and running ESLint from the pre-installed directory.
         """
@@ -113,7 +114,7 @@ class ESLintValidator:
                     '--quiet',
                     '--format', 'json',
                     js_file_to_lint
-                ], capture_output=True, text=True, cwd=temp_dir, env=npm_env) # Pass env here too for consistency
+                ], capture_output=True, text=True, cwd=temp_dir, env=npm_env, check=False) # Pass env here too for consistency
 
 
                 if lint_process.stdout:
@@ -129,7 +130,8 @@ class ESLintValidator:
                     'valid': False,
                     'errors': [{'message': f"ESLint execution failed: {e.stderr}"}]
                 }
-            except Exception as e:
+            except (OSError, RuntimeError) as e:
+                # Catch any other unexpected errors
                 return {'valid': False, 'errors': [{'message': f"An unexpected error occurred: {str(e)}"}]}
 
     def _parse_eslint_output(self, eslint_json_output):
@@ -225,7 +227,7 @@ def clean_up_response(code_string):
 import re
 
 
-def find_react_code_in_response(text):
+def find_react_code_in_response(text: str) -> str:
     """
     Extracts React component code from a text response.
     Handles nested components, complex JSX, and various React patterns.
