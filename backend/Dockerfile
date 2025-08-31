@@ -33,14 +33,8 @@ RUN apt-get update && apt-get install -y curl gnupg \
     && apt-get install -y nodejs \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Create a non-root user with proper home directory
-RUN addgroup --system app && adduser --system --group app --home /home/app --shell /bin/bash
-
-# Set up ESLint environment BEFORE switching users
-WORKDIR /opt/eslint-setup
-COPY ./src/agents/explainer_agent/package.json ./src/agents/explainer_agent/eslint.config.js ./
-RUN npm install
-RUN chown -R app:app /opt/eslint-setup
+# Create a non-root user
+RUN addgroup --system app && adduser --system --group app
 
 # Set work directory
 WORKDIR /home/app/web
