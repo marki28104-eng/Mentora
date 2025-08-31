@@ -1,10 +1,12 @@
 services:
   app:
     container_name: mentora
-    image: m4rkus28/mentora:latest
+    #image: m4rkus28/mentora:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - "8127:8000"
-      - "3306:3306"
+      - "8000:8000"
     env_file:
       - ./.env
     restart: always
