@@ -8,6 +8,12 @@ import tempfile
 import os
 import shutil
 
+plugin_imports = """
+import * as Recharts from 'recharts';
+import React from "react";
+import 'katex/dist/katex.min.css';
+import Latex from 'react-latex-next';
+"""
 
 class ESLintValidator:
     """A class to validate JSX code using ESLint in a self-contained Node.js environment."""
@@ -37,36 +43,15 @@ class ESLintValidator:
         """
         Validates JSX by creating a temporary file and running ESLint from the pre-installed directory.
         """
-        # jsx_code = find_react_code_in_response(jsx_code_input) # Bypass for now
-
-        # --- TEMPORARY TEST --- 
-        jsx_code = """() => {
-    const headerStyle = {
-        color: red, // Undefined variable
-        borderBottom: '2px solid #007bff'
-    };
-    return <div style={headerStyle}>Test<div>;
-}
-"""
-
-        print("Starting to parse jsx code:")
-        print(jsx_code)
-
-        if not (jsx_code.startswith("(") or jsx_code.startswith("const") or jsx_code.startswith("function")):
-            return {
-                'valid': False,
-                'errors': [{'message': f"""
-                Your output format is wrong. Your response should start with () => {{ and end with }}, 
-                but your response starts with {jsx_code[:10]}
-                """}]
-            }
+        cleaned_code = find_react_code_in_response(jsx_code)
+        code_with_imports = plugin_imports + "\n" + cleaned_code
 
         with tempfile.TemporaryDirectory() as temp_dir:
             try:
                 # Write the JSX code to be linted in the temp directory
                 js_file_to_lint = os.path.join(temp_dir, 'temp.jsx')
                 with open(js_file_to_lint, 'w', encoding='utf-8') as f:
-                    f.write(jsx_code)
+                    f.write(code_with_imports)
 
                 # Create a well-defined environment for npm and eslint
                 npm_env = os.environ.copy()
