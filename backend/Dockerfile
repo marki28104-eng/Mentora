@@ -36,6 +36,9 @@ RUN apt-get update && apt-get install -y curl gnupg \
 # Create a non-root user
 RUN addgroup --system app && adduser --system --group app
 
+# Make this directory accessible to your app
+RUN chmod -R 755 /opt/eslint-setup
+
 # Set work directory
 WORKDIR /home/app/web
 
