@@ -153,8 +153,6 @@ function Dashboard() {
 
     switch (status) {
       case 'CourseStatus.CREATING':
-        return { label, color: 'blue', Icon: IconClock };
-      case 'CourseStatus.CREATING':
         return { label, color: 'yellow', Icon: IconLoader };
       case 'CourseStatus.FINISHED':
       case 'CourseStatus.COMPLETED':
