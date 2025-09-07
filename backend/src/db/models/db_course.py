@@ -62,7 +62,8 @@ class Chapter(Base):
 
     # Relationships
     course = relationship("Course", back_populates="chapters")
-    questions = relationship("PracticeQuestion", back_populates="chapter", cascade="all, delete-orphan")
+    mc_questions = relationship("MultipleChoiceQuestion", back_populates="chapter", cascade="all, delete-orphan")
+    notes = relationship("Note", back_populates="chapter", cascade="all, delete-orphan")
 
     # This makes ordering chapters by their index for a given course very fast.
     __table_args__ = (
