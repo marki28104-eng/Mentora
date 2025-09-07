@@ -30,14 +30,106 @@ import ToolbarContainer from '../components/tools/ToolbarContainer';
 import { useToolbar } from '../contexts/ToolbarContext';
 import AiCodeWrapper from "../components/AiCodeWrapper.jsx";
 
+// Note: These components would need to be created or imported from the correct path
+// For now, I'll create simple placeholder components to prevent import errors
+const MediaGallery = ({ images, onDelete, deletingItem, isMobile }) => (
+  <SimpleGrid cols={isMobile ? 1 : 3} spacing="md">
+    {images.map((image) => (
+      <Card key={image.id} shadow="sm" padding="lg" radius="md" withBorder>
+        <Card.Section>
+          {image.objectUrl ? (
+            <Image
+              src={image.objectUrl}
+              height={160}
+              alt={image.filename}
+            />
+          ) : (
+            <Box sx={{ height: 160, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {image.loading ? <Loader size="sm" /> : <Text color="red">Failed to load</Text>}
+            </Box>
+          )}
+        </Card.Section>
+        <Group position="apart" mt="md">
+          <Text weight={500}>{image.filename}</Text>
+          <Button
+            size="xs"
+            color="red"
+            variant="outline"
+            onClick={() => onDelete(image.id)}
+            loading={deletingItem === `image-${image.id}`}
+          >
+            Delete
+          </Button>
+        </Group>
+      </Card>
+    ))}
+  </SimpleGrid>
+);
+
+const FileList = ({ files, onDelete, deletingItem, mediaLoading }) => (
+  <List spacing="xs" size="sm">
+    {files.map((file) => (
+      <List.Item key={file.id}>
+        <Group position="apart">
+          <Box>
+            {file.objectUrl ? (
+              <a href={file.objectUrl} target="_blank" rel="noopener noreferrer">
+                {file.filename}
+              </a>
+            ) : (
+              <Text color={file.error ? "red" : "dimmed"}>
+                {file.loading ? "Loading..." : file.filename}
+              </Text>
+            )}
+            {file.filename?.endsWith('.pdf') && file.objectUrl && (
+              <Paper withBorder radius="md" mt="sm">
+                <iframe
+                  src={file.objectUrl}
+                  style={{ width: '100%', height: '500px', border: 'none' }}
+                  title={file.filename}
+                />
+              </Paper>
+            )}
+          </Box>
+          <Button
+            size="xs"
+            color="red"
+            variant="outline"
+            onClick={() => onDelete(file.id)}
+            loading={deletingItem === `file-${file.id}`}
+          >
+            Delete
+          </Button>
+        </Group>
+      </List.Item>
+    ))}
+  </List>
+);
+
+const FullscreenContentWrapper = ({ children }) => (
+  <div style={{ position: 'relative' }}>
+    {children}
+  </div>
+);
+
+// Placeholder PDF download functions - these would need to be implemented
+const downloadChapterContentAsPDF = async (element, title) => {
+  console.log('PDF download not implemented');
+  throw new Error('PDF download functionality not implemented');
+};
+
+const prepareElementForPDF = (element) => {
+  return () => {}; // cleanup function
+};
+
 function ChapterView() {
   const { t } = useTranslation('chapterView');
-  const { courseId, chapterId } = useParams(); // This should be the actual DB ID now
+  const { courseId, chapterId } = useParams();
   const navigate = useNavigate();
-  const { toolbarOpen, toolbarWidth } = useToolbar(); // Get toolbar state from context
-  const isMobile = useMediaQuery('(max-width: 768px)'); // Add mobile detection
+  const { toolbarOpen, toolbarWidth } = useToolbar();
+  const isMobile = useMediaQuery('(max-width: 768px)');
   const [chapter, setChapter] = useState(null);
-  const [questions, setQuestions] = useState([]); // Separate state for questions
+  const [questions, setQuestions] = useState([]);
   const [images, setImages] = useState([]);
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -46,17 +138,20 @@ function ChapterView() {
   const [activeTab, setActiveTab] = useState('content');
 
   // Quiz state
-  const [quizAnswers, setQuizAnswers] = useState({}); // For MC questions
-  const [openTextAnswers, setOpenTextAnswers] = useState({}); // For OT questions
+  const [quizAnswers, setQuizAnswers] = useState({});
+  const [openTextAnswers, setOpenTextAnswers] = useState({});
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [quizScore, setQuizScore] = useState(0);
-  const [gradingQuestion, setGradingQuestion] = useState(null); // Track which OT question is being graded
-  const [questionFeedback, setQuestionFeedback] = useState({}); // Store feedback for OT questions
+  const [gradingQuestion, setGradingQuestion] = useState(null);
+  const [questionFeedback, setQuestionFeedback] = useState({});
   const [markingComplete, setMarkingComplete] = useState(false);
+  const [downloadingPDF, setDownloadingPDF] = useState(false);
+  const [deletingItem, setDeletingItem] = useState(null);
+
+  const contentRef = useRef(null);
 
   useEffect(() => {
     console.log("Toolbar state changed:", { open: toolbarOpen, width: toolbarWidth });
-    // We could add additional logic here if needed
   }, [toolbarOpen, toolbarWidth]);
 
   // Fetch chapter data and media info
@@ -64,10 +159,10 @@ function ChapterView() {
     const fetchChapterAndMediaInfo = async () => {
       try {
         setLoading(true);
-        // Fetch chapter data, questions, images, and files separately
+        // Note: These service methods would need to be implemented in courseService
         const [chapterData, questionsData, imagesData, filesData] = await Promise.all([
           courseService.getChapter(courseId, chapterId),
-          courseService.getChapterQuestions(courseId, chapterId),
+          courseService.getChapterQuestions ? courseService.getChapterQuestions(courseId, chapterId) : Promise.resolve([]),
           courseService.getImages(courseId),
           courseService.getFiles(courseId)
         ]);
@@ -76,6 +171,21 @@ function ChapterView() {
         setQuestions(questionsData || []);
         setImages(imagesData);
         setFiles(filesData);
+
+        // Set initial media state with empty URLs
+        setImages(imagesData.map(img => ({
+          ...img,
+          objectUrl: null,
+          loading: true,
+          error: null
+        })));
+
+        setFiles(filesData.map(file => ({
+          ...file,
+          objectUrl: null,
+          loading: true,
+          error: null
+        })));
 
         // Initialize quiz answers based on question types
         if (questionsData && questionsData.length > 0) {
@@ -105,6 +215,142 @@ function ChapterView() {
 
     fetchChapterAndMediaInfo();
   }, [courseId, chapterId, t]);
+
+  const initialLoad = useRef(true);
+
+  // Fetch actual media files
+  useEffect(() => {
+    if (loading) return;
+
+    if (!initialLoad.current && images.every(img => img.objectUrl || img.error) &&
+        files.every(file => file.objectUrl || file.error)) {
+      return;
+    }
+
+    const fetchMedia = async () => {
+      console.log('Starting media fetch...');
+      try {
+        setMediaLoading(true);
+
+        // Process images
+        const updatedImages = await Promise.all(
+          images.map(async (image) => {
+            if (image.objectUrl || image.error) {
+              return image;
+            }
+
+            try {
+              // Note: These download methods would need to be implemented
+              const imageBlob = await courseService.downloadImage(image.id);
+              const objectUrl = URL.createObjectURL(
+                new Blob([imageBlob], { type: image.content_type || 'application/octet-stream' })
+              );
+              return { ...image, objectUrl, loading: false, error: null };
+            } catch (err) {
+              console.error(`Error loading image ${image.id}:`, err);
+              return {
+                ...image,
+                error: t('errors.mediaLoadFailed'),
+                loading: false,
+                errorDetails: err.message
+              };
+            }
+          })
+        );
+
+        // Process files
+        const updatedFiles = await Promise.all(
+          files.map(async (file) => {
+            if (file.objectUrl || file.error) {
+              return file;
+            }
+
+            try {
+              const fileBlob = await courseService.downloadFile(file.id);
+              const objectUrl = URL.createObjectURL(
+                new Blob([fileBlob], { type: file.content_type || 'application/octet-stream' })
+              );
+              return { ...file, objectUrl, loading: false, error: null };
+            } catch (err) {
+              console.error(`Error loading file ${file.id}:`, err);
+              return {
+                ...file,
+                error: t('errors.mediaLoadFailed'),
+                loading: false,
+                errorDetails: err.message
+              };
+            }
+          })
+        );
+
+        setImages(updatedImages);
+        setFiles(updatedFiles);
+        initialLoad.current = false;
+      } catch (error) {
+        console.error('Unexpected error in media fetch:', error);
+        toast.error(t('errors.mediaLoadFailed'));
+      } finally {
+        setMediaLoading(false);
+      }
+    };
+
+    fetchMedia();
+  }, [loading, t, images, files]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      console.log('Cleaning up media URLs on unmount...');
+      const allMedia = [...images, ...files];
+      allMedia.forEach(item => {
+        if (item?.objectUrl) {
+          URL.revokeObjectURL(item.objectUrl);
+        }
+      });
+    };
+  }, [images, files]);
+
+  const handleDeleteImage = async (imageId) => {
+    try {
+      setDeletingItem(`image-${imageId}`);
+      await courseService.deleteImage(imageId);
+
+      setImages(prevImages => prevImages.filter(img => img.id !== imageId));
+
+      const imageToDelete = images.find(img => img.id === imageId);
+      if (imageToDelete?.objectUrl) {
+        URL.revokeObjectURL(imageToDelete.objectUrl);
+      }
+
+      toast.success(t('imageDeleted'));
+    } catch (error) {
+      console.error('Error deleting image:', error);
+      toast.error(t('errors.deleteFailed'));
+    } finally {
+      setDeletingItem(null);
+    }
+  };
+
+  const handleDeleteFile = async (fileId) => {
+    try {
+      setDeletingItem(`file-${fileId}`);
+      await courseService.deleteDocument(fileId);
+
+      setFiles(prevFiles => prevFiles.filter(file => file.id !== fileId));
+
+      const fileToDelete = files.find(file => file.id === fileId);
+      if (fileToDelete?.objectUrl) {
+        URL.revokeObjectURL(fileToDelete.objectUrl);
+      }
+
+      toast.success(t('fileDeleted'));
+    } catch (error) {
+      console.error('Error deleting file:', error);
+      toast.error(t('errors.deleteFailed'));
+    } finally {
+      setDeletingItem(null);
+    }
+  };
 
   const handleMCAnswerChange = (questionId, value) => {
     setQuizAnswers((prev) => ({
@@ -156,7 +402,6 @@ function ChapterView() {
     let correct = 0;
     let totalMCQuestions = 0;
 
-    // Only count MC questions for the score calculation
     questions.forEach((question) => {
       if (question.type === 'MC') {
         totalMCQuestions++;
@@ -177,7 +422,6 @@ function ChapterView() {
         toast.info(t('toast.quizReviewContent', { scorePercentage }));
       }
     } else {
-      // If there are no MC questions, just mark as submitted
       setQuizSubmitted(true);
       toast.info('Quiz completed! Check your open text question feedback above.');
     }
@@ -197,9 +441,32 @@ function ChapterView() {
     }
   };
 
+  const handleDownloadPDF = async () => {
+    if (!contentRef.current || !chapter) {
+      toast.error('Content not available for download');
+      return;
+    }
+
+    try {
+      setDownloadingPDF(true);
+
+      const cleanup = prepareElementForPDF(contentRef.current);
+      await new Promise(resolve => setTimeout(resolve, 100));
+      await downloadChapterContentAsPDF(contentRef.current, chapter.caption || 'Chapter');
+      cleanup();
+
+      toast.success('Chapter content downloaded as PDF');
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+      toast.error('Failed to download PDF. Please try again.');
+    } finally {
+      setDownloadingPDF(false);
+    }
+  };
+
   const sidebarWidth = isMobile
-    ? (toolbarOpen ? window.innerWidth : 0) // Full screen on mobile when open, hidden when closed
-    : (toolbarOpen ? toolbarWidth : 40); // Desktop shows normal width when open, 40px when closed
+    ? (toolbarOpen ? window.innerWidth : 0)
+    : (toolbarOpen ? toolbarWidth : 40);
 
   const mcQuestions = questions.filter(q => q.type === 'MC');
   const otQuestions = questions.filter(q => q.type === 'OT');
@@ -210,22 +477,21 @@ function ChapterView() {
       display: 'flex',
       position: 'relative',
       width: '100%',
-      height: 'calc(100vh - 70px)', // Adjust for header height
+      height: 'calc(100vh - 70px)',
       marginTop: 0,
-      overflow: 'hidden' // Prevent page-level scrolling issues
+      overflow: 'hidden'
     }}>
-      {/* Main content with dynamic positioning - centered in available space */}
       <Container size="lg" py="xl" style={{
         flexGrow: 1,
-        maxWidth: `calc(100% - ${sidebarWidth}px)`, // Limit max width to available space
-        width: `calc(100% - ${sidebarWidth}px)`, // Use calculated width
+        maxWidth: `calc(100% - ${sidebarWidth}px)`,
+        width: `calc(100% - ${sidebarWidth}px)`,
         transition: 'all 0.3s ease',
-        marginRight: `${sidebarWidth}px`, // Keep space for toolbar
-        paddingLeft: '20px', // Add padding on left
-        paddingRight: '20px', // Add padding on right
-        overflow: 'auto', // Allow content to scroll if needed
-        position: 'relative', // Create stacking context
-        height: '100%' // Fill the available height
+        marginRight: `${sidebarWidth}px`,
+        paddingLeft: '20px',
+        paddingRight: '20px',
+        overflow: 'auto',
+        position: 'relative',
+        height: '100%'
       }}>
         {loading && (
           <Box sx={{ display: 'flex', justifyContent: 'center', padding: '50px' }}>
@@ -285,27 +551,27 @@ function ChapterView() {
                 </Paper>
               </Tabs.Panel>
 
-                <Tabs.Panel value="images" pt="xs">
-                  <Paper shadow="xs" p="md" withBorder>
-                    <MediaGallery 
-                      images={images} 
-                      onDelete={handleDeleteImage} 
-                      deletingItem={deletingItem} 
-                      isMobile={isMobile} 
-                    />
-                  </Paper>
-                </Tabs.Panel>
+              <Tabs.Panel value="images" pt="xs">
+                <Paper shadow="xs" p="md" withBorder>
+                  <MediaGallery
+                    images={images}
+                    onDelete={handleDeleteImage}
+                    deletingItem={deletingItem}
+                    isMobile={isMobile}
+                  />
+                </Paper>
+              </Tabs.Panel>
 
-                <Tabs.Panel value="files" pt="xs">
-                  <Paper shadow="xs" p="md" withBorder>
-                    <FileList 
-                      files={files} 
-                      onDelete={handleDeleteFile} 
-                      deletingItem={deletingItem} 
-                      mediaLoading={mediaLoading} 
-                    />
-                  </Paper>
-                </Tabs.Panel>
+              <Tabs.Panel value="files" pt="xs">
+                <Paper shadow="xs" p="md" withBorder>
+                  <FileList
+                    files={files}
+                    onDelete={handleDeleteFile}
+                    deletingItem={deletingItem}
+                    mediaLoading={mediaLoading}
+                  />
+                </Paper>
+              </Tabs.Panel>
 
               <Tabs.Panel value="quiz" pt="xs">
                 <Paper shadow="xs" p="md" withBorder>
@@ -412,7 +678,7 @@ function ChapterView() {
                     </Card>
                   ))}
 
-                  {/* Submit Quiz Button - only show if there are MC questions and not submitted yet */}
+                  {/* Submit Quiz Button */}
                   {mcQuestions.length > 0 && !quizSubmitted && (
                     <Button
                       onClick={handleSubmitQuiz}
@@ -456,10 +722,9 @@ function ChapterView() {
               )}
             </Group>
           </>
-        )}      
+        )}
       </Container>
-      
-      {/* Toolbar Container with all interactive tools */}
+
       <ToolbarContainer courseId={courseId} chapterId={chapterId} />
     </div>
   );
