@@ -33,7 +33,7 @@ User Answer: {users_answer}
         return create_text_query(pretty_chapter)
 
 
-    def get_explainer_query(self, user_id, course_id, chapter_idx):
+    def get_explainer_query(self, user_id, course_id, chapter_idx, language, difficulty):
         chapter = self.sm.get_state(user_id, course_id)['chapters'][chapter_idx]
         pretty_chapter = \
             f"""
@@ -42,8 +42,8 @@ User Answer: {users_answer}
                 Time in Minutes: {chapter['time']}
                 Content Summary: \n{json.dumps(chapter['content'], indent=2)}
                 Note by Planner Agent: {json.dumps(chapter['note'], indent=2)}
-                Response Language: {chapter['language']}
-                Response Difficulty: {chapter['difficulty']}
+                Response Language: {language}
+                Response Difficulty: {difficulty}
             """
         return create_text_query(pretty_chapter)
 
