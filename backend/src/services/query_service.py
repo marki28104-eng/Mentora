@@ -28,6 +28,8 @@ User Answer: {users_answer}
         Time for Chapter: {chapter["time"]} minutes
         Full Chapter Content (React): \n{json.dumps(explanation, indent=2)}
         """
+        #Response Language: {chapter['language']}
+        #Response Difficulty: {chapter['difficulty']}
         return create_text_query(pretty_chapter)
 
 
@@ -40,6 +42,8 @@ User Answer: {users_answer}
                 Time in Minutes: {chapter['time']}
                 Content Summary: \n{json.dumps(chapter['content'], indent=2)}
                 Note by Planner Agent: {json.dumps(chapter['note'], indent=2)}
+                Response Language: {chapter['language']}
+                Response Difficulty: {chapter['difficulty']}
             """
         return create_text_query(pretty_chapter)
 
@@ -60,6 +64,8 @@ User Answer: {users_answer}
             The users uploaded the following documents:
             {[doc.filename for doc in docs]}
             {[img.filename for img in images]}
+            Response Language: {request.language}
+            Response Difficulty: {request.difficulty}
         """)
 
     @staticmethod
@@ -71,5 +77,9 @@ User Answer: {users_answer}
             Answer (User): \n{request.query}
             Question (System): How many hours do you want to invest?
             Answer (User): {request.time_hours}
+            Question (System): What language do you want to learn?
+            Answer (User): {request.language}
+            Question (System): What difficulty do you want to learn?
+            Answer (User): {request.difficulty}
         """
         return create_docs_query(planner_query, docs, images)
