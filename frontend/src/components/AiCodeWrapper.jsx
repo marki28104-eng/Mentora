@@ -2,7 +2,6 @@ import React, {Suspense, lazy} from "react";
 import PaperBackground from "./PaperBackground.jsx";
 import { ErrorBoundary } from 'react-error-boundary';
 const LazyStringToReactComponent = lazy(() => import('string-to-react-component'));
-import he from 'he';
 import { useTranslation } from 'react-i18next';
 
 
@@ -18,6 +17,7 @@ import '@xyflow/react/dist/style.css';
 import { motion } from "motion/react"
 import CustomReactFlow from "./ai_helper_components/CustomReactFlow.jsx";
 import TestComponent from "./ai_helper_components/playground2.jsx";
+import comprehensiveHtmlDecode from "./ai_helper_components/htmlDecoder.js";
 
 
 // Create a modified RF object with custom ReactFlow defaults
@@ -27,14 +27,15 @@ const ModifiedRF = {
 };
 
 // Main function that shows the content
-function AiCodeWrapper({ children }) {
+function AiCodeWrapper({ children, Background = true }) {
   const plugins = "Latex, Recharts, Plot, SyntaxHighlighter, dark, RF, motion";
   const header = `(props) => 
   { const {${plugins}} = props;`;
 
   const full_react_component = `${header}${children}`;
 
-  const decodedString = he.decode(full_react_component);
+  //const decodedString = comprehensiveHtmlDecode(full_react_component);
+    const decodedString = full_react_component
 
   // Get translations
   const { t } = useTranslation('common');
@@ -77,24 +78,31 @@ function AiCodeWrapper({ children }) {
     </div>
   );
 
-  return (
-    <PaperBackground>
-      <Suspense fallback={<Loader />}>
-        <SafeComponent
-          code={decodedString}
-          data={{
-            Latex,
-            Recharts,
-            Plot: LazyPlot,
-            SyntaxHighlighter,
-            dark,
-            RF: ModifiedRF,
-            motion
-          }}
-        />
-      </Suspense>
-    </PaperBackground>
+  const content = (
+    <Suspense fallback={<Loader />}>
+      <SafeComponent
+        code={decodedString}
+        data={{
+          Latex,
+          Recharts,
+          Plot: LazyPlot,
+          SyntaxHighlighter,
+          dark,
+          RF: ModifiedRF,
+          motion
+        }}
+      />
+    </Suspense>
   );
+
+  if (Background) {
+    return (
+        <PaperBackground>
+          {content}
+        </PaperBackground>
+    )
+  }
+  return content;
 }
 
 

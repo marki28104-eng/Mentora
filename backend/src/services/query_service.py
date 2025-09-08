@@ -3,6 +3,7 @@ Utility class to get the queries for all the agents
 As the queries are very text heavy, I do not want to build them up in the agent or state service.
 """
 import json
+import fitz #pymupdf
 
 from ..agents.utils import create_text_query, create_docs_query
 
@@ -24,7 +25,7 @@ class QueryService:
         return create_text_query(pretty_chapter)
 
 
-    def get_explainer_query(self, user_id, course_id, chapter_idx, language: str, difficulty: str):
+    def get_explainer_query(self, user_id, course_id, chapter_idx, language: str, difficulty: str, ragInfos: list):
         chapter = self.sm.get_state(user_id, course_id)['chapters'][chapter_idx]
         pretty_chapter = \
             f"""
@@ -35,6 +36,10 @@ class QueryService:
                 Note by Planner Agent: {json.dumps(chapter['note'], indent=2)}
                 Response Language: {language}
                 Response Difficulty: {difficulty}
+
+                The following additional information was uploaded by the User. 
+                He does not have access to it so please explain what you are referring to,
+                {json.dumps(ragInfos, indent=2)}
             """
         return create_text_query(pretty_chapter)
     
@@ -50,20 +55,36 @@ class QueryService:
 
     @staticmethod
     def get_info_query(request, docs, images):
-        """
-        Get the query for the info agent
+        """Get the query for the info agent"""
+        doc_data = []
+        text_extensions = {'.txt', '.md', '.py', '.js', '.html', '.css', '.json', '.xml', '.csv', '.yaml', '.yml'}
 
-        Args:
-            request: The request from the frontend
-            docs: All documents uploaded to the course
-            images: All images uploaded to the course
-        """
+        for doc in docs:
+            ext = doc.filename.lower().split('.')[-1] if '.' in doc.filename else ''
+
+            try:
+                if doc.filename.lower().endswith('.pdf'):
+                    pdf_doc = fitz.open(stream=doc.file_data, filetype="pdf")
+                    text = "".join(page.get_text() for page in pdf_doc)
+                    pdf_doc.close()
+                elif f'.{ext}' in text_extensions:
+                    text = doc.file_data.decode('utf-8', errors='ignore')
+                else:
+                    continue  # Skip non-text files
+
+                lines = text.strip().splitlines()[:10]
+                doc_data.append(f"{doc.filename}:\n" + "\n".join(lines))
+
+            except Exception as e:
+                print(f"Error processing {doc.filename}: {e}")
+
+        print("EIERLECKER" + json.dumps(doc_data, indent=2))
         return create_text_query(
         f"""
             The following is the user query for creating a course / learning path:
             {request.query}
             The users uploaded the following documents:
-            {[doc.filename for doc in docs]}
+            {json.dumps(doc_data, indent=2)}
             {[img.filename for img in images]}
             Response Language: {request.language}
             Response Difficulty: {request.difficulty}

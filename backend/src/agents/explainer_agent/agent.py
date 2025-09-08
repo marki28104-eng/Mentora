@@ -12,12 +12,12 @@ from google.adk.runners import Runner
 from google.genai import types
 from litellm import max_tokens
 
-from .code_checker import ESLintValidator, clean_up_response
+from ..code_checker.code_checker import ESLintValidator, clean_up_response
 from ..agent import StandardAgent
 from ..utils import load_instructions_from_files, create_text_query
 
 
-class ExplainerAgent(StandardAgent):
+class CodingExplainer(StandardAgent):
     def __init__(self, app_name: str, session_service):
         files = ["explainer_agent/instructions.txt"]
         files.extend([f"explainer_agent/plugin_docs/{filename}" for filename in os.listdir(os.path.join(os.path.dirname(__file__), "plugin_docs"))])
@@ -38,8 +38,9 @@ Please only include content about the chapter that is assigned to you in the fol
         """
 
         # LiteLlm("openai/gpt-4.1-2025-04-14")
-        # gemini-2.5-pro-preview-05-06
-        # gemini-2.5-flash-preview-05-20
+        # gemini-2.5-pro
+        # gemini-2.5-flash
+        # gemini-2.5-flash-lite-preview-06-17
         """LiteLlm(
                 model="anthropic/claude-sonnet-4-20250514",
                 reasoning_effort="low",
@@ -47,10 +48,11 @@ Please only include content about the chapter that is assigned to you in the fol
             )"""
         explainer_agent = LlmAgent(
             name="explainer_agent",
-            model="gemini-2.5-flash-preview-05-20",
+            model="gemini-2.5-pro",
             description="Agent for creating engaging visual explanations using react",
             global_instruction=lambda _: full_instructions,
             instruction=dynamic_instructions,
+            
         )
 
         # Assign attributes
@@ -63,14 +65,14 @@ Please only include content about the chapter that is assigned to you in the fol
         )
 
 
-class CodeReviewAgent(StandardAgent):
+class ExplainerAgent(StandardAgent):
     """
     Custom loop agent to provide a feedback loop between the explainer and the react parser.
     I unfortunately cannot use adks loop agent because of missing functionality,
     see https://github.com/google/adk-python/issues/1235
     """
     def __init__(self, app_name: str, session_service, iterations = 5):
-        self.explainer = ExplainerAgent(app_name=app_name, session_service=session_service)
+        self.explainer = CodingExplainer(app_name=app_name, session_service=session_service)
         self.eslint = ESLintValidator()
         self.iterations = iterations
 

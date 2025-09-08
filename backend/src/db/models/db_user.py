@@ -7,6 +7,8 @@ from sqlalchemy.orm import relationship
 
 
 class User(Base):
+    """Model for user accounts in the system."""
+    
     __tablename__ = "users"
 
     id = Column(Text, primary_key=True, index=True)
@@ -20,6 +22,13 @@ class User(Base):
     profile_image_base64 = Column(LONGTEXT, nullable=True) # New field for profile image
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=True)
     last_login = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=True) # Will be updated manually on login
-
-
     courses = relationship("Course", back_populates="user", cascade="all, delete-orphan")
+    login_streak = Column(Integer, default=0)
+
+    is_verified = Column(Boolean, default=False)  # New field for email verification status
+    verification_token = Column(String(100), nullable=True)  # Token for email verification
+    is_subscribed = Column(Boolean, default=False)  # New field for subscription status
+
+
+
+    

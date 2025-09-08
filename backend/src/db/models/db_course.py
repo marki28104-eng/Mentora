@@ -1,5 +1,6 @@
 import enum
 from sqlalchemy import Boolean, Column, Integer, String, Text, DateTime, ForeignKey, Enum, Index
+from sqlalchemy.dialects.mysql import LONGBLOB
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from ...db.database import Base
@@ -38,6 +39,8 @@ class Course(Base):
     chapter_count = Column(Integer, nullable=True)
     error_msg = Column(Text, nullable=True)
 
+    is_public = Column(Boolean, default=False)
+
     # Relationships
     chapters = relationship("Chapter", back_populates="course", cascade="all, delete-orphan")
     user = relationship("User", back_populates="courses")
@@ -59,7 +62,7 @@ class Chapter(Base):
     time_minutes = Column(Integer, nullable=False)
     is_completed = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    image_url = Column(Text, nullable=True)
+    image_url = Column(Text, nullable=False)
 
     # Relationships
     course = relationship("Course", back_populates="chapters")
@@ -69,6 +72,7 @@ class Chapter(Base):
     # This makes ordering chapters by their index for a given course very fast.
     __table_args__ = (
         Index('ix_chapter_course_id_index', 'course_id', 'index'),
+        Index('ix_chapter_fulltext', 'caption', 'summary', 'content', mysql_prefix='FULLTEXT'),
     )
 
 

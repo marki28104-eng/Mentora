@@ -1,29 +1,26 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+//ChapterView.jsx - Fixed tab switching logic
+
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Container,
   Title,
   Text,
-  Card,
   Group,
   Button,
   Tabs,
-  List,
-  Radio,
   Alert,
   Box,
   Loader,
   Paper,
   Badge,
-  SimpleGrid,
-  Image,
-  Textarea,
+  ActionIcon,
+  
 } from '@mantine/core';
 import { IconDownload } from '@tabler/icons-react';
-
 import { useMediaQuery } from '@mantine/hooks';
-import { IconAlertCircle, IconBookmark, IconQuestionMark, IconPhoto, IconFileText } from '@tabler/icons-react';
+import { IconAlertCircle, IconBookmark, IconQuestionMark, IconPhoto, IconFileText, IconCards } from '@tabler/icons-react';
 import { MediaGallery } from '../components/media/MediaGallery';
 import { FileList } from '../components/media/FileList';
 import { toast } from 'react-toastify';
@@ -33,56 +30,114 @@ import { useToolbar } from '../contexts/ToolbarContext';
 import AiCodeWrapper from "../components/AiCodeWrapper.jsx";
 import { downloadChapterContentAsPDF, prepareElementForPDF } from '../utils/pdfDownload';
 import FullscreenContentWrapper from '../components/FullscreenContentWrapper';
-import QuizPanel from '../components/media/QuizPanel';
+import Quiz from './Quiz';
+import FlashcardDeck from '../components/flashcards/FlashcardDeck';
 
 function ChapterView() {
   const { t } = useTranslation('chapterView');
-  const { courseId, chapterId } = useParams(); // This should be the actual DB ID now
+  const { courseId, chapterId } = useParams();
   const navigate = useNavigate();
-  const { toolbarOpen, toolbarWidth } = useToolbar(); // Get toolbar state from context
-  const isMobile = useMediaQuery('(max-width: 768px)'); // Add mobile detection
+  const location = useLocation(); // Get location to read query params
+  const { toolbarOpen, toolbarWidth } = useToolbar();
+  const isMobile = useMediaQuery('(max-width: 768px)');
+
+  // Read tab from URL, default to 'content'
+  const queryParams = new URLSearchParams(location.search);
+  const initialTab = queryParams.get('tab') || 'content';
+
   const [chapter, setChapter] = useState(null);
-  const [questions, setQuestions] = useState([]); // This will store all quiz questions
-  const [images, setImages] = useState([]); // This will store image info + object URLs
-  const [files, setFiles] = useState([]); // This will store file info + object URLs
+  const [images, setImages] = useState([]);
+  const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mediaLoading, setMediaLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('content');
-  const [quizAnswers, setQuizAnswers] = useState({});
-  const [openTextAnswers, setOpenTextAnswers] = useState({});
-  const [quizSubmitted, setQuizSubmitted] = useState(false);
-  const [quizScore, setQuizScore] = useState(0);
-  const [gradingQuestion, setGradingQuestion] = useState(null);
-  const [questionFeedback, setQuestionFeedback] = useState({});
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState(location.hash.replace('#', '') || 'content');
   const [markingComplete, setMarkingComplete] = useState(false);
   const [downloadingPDF, setDownloadingPDF] = useState(false);
-  const [deletingItem, setDeletingItem] = useState(null); // Track which item is being deleted
+  const [deletingItem, setDeletingItem] = useState(null);
+  const [hasQuestions, setHasQuestions] = useState(false);
+  const [questionsCreated, setQuestionsCreated] = useState(false); // Start as false
+  const [questionCount, setQuestionCount] = useState(0);
+  const [isBlinking, setIsBlinking] = useState(false); // New state for blinking
+  const [quizKey, setQuizKey] = useState(0); // Force Quiz component re-mount
+  const [courseChapters, setCourseChapters] = useState([]);
 
-  // Ref for the content area that we want to download as PDF
+  const { isLastChapter, nextChapterId } = useMemo(() => {
+    
+    if (!courseChapters || courseChapters.length === 0) {
+      return { isLastChapter: false, nextChapterId: null };
+    }
+    // Ensure IDs are compared as strings, as chapterId from URL is a string
+    const currentIndex = courseChapters.findIndex(c => String(c.id) === chapterId);
+    if (currentIndex === -1) {
+      return { isLastChapter: false, nextChapterId: null };
+    }
+    const isLast = currentIndex === courseChapters.length - 1;
+    const nextId = isLast ? null : courseChapters[currentIndex + 1].id;
+    return { isLastChapter: isLast, nextChapterId: nextId };
+  }, [courseChapters, chapterId]);
+
+  // Refs for cleanup
   const contentRef = useRef(null);
+  const pollIntervalRef = useRef(null);
+  const blinkTimeoutRef = useRef(null);
+
+  // Listen for URL parameter changes and update active tab
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const urlTab = queryParams.get('tab') || 'content';
+    setActiveTab(urlTab);
+  }, [location.search]);
+
+  // Handle tab change and update URL
+  const handleTabChange = (newTab) => {
+    const currentParams = new URLSearchParams(location.search);
+    currentParams.set('tab', newTab);
+    navigate(`${location.pathname}?${currentParams.toString()}`, { replace: true });
+  };
+
+  useEffect(() => {
+    const hash = location.hash.replace('#', '');
+    if (hash) {
+      setActiveTab(hash);
+    }
+  }, [location.hash]);
 
   useEffect(() => {
     console.log("Toolbar state changed:", { open: toolbarOpen, width: toolbarWidth });
-    // We could add additional logic here if needed
   }, [toolbarOpen, toolbarWidth]);
 
-  // Fetch chapter data, questions, and media info
+
+  // Fetch chapter data and media info
   useEffect(() => {
     const fetchChapterAndMediaInfo = async () => {
       try {
         setLoading(true);
-        // Fetch chapter data, questions, and media info
-        const [chapterData, questionsData, imagesData, filesData] = await Promise.all([
+        
+        // Fetch chapter data and media info (including questions check)
+        const [chapterData, imagesData, filesData, questionsData, chaptersData] = await Promise.all([
           courseService.getChapter(courseId, chapterId),
-          courseService.getChapterQuestions(courseId, chapterId),
           courseService.getImages(courseId),
-          courseService.getFiles(courseId)
+          courseService.getFiles(courseId),
+          courseService.getChapterQuestions(courseId, chapterId),
+          courseService.getCourseChapters(courseId),
         ]);
 
         setChapter(chapterData);
-        setQuestions(questionsData || []);
-        
+        setCourseChapters(chaptersData || []);
+
+        // Check if chapter has questions
+        if (questionsData && questionsData.length > 0) {
+          setHasQuestions(true);
+          setQuestionCount(questionsData.length);
+          setQuestionsCreated(true); // Questions already exist
+        } else {
+          setHasQuestions(false);
+          setQuestionCount(0);
+          setQuestionsCreated(false); // No questions yet, start polling
+        }
+
         // Set initial media state with empty URLs (will be populated in next effect)
         setImages(imagesData.map(img => ({
           ...img,
@@ -90,30 +145,13 @@ function ChapterView() {
           loading: true,
           error: null
         })));
-        
+
         setFiles(filesData.map(file => ({
           ...file,
           objectUrl: null,
           loading: true,
           error: null
         })));
-
-        // Initialize quiz answers for both MC and OT questions
-        if (questionsData && questionsData.length > 0) {
-          const initialMCAnswers = {};
-          const initialOTAnswers = {};
-
-          questionsData.forEach((question) => {
-            if (question.type === 'MC') {
-              initialMCAnswers[question.id] = '';
-            } else if (question.type === 'OT') {
-              initialOTAnswers[question.id] = question.users_answer || '';
-            }
-          });
-
-          setQuizAnswers(initialMCAnswers);
-          setOpenTextAnswers(initialOTAnswers);
-        }
 
         setError(null);
       } catch (error) {
@@ -132,123 +170,174 @@ function ChapterView() {
 
   // Fetch actual media files
   useEffect(() => {
-    if (loading) return; // Wait for initial data to load
-    
-    // Only run on initial load or when media data changes
-    if (!initialLoad.current && images.every(img => img.objectUrl || img.error) && 
+    if (loading) return;
+
+    if (!initialLoad.current && images.every(img => img.objectUrl || img.error) &&
         files.every(file => file.objectUrl || file.error)) {
       return;
     }
-    
+
     const fetchMedia = async () => {
       console.log('Starting media fetch...');
       try {
         setMediaLoading(true);
-        
+
         // Process images
         console.log('Processing images...', images);
         const updatedImages = await Promise.all(
           images.map(async (image) => {
             if (image.objectUrl || image.error) {
-              console.log(`Skipping image ${image.id} - already ${image.objectUrl ? 'loaded' : 'errored'}`);
+              console.log(`Skipping image ${image.id} - already processed`);
               return image;
             }
-            
+
             try {
-              console.log(`Downloading image ${image.id}...`);
-              const imageBlob = await courseService.downloadImage(image.id);
-              console.log(`Downloaded image ${image.id}, creating object URL...`);
-              const objectUrl = URL.createObjectURL(
-                new Blob([imageBlob], { type: image.content_type || 'application/octet-stream' })
-              );
-              console.log(`Created object URL for image ${image.id}:`, objectUrl.substring(0, 50) + '...');
+              console.log(`Fetching image ${image.id}...`);
+              const blob = await courseService.downloadImage(image.id);
+              const objectUrl = URL.createObjectURL(blob);
+              console.log(`Successfully fetched image ${image.id}`);
               return { ...image, objectUrl, loading: false, error: null };
-            } catch (err) {
-              console.error(`Error loading image ${image.id} (${image.filename}):`, err);
-              return { 
-                ...image, 
-                error: t('errors.mediaLoadFailed'), 
-                loading: false,
-                errorDetails: err.message
-              };
+            } catch (error) {
+              console.error(`Error fetching image ${image.id}:`, error);
+              return { ...image, loading: false, error: 'Failed to load image', objectUrl: null };
             }
           })
         );
-        
+
         // Process files
         console.log('Processing files...', files);
         const updatedFiles = await Promise.all(
           files.map(async (file) => {
             if (file.objectUrl || file.error) {
-              console.log(`Skipping file ${file.id} - already ${file.objectUrl ? 'loaded' : 'errored'}`);
+              console.log(`Skipping file ${file.id} - already processed`);
               return file;
             }
-            
+
             try {
-              console.log(`Downloading file ${file.id}...`);
-              const fileBlob = await courseService.downloadFile(file.id);
-              console.log(`Downloaded file ${file.id}, creating object URL...`);
-              const objectUrl = URL.createObjectURL(
-                new Blob([fileBlob], { type: file.content_type || 'application/octet-stream' })
-              );
-              console.log(`Created object URL for file ${file.id}:`, objectUrl.substring(0, 50) + '...');
+              console.log(`Fetching file ${file.id}...`);
+              const blob = await courseService.downloadFile(file.id);
+              const objectUrl = URL.createObjectURL(blob);
+              console.log(`Successfully fetched file ${file.id}`);
               return { ...file, objectUrl, loading: false, error: null };
-            } catch (err) {
-              console.error(`Error loading file ${file.id} (${file.filename}):`, err);
-              return { 
-                ...file, 
-                error: t('errors.mediaLoadFailed'), 
-                loading: false,
-                errorDetails: err.message
-              };
+            } catch (error) {
+              console.error(`Error fetching file ${file.id}:`, error);
+              return { ...file, loading: false, error: 'Failed to load file', objectUrl: null };
             }
           })
         );
-        
-        console.log('Media fetch complete, updating state...');
+
         setImages(updatedImages);
         setFiles(updatedFiles);
-        initialLoad.current = false;
+
       } catch (error) {
-        console.error('Unexpected error in media fetch:', error);
+        console.error('Error in media fetch:', error);
         toast.error(t('errors.mediaLoadFailed'));
       } finally {
-        console.log('Media fetch completed, setting loading to false');
         setMediaLoading(false);
+        initialLoad.current = false;
       }
     };
 
     fetchMedia();
-  }, [loading, t, images, files]); // Include images and files in dependencies
+  }, [images, files, loading, t]);
 
-  // Separate effect for cleanup on unmount
+  // Polling logic for quiz questions - FIXED
+  useEffect(() => {
+    // Only start polling if questions haven't been created yet
+    if (questionsCreated || loading) {
+      return;
+    }
+
+    console.log('Starting polling for quiz questions...');
+
+    const pollForQuestions = async () => {
+      try {
+        const questionsData = await courseService.getChapterQuestions(courseId, chapterId);
+
+        if (questionsData && questionsData.length > 0) {
+          console.log('Questions found! Stopping polling.');
+
+          // Clear the polling interval
+          if (pollIntervalRef.current) {
+            clearInterval(pollIntervalRef.current);
+            pollIntervalRef.current = null;
+          }
+
+          // Update state
+          setHasQuestions(true);
+          setQuestionCount(questionsData.length);
+          setQuestionsCreated(true);
+          toast.success(t("quizReady"))
+
+
+          // Force Quiz component to re-mount and fetch new data
+          setQuizKey(prev => prev + 1);
+
+          // Start blinking animation
+          setIsBlinking(true);
+
+          // Stop blinking after 4 seconds
+          blinkTimeoutRef.current = setTimeout(() => {
+            setIsBlinking(false);
+          }, 4000);
+        }
+      } catch (error) {
+        console.error('Error polling for questions:', error);
+        // Don't show error toast for polling failures, as this is expected during creation
+      }
+    };
+
+    // Start polling every 500ms
+    pollIntervalRef.current = setInterval(pollForQuestions, 500);
+
+    // Cleanup function
+    return () => {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+        pollIntervalRef.current = null;
+      }
+    };
+  }, [courseId, chapterId, questionsCreated, loading, t]);
+
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
-      console.log('Cleaning up media URLs on unmount...');
-      const allMedia = [...images, ...files];
-      allMedia.forEach(item => {
-        if (item?.objectUrl) {
-          console.log(`Revoking URL for ${item.id} (${item.filename})`);
-          URL.revokeObjectURL(item.objectUrl);
+      // Cleanup object URLs
+      images.forEach(image => {
+        if (image.objectUrl) {
+          URL.revokeObjectURL(image.objectUrl);
         }
       });
+      files.forEach(file => {
+        if (file.objectUrl) {
+          URL.revokeObjectURL(file.objectUrl);
+        }
+      });
+
+      // Cleanup intervals and timeouts
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+      }
+      if (blinkTimeoutRef.current) {
+        clearTimeout(blinkTimeoutRef.current);
+      }
+
     };
-  }, []); // Empty dependency array means this only runs on unmount
+  }, [courseId, chapterId, images, files]);
 
   const handleDeleteImage = async (imageId) => {
     try {
-      setDeletingItem(`image-${imageId}`);
+      setDeletingItem(imageId);
       await courseService.deleteImage(imageId);
-      
-      // Optimistically update the UI
-      setImages(prevImages => prevImages.filter(img => img.id !== imageId));
-      
-      // Clean up the object URL
+
+      // Find and revoke the object URL
       const imageToDelete = images.find(img => img.id === imageId);
       if (imageToDelete?.objectUrl) {
         URL.revokeObjectURL(imageToDelete.objectUrl);
       }
-      
+
+      // Remove from state
+      setImages(prev => prev.filter(img => img.id !== imageId));
       toast.success(t('imageDeleted'));
     } catch (error) {
       console.error('Error deleting image:', error);
@@ -260,18 +349,17 @@ function ChapterView() {
 
   const handleDeleteFile = async (fileId) => {
     try {
-      setDeletingItem(`file-${fileId}`);
+      setDeletingItem(fileId);
       await courseService.deleteDocument(fileId);
-      
-      // Optimistically update the UI
-      setFiles(prevFiles => prevFiles.filter(file => file.id !== fileId));
-      
-      // Clean up the object URL
+
+      // Find and revoke the object URL
       const fileToDelete = files.find(file => file.id === fileId);
       if (fileToDelete?.objectUrl) {
         URL.revokeObjectURL(fileToDelete.objectUrl);
       }
-      
+
+      // Remove from state
+      setFiles(prev => prev.filter(file => file.id !== fileId));
       toast.success(t('fileDeleted'));
     } catch (error) {
       console.error('Error deleting file:', error);
@@ -281,88 +369,12 @@ function ChapterView() {
     }
   };
 
-  const handleMCAnswerChange = (questionId, value) => {
-    setQuizAnswers((prev) => ({
-      ...prev,
-      [questionId]: value,
-    }));
-  };
-
-  const handleOTAnswerChange = (questionId, value) => {
-    setOpenTextAnswers((prev) => ({
-      ...prev,
-      [questionId]: value,
-    }));
-  };
-
-  const handleGradeOpenTextQuestion = async (questionId) => {
-    const userAnswer = openTextAnswers[questionId];
-    if (!userAnswer || !userAnswer.trim()) {
-      toast.error('Please provide an answer before grading.');
-      return;
-    }
-
-    try {
-      setGradingQuestion(questionId);
-      const feedback = await courseService.getQuestionFeedback(
-        courseId,
-        chapterId,
-        questionId,
-        userAnswer
-      );
-
-      setQuestionFeedback(prev => ({
-        ...prev,
-        [questionId]: feedback
-      }));
-
-      toast.success('Your answer has been graded!');
-    } catch (error) {
-      console.error('Error grading question:', error);
-      toast.error('Failed to grade your answer. Please try again.');
-    } finally {
-      setGradingQuestion(null);
-    }
-  };
-
-  const handleSubmitQuiz = () => {
-    if (!questions.length) return;
-
-    let correct = 0;
-    let totalMCQuestions = 0;
-
-    questions.forEach((question) => {
-      if (question.type === 'MC') {
-        totalMCQuestions++;
-        if (quizAnswers[question.id] === question.correct_answer) {
-          correct++;
-        }
-      }
-    });
-
-    if (totalMCQuestions > 0) {
-      const scorePercentage = Math.round((correct / totalMCQuestions) * 100);
-      setQuizScore(scorePercentage);
-      setQuizSubmitted(true);
-
-      if (scorePercentage >= 70) {
-        toast.success(t('toast.quizGreatJob', { scorePercentage }));
-      } else {
-        toast.info(t('toast.quizReviewContent', { scorePercentage }));
-      }
-    } else {
-      setQuizSubmitted(true);
-      toast.info('Quiz completed! Check your open text question feedback above.');
-    }
-  };
-
   const markChapterComplete = async () => {
     try {
       setMarkingComplete(true);
-      // Using the ID from URL params
       await courseService.markChapterComplete(courseId, chapterId);
       toast.success(t('toast.markedCompleteSuccess'));
-      navigate(`/dashboard/courses/${courseId}`);
+      //navigate(`/dashboard/courses/${courseId}`);
     } catch (error) {
       toast.error(t('toast.markedCompleteError'));
       console.error('Error marking chapter complete:', error);
@@ -380,16 +392,9 @@ function ChapterView() {
     try {
       setDownloadingPDF(true);
 
-      // Prepare element for PDF generation (temporarily adjust styles)
       const cleanup = prepareElementForPDF(contentRef.current);
-
-      // Give the browser a moment to apply the style changes
       await new Promise(resolve => setTimeout(resolve, 100));
-
-      // Download the PDF
       await downloadChapterContentAsPDF(contentRef.current, chapter.caption || 'Chapter');
-
-      // Cleanup styles
       cleanup();
 
       toast.success('Chapter content downloaded as PDF');
@@ -401,129 +406,272 @@ function ChapterView() {
     }
   };
 
-  const sidebarWidth = isMobile
-    ? (toolbarOpen ? window.innerWidth : 0)
-    : (toolbarOpen ? toolbarWidth : 40);
+  if (loading) {
+    return (
+      <Container>
+        <Group position="center" mt="xl">
+          <Loader size="lg" />
+          <Text>{t('loading')}</Text>
+        </Group>
+      </Container>
+    );
+  }
 
-  const mcQuestions = questions.filter(q => q.type === 'MC');
-  const otQuestions = questions.filter(q => q.type === 'OT');
-  const hasQuestions = questions.length > 0;
+  if (error) {
+    return (
+      <Container>
+        <Alert
+          icon={<IconAlertCircle size={16} />}
+          title={t('errors.genericTitle')}
+          color="red"
+          mt="xl"
+        >
+          {error}
+        </Alert>
+      </Container>
+    );
+  }
 
   return (
-    <div style={{
-      display: 'flex',
-      position: 'relative',
-      width: '100%',
-      height: 'calc(100vh - 70px)', // Adjust for header height
-      marginTop: 0,
-      overflow: 'hidden' // Prevent page-level scrolling issues
-    }}>
-      {/* Main content with dynamic positioning - centered in available space */}
-      <Container size="lg" py="xl" style={{
-        flexGrow: 1,
-        maxWidth: `calc(100% - ${sidebarWidth}px)`, // Limit max width to available space
-        width: `calc(100% - ${sidebarWidth}px)`, // Use calculated width
-        transition: 'all 0.3s ease',
-        marginRight: `${sidebarWidth}px`, // Keep space for toolbar
-        paddingLeft: '20px', // Add padding on left
-        paddingRight: '20px', // Add padding on right
-        overflow: 'auto', // Allow content to scroll if needed
-        position: 'relative', // Create stacking context
-        height: '100%' // Fill the available height
-      }}>
-        {loading && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', padding: '50px' }}>
-            <Loader size="lg" title={t('loading')} />
-          </Box>
-        )}
+    <div
+      style={{
+        marginRight: toolbarOpen ? `${toolbarWidth}px` : 0,
+        transition: 'margin-right 0.3s ease',
+        minHeight: '100vh',
+        width: toolbarOpen ? `calc(100% - ${toolbarWidth}px)` : '100%',
+        maxWidth: '100%',
+        marginLeft: 0,
+        padding: 0,
+      }}
+    >
+      {/* Add CSS for blinking animation */}
+      <style>
+        {`
+          @keyframes tabBlink {
+            0%, 50% { 
+              background-color: #339af0; 
+              color: white;
+              transform: scale(1.05);
+            }
+            25%, 75% { 
+              background-color: #74c0fc; 
+              color: white;
+              transform: scale(1.02);
+            }
+          }
+          
+          .quiz-tab-blinking {
+            animation: tabBlink 1s ease-in-out 4;
+            border-radius: 4px;
+          }
+        `}
+      </style>
 
-        {error && !loading && (
-          <Alert
-            icon={<IconAlertCircle size={16} />}
-            title={t('errors.genericTitle')}
-            color="red"
-            mb="lg"
-          >
-            {error}
-          </Alert>
-        )}
-
-        {!loading && !error && chapter && (
+      <Container 
+        size="xl" 
+        py="xl"
+        style={{
+          maxWidth: '100%',
+          width: '100%',
+          padding: '0 16px',
+        }}
+      >
+        {chapter && (
           <>
-            <Group position="apart" mb="md">
-              <div>
-                <Title order={1}>{chapter.caption}</Title>
-                <Text color="dimmed">{t('estimatedTime', { minutes: chapter.time_minutes })}</Text>
-              </div>
-              <Button
-                color="green"
-                onClick={markChapterComplete}
-                loading={markingComplete}
-                disabled={markingComplete}
-              >
-                {t('buttons.markComplete')}
-              </Button>
+            <Group position="apart" mb="xl">
+              <Box>
+                <Title order={1} mb="xs">
+                  {chapter.caption || 'Chapter'}
+                </Title>
+                <Group>
+                  <Button
+                    leftIcon={<IconDownload size={16} />}
+                    onClick={handleDownloadPDF}
+                    loading={downloadingPDF}
+                    variant="outline"
+                  >
+                    {t('buttons.downloadPDF', 'Download as PDF')}
+                  </Button>
+                </Group>
+              </Group>
+
+              <Tabs value={activeTab} onTabChange={(value) => { setActiveTab(value); navigate(`#${value}`); }} mt="md">
+                <Tabs.List>
+                  <Tabs.Tab value="content" icon={<IconBookmark size={14} />}>{t('tabs.content', 'Content')}</Tabs.Tab>
+                  {images.length > 0 && (
+                    <Tabs.Tab value="images" icon={<IconPhoto size={14} />}>{t('tabs.images', 'Images')}</Tabs.Tab>
+                  )}
+                  {files.length > 0 && (
+                    <Tabs.Tab value="files" icon={<IconFileText size={14} />}>{t('tabs.files', 'Files')}</Tabs.Tab>
+                  )}
+                  {hasQuestions && (
+                    <Tabs.Tab 
+                      value="quiz" 
+                      icon={<IconQuestionMark size={14} />}
+                      className={isBlinking ? 'quiz-tab-blinking' : ''}
+                    >
+                      {questionCount > 0 ? t('tabs.quiz', { count: questionCount }) : 'Quiz'}
+                    </Tabs.Tab>
+                  )}
+                </Tabs.List>
+
+                <Tabs.Panel value="content" pt="xs">
+                  <FullscreenContentWrapper>
+                    <Paper shadow="xs" p="md" withBorder ref={contentRef}>
+                      <div className="markdown-content">
+                        <AiCodeWrapper>{chapter.content}</AiCodeWrapper>
+                      </div>
+                    </Paper>
+                  </FullscreenContentWrapper>
+                </Tabs.Panel>
+
+                <Tabs.Panel value="images" pt="xs">
+                  <Paper shadow="xs" p="md" withBorder>
+                    <MediaGallery
+                      images={images}
+                      onDelete={handleDeleteImage}
+                      deletingItem={deletingItem}
+                      isMobile={isMobile}
+                    />
+                  </Paper>
+                </Tabs.Panel>
+
+                <Tabs.Panel value="files" pt="xs">
+                  <Paper shadow="xs" p="md" withBorder>
+                    <FileList
+                      files={files}
+                      onDelete={handleDeleteFile}
+                      deletingItem={deletingItem}
+                      mediaLoading={mediaLoading}
+                    />
+                  </Paper>
+                </Tabs.Panel>
+
+                <Tabs.Panel value="quiz" pt="xs">
+                  <Quiz
+                    key={quizKey} // Force re-mount when questions become available
+                    courseId={courseId}
+                    chapterId={chapterId}
+                    onQuestionCountChange={(count) => {
+                      setQuestionCount(count);
+                      setHasQuestions(count > 0);
+                    }}
+                  />
+                </Tabs.Panel>
+              </Tabs>
+
+              <Group position="apart" mt="md">
+                <Button
+                  variant="outline"
+                  onClick={() => navigate(`/dashboard/courses/${courseId}`)}
+                >
+                  {t('buttons.backToCourse', 'Back to Course')}
+                </Button>
+                <Group spacing="sm">
+                  {!chapter?.is_completed ? (
+                    <Button
+                      color="green"
+                      onClick={markChapterComplete}
+                      loading={markingComplete}
+                    >
+                      {t('buttons.markComplete', 'Mark as Complete')}
+                    </Button>
+                  ) : hasQuestions ? (
+                    activeTab === 'quiz' ? (
+                      !isLastChapter ? (
+                        <Button onClick={handleNextChapter}>
+                          {t('buttons.nextChapter', 'Continue with Next Chapter')}
+                        </Button>
+                      ) : (
+                        <Text weight={500} color="teal">{t('messages.courseComplete', 'Well done, you mastered this course!')}</Text>
+                      )
+                    ) : (
+                      <Button onClick={() => { setActiveTab('quiz'); navigate(`#quiz`); }}>
+                        {t('buttons.testYourself', 'Test Yourself')}
+                      </Button>
+                    )
+                  ) : (
+                    !isLastChapter ? (
+                      <Button onClick={handleNextChapter}>
+                        {t('buttons.nextChapter', 'Next Chapter')}
+                      </Button>
+                    ) : (
+                      <Text weight={500} color="teal">{t('messages.courseComplete', 'Well done, you mastered this course!')}</Text>
+                    )
+                  )}
+                </Group>
+              </Group>
             </Group>
 
-            <Tabs value={activeTab} onTabChange={setActiveTab} mb="xl">
+            <Tabs value={activeTab} onTabChange={handleTabChange} mb="xl">
               <Tabs.List>
                 <Tabs.Tab value="content" icon={<IconBookmark size={14} />}>{t('tabs.content')}</Tabs.Tab>
+                {/* <Tabs.Tab value="flashcards" icon={<IconCards size={14} />}>Flashcards</Tabs.Tab>*/}
                 {images.length > 0 && (
-                    <Tabs.Tab value="images" icon={<IconPhoto size={14} />}>{t('tabs.images')}</Tabs.Tab>
+                  <Tabs.Tab value="images" icon={<IconPhoto size={14} />}>{t('tabs.images')}</Tabs.Tab>
                 )}
                 {files.length > 0 && (
-                    <Tabs.Tab value="files" icon={<IconFileText size={14} />}>{t('tabs.files')}</Tabs.Tab>
+                  <Tabs.Tab value="files" icon={<IconFileText size={14} />}>{t('tabs.files')}</Tabs.Tab>
                 )}
                 {hasQuestions && (
-                  <Tabs.Tab value="quiz" icon={<IconQuestionMark size={14} />}>
-                    {t('tabs.quiz', { count: questions.length })}
+                  <Tabs.Tab 
+                    value="quiz" 
+                    icon={<IconQuestionMark size={14} />}
+                    className={isBlinking ? 'quiz-tab-blinking' : ''}
+                  >
+                    {questionCount > 0 ? t('tabs.quiz', { count: questionCount }) : 'Quiz'}
                   </Tabs.Tab>
                 )}
               </Tabs.List>
 
-              <Tabs.Panel value="content" pt="xs">
-                <Paper shadow="xs" p="md" withBorder>
-                  <div className="markdown-content">
-                    <AiCodeWrapper>{chapter.content}</AiCodeWrapper>
-                  </div>
+              <Tabs.Panel value="content" pt="xs" style={{ width: '100%' }}>
+                <FullscreenContentWrapper>
+                  <Paper shadow="xs" p="md" withBorder ref={contentRef} style={{ width: '100%' }}>
+                    <div className="markdown-content" style={{ width: '100%' }}>
+                      <AiCodeWrapper>{chapter.content}</AiCodeWrapper>
+                    </div>
+                  </Paper>
+                </FullscreenContentWrapper>
+              </Tabs.Panel>
+              {/* 
+              <Tabs.Panel value="flashcards" pt="xs" style={{ width: '100%' }}>
+                <Paper shadow="xs" p="md" withBorder style={{ width: '100%' }}>
+                  <FlashcardDeck courseId={courseId} chapterId={chapterId} />
                 </Paper>
               </Tabs.Panel>
-
-              <Tabs.Panel value="images" pt="xs">
-                <Paper shadow="xs" p="md" withBorder>
-                  <MediaGallery 
-                    images={images} 
-                    onDelete={handleDeleteImage} 
-                    deletingItem={deletingItem} 
-                    isMobile={isMobile} 
+              */}  
+              <Tabs.Panel value="images" pt="xs" style={{ width: '100%' }}>
+                <Paper shadow="xs" p="md" withBorder style={{ width: '100%' }}>
+                  <MediaGallery
+                    images={images}
+                    onDelete={handleDeleteImage}
+                    deletingItem={deletingItem}
+                    isMobile={isMobile}
                   />
                 </Paper>
               </Tabs.Panel>
 
-              <Tabs.Panel value="files" pt="xs">
-                <Paper shadow="xs" p="md" withBorder>
-                  <FileList 
-                    files={files} 
-                    onDelete={handleDeleteFile} 
-                    deletingItem={deletingItem} 
-                    mediaLoading={mediaLoading} 
+              <Tabs.Panel value="files" pt="xs" style={{ width: '100%' }}>
+                <Paper shadow="xs" p="md" withBorder style={{ width: '100%' }}>
+                  <FileList
+                    files={files}
+                    onDelete={handleDeleteFile}
+                    deletingItem={deletingItem}
+                    mediaLoading={mediaLoading}
                   />
                 </Paper>
               </Tabs.Panel>
 
-              <Tabs.Panel value="quiz" pt="xs">
-                <QuizPanel
-                  questions={questions}
-                  quizAnswers={quizAnswers}
-                  openTextAnswers={openTextAnswers}
-                  quizSubmitted={quizSubmitted}
-                  quizScore={quizScore}
-                  gradingQuestion={gradingQuestion}
-                  questionFeedback={questionFeedback}
-                  onMCAnswerChange={handleMCAnswerChange}
-                  onOTAnswerChange={handleOTAnswerChange}
-                  onGradeQuestion={handleGradeOpenTextQuestion}
-                  onSubmitQuiz={handleSubmitQuiz}
+              <Tabs.Panel value="quiz" pt="xs" style={{ width: '100%' }}>
+                <Quiz
+                  key={quizKey}
+                  courseId={courseId}
+                  chapterId={chapterId}
+                  onQuestionCountChange={(count) => {
+                    setQuestionCount(count);
+                    setHasQuestions(count > 0);
+                  }}
+                  style={{ width: '100%' }}
                 />
               </Tabs.Panel>
             </Tabs>
@@ -549,10 +697,9 @@ function ChapterView() {
           </>
         )}
       </Container>
-      
-      {/* Toolbar Container with all interactive tools */}
+
       <ToolbarContainer courseId={courseId} chapterId={chapterId} />
-    </div>
+    </>
   );
 }
 

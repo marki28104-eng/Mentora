@@ -1,0 +1,6 @@
+Please ONLY output the part of the component that I indicated (()=>{..}), in particular do not include:
+- ```jsx tags before/after your code
+- the <start of your output> and <end of your output> tags
+- any explanation of your code or text around the code
+- empty jsx tags <></> around your return statement
+Your code will be parsed and displayed immediately to the user without review so prevent syntax errors at all costs!!

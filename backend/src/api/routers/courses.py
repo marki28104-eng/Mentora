@@ -8,16 +8,20 @@ from ...db.models.db_course import Chapter, Course, CourseStatus
 from ...db.models.db_user import User
 from ...services.agent_service import AgentService
 from ...utils.auth import get_current_active_user
-from ...db.database import get_db
-from ...db.crud import courses_crud, chapters_crud, users_crud
+from ...db.database import get_db, get_db_context, SessionLocal
+from ...db.crud import courses_crud, chapters_crud, users_crud, usage_crud
+from ...services import course_service
+from ...services.course_service import verify_course_ownership
 
-from ...services.notification_service import manager as ws_manager
+#from ...services.notification_service import manager as ws_manager
 from ..schemas.course import (
     CourseInfo,
     CourseRequest,
     Chapter as ChapterSchema,
+    UpdateCoursePublicStatusRequest,
 )
 
+from ...config.settings import ( MAX_COURSE_CREATIONS, MAX_PRESENT_COURSES )
 
 
 
@@ -28,22 +32,7 @@ router = APIRouter(
 )
 agent_service = AgentService()
 
-async def _verify_course_ownership(course_id: int, user_id: str, db: Session) -> Course:
-    """
-    Verify that a course belongs to the current user.
-    Returns the course if valid, raises HTTPException if not found or unauthorized.
-    """
-    course = (db.query(Course)
-              .filter(Course.id == course_id, Course.user_id == user_id)
-              .first())
-    
-    if not course:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Course not found or access denied"
-        )
-    
-    return course
+
 
 
 @router.post("/create")
@@ -51,45 +40,86 @@ async def create_course_request(
         course_request: CourseRequest,
         background_tasks: BackgroundTasks,
         current_user: User = Depends(get_current_active_user),
-        db: Session = Depends(get_db)
 ) -> CourseInfo:
     """
     Initiate course creation as a background task and return a task ID for WebSocket progress updates.
     """
-   
-   # Create empty course in the database
-    course = courses_crud.create_new_course(
-        db=db,
-        user_id=str(current_user.id),
-        total_time_hours=course_request.time_hours,
-        query_=course_request.query,
-        status=CourseStatus.CREATING  # Set initial status to CREATING
-    )
-    if not course:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to create course in the database"
-        )
+
+    # Limit not admin account to 10 course creastions
+    if not current_user.is_admin:
+        with get_db_context() as db:
+            created_course_count = usage_crud.get_total_created_courses(db, current_user.id)
+            if created_course_count >= MAX_COURSE_CREATIONS:
+                raise HTTPException(
+                    status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                    detail={
+                    "error": "LIMIT_REACHED",
+                    "code": "MAX_COURSE_CREATIONS_REACHED",
+                    "limit": MAX_COURSE_CREATIONS,
+                    "message": "You have reached the maximum number of courses you can create."
+                }
+            )
+        with get_db_context() as db:
+            current_courses = courses_crud.get_course_count_by_user_id(db, current_user.id)
+            if current_courses >= MAX_PRESENT_COURSES:
+                raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail={
+                    "error": "LIMIT_REACHED",
+                    "code": "MAX_PRESENT_COURSES_REACHED",
+                    "limit": MAX_PRESENT_COURSES,
+                    "message": "You have reached the maximum number of courses you can have present at the same time."
+                }
+            )
+    
 
     
-    # Add the long-running course creation to background tasks
-    # The agent_service.create_course will need to be modified to accept ws_manager and task_id
-    # and use ws_manager.send_json_message(task_id, progress_data) to send updates.
-    background_tasks.add_task(
-        agent_service.create_course,
-        user_id=str(current_user.id),
-        course_id=course.id,
-        request=course_request,
-        db=db,
-        task_id=str(uuid.uuid4()),  # Generate a unique task ID
-        ws_manager=ws_manager
-    )
+    with get_db_context() as db:
+        # Create empty course in the database
+        course = courses_crud.create_new_course(
+            db=db,
+            user_id=str(current_user.id),
+            total_time_hours=course_request.time_hours,
+            query_=course_request.query,
+            language=course_request.language,
+            difficulty=course_request.difficulty,
+            status=CourseStatus.CREATING  # Set initial status to CREATING
+        
+        )
+        if not course:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to create course in the database"
+            )
+        
     
-    return CourseInfo(
-        course_id=int(course.id),
-        total_time_hours=course_request.time_hours,
-        status=course.status.value,  # Convert enum to string
-    )
+        task_id = str(uuid.uuid4())
+        # Add the long-running course creation to background tasks
+        # The agent_service.create_course will need to be modified to accept ws_manager and task_id
+        background_tasks.add_task(
+            agent_service.create_course,
+                            user_id=str(current_user.id),
+                            course_id=course.id,
+                            request=course_request,
+            task_id=task_id
+        )
+
+        return CourseInfo(
+            course_id=int(course.id),
+            total_time_hours=course_request.time_hours,
+            status=course.status.value,  # Convert enum to string
+            completed_chapter_count=0,
+        )
+                
+
+
+
+@router.get("/public", response_model=List[CourseInfo])
+async def get_public_courses(db: Session = Depends(get_db), skip: int = 0, limit: int = 100):
+    """
+    Get all public courses.
+    """
+    return course_service.get_public_courses(db, skip=skip, limit=limit)
 
 
 @router.get("/", response_model=List[CourseInfo])
@@ -103,26 +133,7 @@ async def get_user_courses(
     Get all courses belonging to the current user.
     Pagination supported with skip and limit parameters.
     """
-    # Query courses that belong to the current user
-    courses = (db.query(Course)
-              .filter(Course.user_id == current_user.id)
-              .offset(skip)
-              .limit(limit)
-              .all())
-    
-    return [
-        CourseInfo(
-            course_id=int(course.id),
-            total_time_hours=int(course.total_time_hours),
-            status=str(course.status),
-
-            title=str(course.title),
-            description=str(course.description),
-            chapter_count=int(course.chapter_count) if course.chapter_count else None,
-            image_url= str(course.image_url) if course.image_url else None
-
-        ) for course in courses
-    ]
+    return course_service.get_user_courses( db, current_user.id, skip, limit)
 
 
 @router.get("/{course_id}", response_model=CourseInfo)
@@ -135,7 +146,7 @@ async def get_course_by_id(
     Get a specific course by ID.
     Only accessible if the course belongs to the current user.
     """
-    course = await _verify_course_ownership(course_id, str(current_user.id), db)
+    course = await verify_course_ownership(course_id, str(current_user.id), db)
     
     return CourseInfo(
         course_id=int(course.id),
@@ -145,7 +156,10 @@ async def get_course_by_id(
         title=str(course.title),
         description=str(course.description),
         chapter_count=int(course.chapter_count) if course.chapter_count else None,
-        image_url= str(course.image_url) if course.image_url else None
+        image_url= str(course.image_url) if course.image_url else None,
+        completed_chapter_count=course_service.get_completed_chapters_count(db, course.id),
+        is_public=course.is_public,
+        created_at=course.created_at,
     )
 
 
@@ -160,25 +174,16 @@ async def get_course_chapters(
     Get all chapters for a specific course.
     Only accessible if the course belongs to the current user.
     """
-    course = await _verify_course_ownership(course_id, str(current_user.id), db)
-   
-    chapters = course.chapters
+    await verify_course_ownership(course_id, str(current_user.id), db)
 
-    # Build chapter response
-    chapters = [
-        ChapterSchema(
-            id=chapter.id,  
-            index=chapter.index,
-            caption=chapter.caption,
-            summary=chapter.summary or "",
-            content=chapter.content,
-            image_url=chapter.image_url,
-            time_minutes=chapter.time_minutes,
-            is_completed=chapter.is_completed  
-        ) for chapter in chapters
-    ]
+    chapters = chapters_crud.get_chapters_by_course_id(db, course_id)
+    if not chapters:
+        return []
 
-    return chapters if chapters else []
+    # Convert SQLAlchemy Chapter objects to ChapterSchema using model_validate
+    chapter_schemas = [ChapterSchema.model_validate(chapter) for chapter in chapters]
+
+    return chapter_schemas
 
 
 @router.get("/{course_id}/chapters/{chapter_id}", response_model=ChapterSchema)
@@ -193,18 +198,10 @@ async def get_chapter_by_id(
     Only accessible if the course belongs to the current user.
     """
     # First verify course ownership
-    course = await _verify_course_ownership(course_id, str(current_user.id), db)
+    course = await verify_course_ownership(course_id, str(current_user.id), db)
     
     # Find the specific chapter
-    chapter = (db.query(Chapter)
-              .filter(Chapter.id == chapter_id, Chapter.course_id == course_id)
-              .first())
-    
-    if not chapter:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Chapter not found in this course"
-        )
+    chapter = course_service.get_chapter_by_id(course_id, chapter_id, db)
     
     # Build chapter response
     return ChapterSchema(
@@ -219,6 +216,7 @@ async def get_chapter_by_id(
     )
 
 
+
 @router.patch("/{course_id}/chapters/{chapter_id}/complete")
 async def mark_chapter_complete(
         course_id: int,
@@ -231,18 +229,10 @@ async def mark_chapter_complete(
     Only accessible if the course belongs to the current user.
     """
     # First verify course ownership
-    course = await _verify_course_ownership(course_id, current_user.id, db)
+    course = await verify_course_ownership(course_id, current_user.id, db)
     
     # Find the specific chapter
-    chapter = (db.query(Chapter)
-              .filter(Chapter.id == chapter_id, Chapter.course_id == course_id)
-              .first())
-    
-    if not chapter:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Chapter not found in this course"
-        )
+    chapter = course_service.get_chapter_by_id(course_id, chapter_id, db)
     
     # Mark as completed
     chapter.is_completed = True
@@ -269,7 +259,7 @@ async def update_course_details(
     """
     Update a course's title and description.
     """
-    course = await _verify_course_ownership(course_id, str(current_user.id), db)
+    course = await verify_course_ownership(course_id, str(current_user.id), db)
 
     update_data = {}
     if title:
@@ -286,8 +276,35 @@ async def update_course_details(
         title=str(updated_course.title),
         description=str(updated_course.description),
         chapter_count=int(updated_course.chapter_count) if updated_course.chapter_count else None,
-        image_url=str(updated_course.image_url) if updated_course.image_url else None
+        image_url=str(updated_course.image_url) if updated_course.image_url else None,
+        completed_chapter_count=course_service.get_completed_chapters_count(db, course_id),
+        is_public=updated_course.is_public,
     )
+
+
+@router.patch("/{course_id}/public")
+async def update_course_public_status(
+    course_id: int,
+    request: UpdateCoursePublicStatusRequest,
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Update the public status of a course.
+    """
+    # Verify course ownership
+    await verify_course_ownership(course_id, str(current_user.id), db)
+
+    # Update the public status
+    updated_course = courses_crud.update_course_public_status(db, course_id, request.is_public)
+
+    if not updated_course:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to update course public status"
+        )
+
+    return {"message": f"Course public status updated to {request.is_public}"}
 
 
 @router.delete("/{course_id}")
@@ -301,7 +318,7 @@ async def delete_course(
     Only accessible if the course belongs to the current user.
     """
     # Verify course ownership
-    course = await _verify_course_ownership(course_id, current_user.id, db)
+    course = await verify_course_ownership(course_id, current_user.id, db)
 
     # Delete the course (cascades to chapters)
     success = courses_crud.delete_course(db, course_id)
@@ -337,19 +354,8 @@ async def update_chapter(
     Only accessible if the course belongs to the current user.
     """
     # First verify course ownership
-    _ = await _verify_course_ownership(course_id, str(current_user.id), db)
+    _ = await verify_course_ownership(course_id, str(current_user.id), db)
     
-    # Find the specific chapter
-    chapter = (db.query(Chapter)
-               .filter(Chapter.id == chapter_id, Chapter.course_id == course_id)
-               .first())
-
-    if not chapter:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Chapter not found in this course"
-        )
-
     # Build update data
     update_data = {}
     if caption is not None:
@@ -403,18 +409,10 @@ async def delete_chapter(
     Only accessible if the course belongs to the current user.
     """
     # First verify course ownership
-    course = await _verify_course_ownership(course_id, current_user.id, db)
+    course = await verify_course_ownership(course_id, current_user.id, db)
 
     # Find the specific chapter
-    chapter = (db.query(Chapter)
-               .filter(Chapter.id == chapter_id, Chapter.course_id == course_id)
-               .first())
-
-    if not chapter:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Chapter not found in this course"
-        )
+    chapter = course_service.get_chapter_by_id(course_id, chapter_id, db)
 
     chapter_caption = chapter.caption
 
@@ -446,12 +444,10 @@ async def mark_chapter_incomplete(
     Only accessible if the course belongs to the current user.
     """
     # First verify course ownership
-    course = await _verify_course_ownership(course_id, current_user.id, db)
+    course = await verify_course_ownership(course_id, current_user.id, db)
 
     # Find the specific chapter
-    chapter = (db.query(Chapter)
-               .filter(Chapter.id == chapter_id, Chapter.course_id == course_id)
-               .first())
+    chapter = course_service.get_chapter_by_id(course_id, chapter_id, db)
 
     if not chapter:
         raise HTTPException(

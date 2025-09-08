@@ -2,6 +2,7 @@ from typing import List, Optional
 
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
+from sqlalchemy import text
 from ..models.db_course import Chapter, Course
 
 
@@ -12,6 +13,11 @@ from ..models.db_course import Chapter, Course
 def get_chapter_by_id(db: Session, chapter_id: int) -> Optional[Chapter]:
     """Get chapter by ID"""
     return db.query(Chapter).filter(Chapter.id == chapter_id).first()
+
+def get_chapter_by_course_id_and_chapter_id(db: Session, course_id: int, chapter_id: int) -> Optional[Chapter]:
+    """Get chapter by course_id and ID. Unnecessary as chapters are unique per course."""
+    return db.query(Chapter).filter(Chapter.id == chapter_id, Chapter.course_id == course_id).first()
+
 
 
 def get_chapters_by_course_id(db: Session, course_id: int) -> List[Chapter]:
@@ -89,7 +95,7 @@ def get_chapter_count_by_course(db: Session, course_id: int) -> int:
     return db.query(Chapter).filter(Chapter.course_id == course_id).count()
 
 
-def search_chapters(db: Session, query: str, user_id: str, limit: int = 10) -> List[Chapter]:
+def search_chapters_no_content(db: Session, query: str, user_id: str, limit: int = 10) -> List[Chapter]:
     """
     Search for chapters where title or content contains the query string (case-insensitive).
     
@@ -109,11 +115,46 @@ def search_chapters(db: Session, query: str, user_id: str, limit: int = 10) -> L
             (Course.user_id == user_id)
         )
         .filter(
-            (Chapter.caption.ilike(search)) | 
-        #   (Chapter.content.ilike(search)) |
+            (Chapter.caption.ilike(search)) |
+            #(Chapter.content.ilike(search)) |
             (Chapter.summary.ilike(search))
         )
         .limit(limit)
         .all()
     )
 
+def search_chapters_indexed(db: Session, query: str, user_id: str, limit: int = 10):
+    """
+    Search for chapters using full-text search on indexed fields.
+    Args:
+        db: Database session
+        query: Search string
+        user_id: ID of the user to filter by
+        limit: Maximum number of results to return
+    Returns:
+        List of matching Chapter objects
+    """
+
+    stmt = text("""
+        SELECT 
+            chapters.id, chapters.course_id, chapters.index, 
+            chapters.caption, chapters.summary, chapters.content, 
+            chapters.time_minutes, chapters.is_completed, 
+            chapters.created_at, chapters.image_url
+        FROM chapters
+        JOIN courses ON courses.id = chapters.course_id
+        WHERE courses.user_id = :user_id
+        AND MATCH(chapters.caption, chapters.summary, chapters.content)
+            AGAINST (:query IN NATURAL LANGUAGE MODE)
+        LIMIT :limit
+    """)
+
+    results = db.execute(stmt, {"user_id": user_id, "query": query, "limit": limit})
+    return [Chapter(**row._asdict()) for row in results]
+
+
+def get_completed_chapters_count(db: Session, course_id: int) -> int:
+    """Get total number of completed chapters in a course"""
+    return db.query(Chapter).filter(
+        and_(Chapter.course_id == course_id, Chapter.is_completed == True)
+    ).count()

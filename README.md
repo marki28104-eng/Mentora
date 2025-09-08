@@ -1,129 +1,100 @@
-# Mentora AI Project
+# Mentora AI
 
-<!-- Optional: Add a project logo or banner here -->
-<!-- <p align="center">
-  <img src="link_to_your_logo.png" alt="Mentora AI Logo" width="200"/>
-</p> -->
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/M4RKUS28/Mentora/blob/main/frontend/public/logo_white.png?raw=true">
+  <source media="(prefers-color-scheme: light)" srcset="https://github.com/M4RKUS28/Mentora/blob/main/frontend/public/logo_black.png?raw=true">
+  <img alt="Mentora AI Logo" src="https://github.com/M4RKUS28/Mentora/blob/main/frontend/public/logo_white.png?raw=true">
+</picture>
 
-Welcome to Mentora AI! This project is a full-stack application designed to [**Describe your project's main purpose and goals here. e.g., ...deliver cutting-edge AI solutions for X, Y, Z.**]. It leverages a Python (FastAPI) backend and a modern React frontend (Vite).
+#### Welcome to **Mentora AI**!
 
-**Live Site:** [mentora.de](https://mentora.de)
+This project is a full-stack application designed to deliver cutting-edge **AI solutions for personalized learning assistance**. It leverages a powerful Python backend and a modern React frontend to offer an innovative educational platform.
+
+**🌐 Try it live:** [mentora.de](https://mentora.de)
+
+
+---
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset=https://github.com/M4RKUS28/Mentora/blob/main/doc/dashboard_dark.png?raw=true">
+  <source media="(prefers-color-scheme: light)" srcset="https://github.com/M4RKUS28/Mentora/blob/main/doc/dashboard_white.png?raw=true">
+  <img alt="Mentora AI Logo" src="https://github.com/M4RKUS28/Mentora/blob/main/doc/logo.png?raw=true">
+</picture>
+
 
 ---
 
 ## ✨ Features
 
-*   **Feature 1:** [Describe a key feature]
-*   **Feature 2:** [Describe another key feature]
-*   **User Authentication:** Secure login and registration.
-*   **Interactive UI:** Modern and responsive user interface built with React.
-*   **AI-Powered Capabilities:** [Mention specific AI functionalities if applicable]
-*   ... [Add more features as relevant]
+- **Smart Course Creation:**  
+  Create interactive courses from documents, images, and notes with ease.
 
-<!-- Optional: Add a screenshot of your application -->
-<!-- <p align="center">
-  <img src="link_to_screenshot.png" alt="Mentora Application Screenshot" width="700"/>
-</p> -->
+- **AI-Assisted Learning:**  
+  - Course generation powered by AI agents  
+  - Quizzes (MCQs & Fill-in-the-Blank) with AI-based validation  
+  - Personalized study plans based on time availability  
+  - AI chatbot per chapter trained on relevant knowledge  
+
+- **Interactive Tools:**  
+  Includes timers, plotters, notes, and more to support diverse learning styles.
+
+- **Visualization & Media:**  
+  - Image search via Unsplash API  
+  - Google Vertex AI integration for course logos  
+  - Future integration of flashcards and progress/statistics tracking
+
+- **Multilingual & Theming Support:**  
+  Fully supports multiple languages and light/dark themes.
+
+- **User Authentication:**  
+  Secure and robust registration and login system.
+
+- **Responsive UI:**  
+  Built with React, Tailwind CSS, and Mantine for a seamless user experience.
 
 ---
 
 ## 🛠️ Tech Stack
 
 ### Backend
-*   **Language:** Python (3.10+)
-*   **Framework:** FastAPI
-*   **Database:** [Specify if known, e.g., PostgreSQL, MongoDB]
-*   **Environment Management:** Python `venv`
-*   **Containerization:** Docker (Dockerfile, docker-compose.yml)
+- **Language:** Python (3.12)
+- **Framework:** FastAPI
+- **Databases:** MySQL + ChromaDB (vector storage)
+- **Containerization:** Docker, Docker Compose
+- **Other:** Python `venv`, AI/ML integrations, server agents
 
 ### Frontend
-*   **Library:** React
-*   **Build Tool:** Vite
-*   **Package Manager:** npm
-*   **Language:** JavaScript/TypeScript
-*   **Styling:** [Specify if known, e.g., Tailwind CSS, Material UI, CSS Modules]
-
-### General
-*   **Version Control:** Git
-*   **Linting:** ESLint (Frontend)
+- **Library:** React
+- **Build Tool:** Vite
+- **Styling:** Tailwind CSS, Mantine
+- **Language:** JavaScript (ES6+)
+- **State Management:** React Context + Hooks
 
 ---
 
-## 🚀 Getting Started
+## Course Creation process
 
-Follow these instructions to set up the Mentora AI project for local development.
+![Course Creation Process](https://github.com/M4RKUS28/Mentora/blob/main/doc/final_diagram.png?raw=true)
 
-### Prerequisites
 
-*   **Python:** Version 3.10+
-*   **Node.js:** Version 18.x or later (Check `frontend/package.json` engines field if specified)
-*   **npm:** Version 8.x or later (Usually comes with Node.js)
-*   **Git:** For cloning the repository.
-*   **(Optional) Docker:** If you plan to use Docker for running the backend.
 
-### Installation & Setup
+## 📐 Software Architecture
 
-1.  **Clone the repository:**
-    ```bash
-    git clone <your-repository-url>
-    cd mentora-project # Or your project's root directory name
-    ```
+![Software Architecture](https://github.com/M4RKUS28/Mentora/blob/main/doc/Editor%20_%20Mermaid%20Chart-2025-06-18-210221.png?raw=true)
 
-2.  **Backend Setup:**
-    Navigate to the backend directory:
-    ```bash
-    cd backend
-    ```
-    Create and activate a Python virtual environment:
-    ```bash
-    python -m venv venv
-    ```
-    *   On Windows:
-        ```bash
-        .\venv\Scripts\activate
-        ```
-    *   On macOS/Linux:
-        ```bash
-        source venv/bin/activate
-        ```
-    Install dependencies:
-    ```bash
-    pip install -r requirements.txt
-    ```
-    (Optional) Set up your `.env` file. If an `.env.example` is present, copy it to `.env` and fill in the necessary values.
-    Run the backend server:
-    ```bash
-    ./run.sh
-    ```
-    The backend should now be running (typically on a port like 8000 or 5000).
+---
 
-3.  **Frontend Setup:**
-    Navigate to the frontend directory:
-    ```bash
-    cd ../frontend/ # Assuming you are in the backend directory
-    # Or from root: cd frontend/
-    ```
-    Install dependencies:
-    ```bash
-    npm install
-    ```
-    Run the frontend development server:
-    ```bash
-    npm run dev
-    ```
-    The frontend development server will start, typically on a port like `5173` (Vite default). Open your browser to the specified address.
+## 🧪 Development Installation & Setup
+
+To run the project locally, follow the instructions in our [🛠️ Wiki - How to Run Locally](https://github.com/M4RKUS28/Mentora/wiki/How-to-run-locally)
+
+> Make sure you have Docker, Node.js, and Python 3.12+ installed.
 
 ---
 
 ## 📁 Project Structure
 
-The project is organized into main directories:
-
-*   `backend/`: Contains all the Python (FastAPI) server-side code, API logic, database interactions, and Docker configurations.
-*   `frontend//`: Contains the client-side React application code, built with Vite.
-*   The existing README also mentioned a `server/` directory for "Zusätzliche Server-Komponenten und Agenten". You may want to detail its contents here if it's a key part of the project.
-
-```
+```bash
 mentora-project/
 ├── backend/
 │   ├── src/                  # Main backend source code
@@ -131,58 +102,47 @@ mentora-project/
 │   ├── Dockerfile
 │   ├── docker-compose.yml
 │   ├── requirements.txt
-│   ├── run.sh                # Script to run backend
+│   ├── run.sh
 │   └── ...
 ├── frontend/
-│   ├── src/                  # Main frontend source code (components, pages, etc.)
-│   ├── public/               # Static assets
-│   ├── node_modules/         # Node.js dependencies (ignored by git)
+│   ├── src/                  # React components, routes, utils
+│   ├── public/               # Static assets (images, logo, etc.)
 │   ├── package.json
 │   ├── vite.config.js
 │   └── ...
-├── README.md                 # This file
-└── (server/                  # Optional: if you have this directory)
+├── server/                   # Additional backend services & agents
+│   └── ...
+├── README.md
+└── ...
+---
 ```
 
----
+## 🗓️ Roadmap
 
-## 🐳 Docker (Optional Backend)
-
-The backend can also be run using Docker. Ensure Docker and Docker Compose are installed.
-
-From the `backend/` directory:
-```bash
-docker-compose up --build
-```
-This will build the Docker image (if not already built) and start the backend service as defined in `docker-compose.yml`.
+- [x] Course Creation from Mixed Media
+- [x] AI Quizzes (MCQs, Fill-in-the-Gap)
+- [x] Chapter-Based AI Chat Assistant
+- [X] Flashcards Generator
+- [ ] Progress/Statistics Dashboard
+- [ ] Offline Mode
+- [ ] Collaborative Course Editing
 
 ---
 
-## 🤝 Contributing
+## 🧠 Built With
 
-Contributions are welcome! If you'd like to contribute, please follow these steps:
-
-1.  Fork the repository.
-2.  Create a new branch (`git checkout -b feature/your-feature-name`).
-3.  Make your changes.
-4.  Commit your changes (`git commit -m 'Add some feature'`).
-5.  Push to the branch (`git push origin feature/your-feature-name`).
-6.  Open a Pull Request.
-
-Please make sure to update tests as appropriate.
-
----
-
-## 📜 License
-
-This project is licensed under the [**Specify License, e.g., MIT License**]. See the `LICENSE` file for more details (you might need to create one).
+- 🧬 **AI & ML:** Google Vertex AI, custom vector embeddings with ChromaDB
+- 🖼️ **Image API:** Unsplash
+- ⚙️ **Backend Services:** FastAPI, Docker, Gunicorn
+- 💻 **Frontend Frameworks:** React, Vite, Tailwind CSS, Mantine
 
 ---
 
 ## 📞 Contact
 
-If you have any questions, feedback, or issues, please [**Specify contact method: e.g., open an issue on GitHub, or provide an email address**].
+Have questions or feedback?  
+Feel free to [open an issue](https://github.com/M4RKUS28/Mentora/issues) or contact the maintainer directly via GitHub.
 
 ---
 
-*This README was generated with the assistance of Cascade, your AI coding partner.*
+> Made with 💡 and 🧠 by the Mentora AI Team.

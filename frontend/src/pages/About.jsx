@@ -13,10 +13,13 @@ import {
   Stack,
   ThemeIcon,
   Transition,
-  createStyles
+  createStyles,
+  ActionIcon,
 } from '@mantine/core';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { 
   IconRocket, 
   IconBulb, 
@@ -25,7 +28,9 @@ import {
   IconBrain, 
   IconDeviceLaptop, 
   IconChartBar, 
-  IconHeart 
+  IconHeart ,
+  IconBrandLinkedin,
+  IconBrandGithub
 } from '@tabler/icons-react';
 
 const useStyles = createStyles((theme) => ({
@@ -38,8 +43,8 @@ const useStyles = createStyles((theme) => ({
     fontFamily: `'Roboto', ${theme.fontFamily}`,
     fontWeight: 900,
     textAlign: 'center',
-    marginTop: 120,
-    marginBottom: 30,
+    marginTop: 10,
+    marginBottom: 50,
     
     [theme.fn.smallerThan('sm')]: {
       fontSize: 28,
@@ -83,6 +88,16 @@ function About() {
   const { t } = useTranslation('about');
   const { classes } = useStyles();
   const [visible, setVisible] = useState(false);
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  
+  const handleButtonClick = () => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    } else {
+      navigate('/auth/login');
+    }
+  };
   
   useEffect(() => {
     setVisible(true);
@@ -93,37 +108,40 @@ function About() {
       name: 'Markus Huber',
       role: t('team.members.markusHuber.role'),
       bio: t('team.members.markusHuber.bio'),
-      avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3'
+      avatar: 'https://d112y698adiu2z.cloudfront.net/photos/production/user_photos/003/508/125/datas/profile.jpg',
+      linkedin: 'https://www.linkedin.com/in/markus-huber-0132282bb/',
+      github: 'https://github.com/M4RKUS28'
     },
     {
       name: 'Luca Bozzetti',
       role: t('team.members.lucaBozzetti.role'),
       bio: t('team.members.lucaBozzetti.bio'),
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3'
+      avatar: 'https://poker-spade.de/static/media/Luca.658c06336387cd26c193.jpeg',
+      linkedin: 'https://www.linkedin.com/in/luca-bozzetti-371379282/',
+      github: 'https://github.com/lucabzt'
     },
- /*   {
+    {
       name: 'Sebastian Rogg',
       role: t('team.members.sebastianRogg.role'),
       bio: t('team.members.sebastianRogg.bio'),
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3'
-    },*/
+      avatar: 'https://avatars.githubusercontent.com/u/144535689?v=4',
+      linkedin: 'https://www.linkedin.com/in/sebastian-rogg/',
+    },
     {
       name: 'Matthias Meierlohr',
       role: t('team.members.matthiasMeierlohr.role'),
       bio: t('team.members.matthiasMeierlohr.bio'),
-      avatar: 'https://m.media-amazon.com/images/S/pv-target-images/16627900db04b76fae3b64266ca161511422059cd24062fb5d900971003a0b70._SX1080_FMjpg_.jpg'
-    },{
+      avatar: 'TODO',
+      linkedin: 'https://www.linkedin.com/in/matthias-meierlohr',
+      github: 'https://github.com/Maths24'
+    },
+    {
       name: 'Jonas Hörter',
       role: t('team.members.jonasHoerter.role'),
       bio: t('team.members.jonasHoerter.bio'),
-      avatar: 'https://m.media-amazon.com/images/S/pv-target-images/16627900db04b76fae3b64266ca161511422059cd24062fb5d900971003a0b70._SX1080_FMjpg_.jpg'
+      avatar: 'https://poker-spade.de/static/media/Jonas.2327447cc8a67b962465.jpeg',
+      linkedin: 'https://www.linkedin.com/in/jonas-hörter-4b22562bb/',
     },
-    /*{
-      name: 'Paul Vorderbrügge',
-      role: t('team.members.paulVorderbruegge.role'),
-      bio: t('team.members.paulVorderbruegge.bio'),
-      avatar: 'https://cdn.vectorstock.com/i/1000v/73/85/avatar-portrait-bartender-gieen-bier-vector-16227385.jpg'
-    },*/
   ];
 
   return (
@@ -131,7 +149,7 @@ function About() {
       <Transition mounted={visible} transition="fade" duration={800} timingFunction="ease">
         {(styles) => (
           <div style={styles} >
-            <Title 
+            <Title
               className={classes.title}
               variant="gradient"
               gradient={{ from: 'cyan', to: 'teal' }}
@@ -141,36 +159,34 @@ function About() {
               {t('mainTitle.about')} {t('mainTitle.mentora')}
             </Title>
 
-
-
-        
-            <Grid gutter={50} mb={60}>
+            <Grid position="center" align='center' gutter={50} mb={60}>
               <Grid.Col md={6}>
                 <Stack spacing="xl">
                   <Text size="xl">
                     {t('mainDescription')}
                   </Text>
-                  
+
                   <Text>
                     {t('learningApproach')}
                   </Text>
-                  
+
                   <Group>
-                    <Button 
-                      variant="gradient" 
+                    <Button
+                      variant="gradient"
                       gradient={{ from: 'cyan', to: 'teal' }}
                       size="lg"
                       radius="md"
                       leftIcon={<IconRocket size={20} />}
+                      onClick={handleButtonClick}
                     >
                       {t('buttons.startYourJourney')}
                     </Button>
                   </Group>
                 </Stack>
               </Grid.Col>
-              
+
               <Grid.Col md={6}>
-                <Image 
+                <Image
                   src="https://images.unsplash.com/photo-1522881451255-f59ad836fdfb"
                   radius="md"
                   alt={t('imageAlt')}
@@ -178,7 +194,7 @@ function About() {
                 />
               </Grid.Col>
             </Grid>
-            
+
             {/* Our Mission */}
             <Card p="xl" radius="md" mb={60} withBorder>
               <Group position="center" mb="lg">
@@ -186,13 +202,13 @@ function About() {
                   <IconBulb size={34} />
                 </ThemeIcon>
               </Group>
-              
+
               <Title order={2} align="center" mb="md">{t('mission.title')}</Title>
-              
+
               <Text size="lg" align="center" mb="xl">
                 {t('mission.description')}
               </Text>
-              
+
               <Grid>
                 <Grid.Col sm={6} md={3}>
                   <Card shadow="sm" p="md" radius="md" className={classes.card}>
@@ -205,7 +221,7 @@ function About() {
                     </Text>
                   </Card>
                 </Grid.Col>
-                
+
                 <Grid.Col sm={6} md={3}>
                   <Card shadow="sm" p="md" radius="md" className={classes.card}>
                     <ThemeIcon size={40} radius="md" color="cyan">
@@ -217,7 +233,7 @@ function About() {
                     </Text>
                   </Card>
                 </Grid.Col>
-                
+
                 <Grid.Col sm={6} md={3}>
                   <Card shadow="sm" p="md" radius="md" className={classes.card}>
                     <ThemeIcon size={40} radius="md" color="blue">
@@ -229,7 +245,7 @@ function About() {
                     </Text>
                   </Card>
                 </Grid.Col>
-                
+
                 <Grid.Col sm={6} md={3}>
                   <Card shadow="sm" p="md" radius="md" className={classes.card}>
                     <ThemeIcon size={40} radius="md" color="indigo">
@@ -243,59 +259,12 @@ function About() {
                 </Grid.Col>
               </Grid>
             </Card>
-            
+
             {/* Our Story */}
-            <Grid gutter={50} mb={60}>
-              <Grid.Col md={5}>
-                <Title order={2} mb="xl">{t('journey.title')}</Title>
-                
-                <Timeline active={4} bulletSize={24} lineWidth={2}>
-                  <Timeline.Item 
-                    bullet={<IconBulb size={12} />} 
-                    title={t('journey.event1.title')} 
-                  >
-                    <Text color="dimmed" size="sm">
-                      {t('journey.event1.description')}
-                    </Text>
-                    <Text size="xs" mt={4}>{t('journey.event1.date')}</Text>
-                  </Timeline.Item>
-                  
-                  <Timeline.Item 
-                    bullet={<IconRocket size={12} />} 
-                    title={t('journey.event2.title')} 
-                  >
-                    <Text color="dimmed" size="sm">
-                      {t('journey.event2.description')}
-                    </Text>
-                    <Text size="xs" mt={4}>{t('journey.event2.date')}</Text>
-                  </Timeline.Item>
-                  
-                  <Timeline.Item 
-                    bullet={<IconChartBar size={12} />} 
-                    title={t('journey.event3.title')} 
-                  >
-                    <Text color="dimmed" size="sm">
-                      {t('journey.event3.description')}
-                    </Text>
-                    <Text size="xs" mt={4}>{t('journey.event3.date')}</Text>
-                  </Timeline.Item>
-                  
-                  <Timeline.Item 
-                    bullet={<IconHeart size={12} />}
-                    title={t('journey.event4.title')}
-                  >
-                    <Text color="dimmed" size="sm">
-                      {t('journey.event4.description')}
-                    </Text>
-                    <Text size="xs" mt={4}>{t('journey.event4.date')}</Text>
-                  </Timeline.Item>
-                  
-                </Timeline>
-              </Grid.Col>
-              
-              <Grid.Col md={7}>
-                <Title order={2} mb="xl">{t('team.title')}</Title>
-                
+
+            <Grid gutter={50} mx="xl" my="xl">
+
+
                 <Grid>
                   {teamMembers.map((member, index) => (
                     <Grid.Col md={6} key={index}>
@@ -303,30 +272,50 @@ function About() {
                         <Card.Section sx={{ display: 'flex', justifyContent: 'center', padding: '20px 0 0 0' }}>
                           <Avatar src={member.avatar} size={80} radius="xl" />
                         </Card.Section>
-                        
+
                         <Stack spacing={5} mt="md" align="center">
-                          <Text weight={700}>{member.name}</Text>
-                          <Badge color="teal" variant="light">
-                            {member.role}
-                          </Badge>
-                        </Stack>
-                        
+                        <Text weight={700}>{member.name}</Text>
+                        <Badge color="teal" variant="light">{member.role}</Badge>
+                        <Group spacing={5}>
+                          <ActionIcon
+                            component="a"
+                            href={member.linkedin}
+                            target="_blank"
+
+                            size="sm"
+                            color="blue"
+                          >
+                            <IconBrandLinkedin size={18} />
+                          </ActionIcon>
+                          <ActionIcon
+                            component="a"
+                            href={member.github}
+                            target="_blank"
+
+                            size="sm"
+                            color="blue"
+                          >
+                            <IconBrandGithub size={18} />
+                          </ActionIcon>
+                        </Group>
+                      </Stack>
+
                         <Text size="sm" color="dimmed" mt="sm" align="center">
                           {member.bio}
                         </Text>
                       </Card>
                     </Grid.Col>
                   ))}
-                  
-             
+
+
                 </Grid>
-              </Grid.Col>
+
             </Grid>
-            
+
             {/* Contact CTA */}
-            <Card 
-              p="xl" 
-              radius="lg" 
+            <Card
+              p="xl"
+              radius="lg"
               sx={(theme) => ({
                 backgroundImage: theme.fn.gradient({ from: 'cyan', to: 'teal', deg: 45 }),
               })}
@@ -338,13 +327,14 @@ function About() {
                     {t('cta.subtitle')}
                   </Text>
                 </Grid.Col>
-                
+
                 <Grid.Col md={4} sx={{ display: 'flex', justifyContent: 'center' }}>
-                  <Button 
-                    variant="white" 
-                    color="dark" 
-                    size="lg" 
+                  <Button
+                    variant="white"
+                    color="dark"
+                    size="lg"
                     radius="md"
+                    onClick={handleButtonClick}
                   >
                     {t('cta.button')}
                   </Button>

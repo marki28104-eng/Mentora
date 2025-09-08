@@ -1,37 +1,91 @@
 import { apiWithCookies } from './baseApi';
 
+// Debounce helper function
+const debounce = (func, wait) => {
+  let timeout;
+  return function(...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+};
+
 export const courseService = {
   // Get all courses for current user
-  getUserCourses: async () =>
-    (await apiWithCookies.get('/courses/')).data,
+  getPublicCourses: async () => {
+    const response = await apiWithCookies.get('/courses/public');
+    return response.data;
+  },
+
+  updateCoursePublicStatus: async (courseId, isPublic) => {
+    const response = await apiWithCookies.patch(`/courses/${courseId}/public`, { is_public: isPublic });
+    return response.data;
+  },
+
+  // Get all courses for current user
+  getUserCourses: async () => {
+    const response = await apiWithCookies.get('/courses/');
+    console.log('getUserCourses response:', response.data);
+    return response.data;
+  },
 
   // Get a course by ID
   getCourseById: async (courseId) =>
     (await apiWithCookies.get(`/courses/${courseId}`)).data,
 
   // Get all courses with pagination
-  getCourseChapters: async (courseId) =>
-    (await apiWithCookies.get(`/courses/${courseId}/chapters`)).data,
+  getCourseChapters: async (courseId) => {
+    const chapters = (await apiWithCookies.get(`/courses/${courseId}/chapters`)).data;
+    if (!chapters || chapters.length === 0) return [];
+    
+    // Sort chapters by index to ensure correct order
+    const sortedChapters = chapters.sort((a, b) => a.index - b.index);
+    
+    // Find the first missing index and remove everything from that point onwards
+    const result = [];
+    let expectedIndex = 1;
+    
+    for (const chapter of sortedChapters) {
+      if (chapter.index === expectedIndex) {
+        result.push(chapter);
+        expectedIndex++;
+      } else {
+        // Found a gap, stop here
+        break;
+      }
+    }
+    
+    return result;
+  },
 
   // Get a specific chapter by ID
   getChapter: async (courseId, chapterId) =>
     (await apiWithCookies.get(`/courses/${courseId}/chapters/${chapterId}`)).data,
 
-  // Get questions for a specific chapter
+  // Get questions for a specific chapter with full QuestionResponse data
   getChapterQuestions: async (courseId, chapterId) =>
     (await apiWithCookies.get(`/chapters/${courseId}/chapters/${chapterId}`)).data,
 
+  // save mc answer
+  saveMCAnswer: async (courseId, chapterId, questionId, usersAnswer) => {
+    const params = new URLSearchParams();
+    params.append('users_answer', usersAnswer);
+    return (await apiWithCookies.get(
+      `/chapters/${courseId}/chapters/${chapterId}/${questionId}/save?${params.toString()}`
+    )).data;
+  },
+
   // Get feedback for an open text question
   getQuestionFeedback: async (courseId, chapterId, questionId, userAnswer) => {
-    const params = new URLSearchParams();
-    params.append('users_answer', userAnswer);
-    return (await apiWithCookies.get(`/chapters/${courseId}/chapters/${chapterId}/${questionId}/feedback?${params.toString()}`)).data;
+    return (await apiWithCookies.get(
+      `/chapters/${courseId}/chapters/${chapterId}/${questionId}/feedback?users_answer=${encodeURIComponent(userAnswer)}`
+    )).data;
   },
 
   // Mark a chapter as complete
   markChapterComplete: async (courseId, chapterId) =>
       // Use the actual chapter ID, not index
     (await apiWithCookies.patch(`/courses/${courseId}/chapters/${chapterId}/complete`)).data,
+
 
   getFiles: async (courseId) =>
   (await apiWithCookies.get(`/files/documents?course_id=${courseId}`)).data,
@@ -82,7 +136,6 @@ export const courseService = {
   },
 
   createCourse: async (data) => { // Removed onProgress, onError, onComplete
-    // let ws; // WebSocket instance - REMOVED
     console.log('[POST] Initiating createCourse POST request');
     // Step 1: Make the initial POST request to get the course data (including ID)
     const response = await apiWithCookies.post('/courses/create', data);
