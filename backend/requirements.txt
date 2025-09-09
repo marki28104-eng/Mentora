@@ -29,4 +29,5 @@ pymupdf>=1.23.0
 matplotlib~=3.8.0
 genanki~=0.13.0
 pdf2image~=1.17.0
-Pillow~=10.0.0
+Pillow~=10.4.0
+

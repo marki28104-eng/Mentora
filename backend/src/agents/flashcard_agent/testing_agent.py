@@ -8,7 +8,7 @@ from google.adk.agents import LlmAgent
 from google.adk.runners import Runner
 
 from .instructions_txt import instructions
-from .schema import MultipleChoiceQuestion, TaskStatus
+from .schema import PracticeQuestion, TaskStatus
 from ..agent import StandardAgent
 from ..utils import create_text_query
 
@@ -36,7 +36,7 @@ class TestingFlashcardAgent(StandardAgent):
             session_service=self.session_service,
         )
 
-    async def generate_questions(self, text_content: str, difficulty: str, num_questions: int = 20, progress_callback=None) -> List[MultipleChoiceQuestion]:
+    async def generate_questions(self, text_content: str, difficulty: str, num_questions: int = 20, progress_callback=None) -> List[PracticeQuestion]:
         """Generate multiple choice questions from text content."""
         if len(text_content) > 50000:  # Large text, use chunking
             return await self._generate_questions_from_chunks(text_content, difficulty, num_questions, progress_callback)
@@ -93,7 +93,7 @@ class TestingFlashcardAgent(StandardAgent):
                 else:
                     explanation = "---\n*Created with Mentora-AI* - [mentora-kiro.de](https://mentora-kiro.de)"
                 
-                question = MultipleChoiceQuestion(
+                question = PracticeQuestion(
                     question=q_data["question"],
                     options=q_data["options"],
                     correct_answer=q_data["correct_answer"],
@@ -107,7 +107,7 @@ class TestingFlashcardAgent(StandardAgent):
             print(f"Error generating questions: {e}")
             return []
 
-    async def _generate_questions_from_chunks(self, text_content: str, difficulty: str, num_questions: int, progress_callback=None) -> List[MultipleChoiceQuestion]:
+    async def _generate_questions_from_chunks(self, text_content: str, difficulty: str, num_questions: int, progress_callback=None) -> List[PracticeQuestion]:
         """Generate questions from large text by processing it in chunks with parallel processing."""
         # Split text into chunks
         chunks = self._split_text_into_chunks(text_content, chunk_size=8000, overlap=500)
@@ -150,7 +150,7 @@ class TestingFlashcardAgent(StandardAgent):
 
     async def _process_chunk_parallel(self, chunk: str, difficulty: str, chunk_questions: int, 
                                     chunk_index: int, total_chunks: int, semaphore: asyncio.Semaphore, 
-                                    progress_callback=None, start_time=None) -> List[MultipleChoiceQuestion]:
+                                    progress_callback=None, start_time=None) -> List[PracticeQuestion]:
         """Process a single chunk in parallel with rate limiting."""
         async with semaphore:
             try:
@@ -210,7 +210,7 @@ class TestingFlashcardAgent(StandardAgent):
                     else:
                         explanation = "---\n*Created with Mentora-AI* - [mentora-kiro.de](https://mentora-kiro.de)"
                     
-                    question = MultipleChoiceQuestion(
+                    question = PracticeQuestion(
                         question=q_data["question"],
                         options=q_data["options"],
                         correct_answer=q_data["correct_answer"],

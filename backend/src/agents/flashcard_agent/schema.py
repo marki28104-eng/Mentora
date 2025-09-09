@@ -38,7 +38,7 @@ class FlashcardConfig(BaseModel):
     slides_per_chapter: Optional[int] = None
 
 
-class MultipleChoiceQuestion(BaseModel):
+class PracticeQuestion(BaseModel):
     question: str
     options: Dict[str, str]
     correct_answer: str
@@ -55,7 +55,7 @@ class LearningCard(BaseModel):
 class FlashcardPreview(BaseModel):
     type: FlashcardType
     estimated_cards: int
-    sample_question: Optional[MultipleChoiceQuestion] = None
+    sample_question: Optional[PracticeQuestion] = None
     sample_learning_card: Optional[LearningCard] = None
     chapters: Optional[List[str]] = None
 

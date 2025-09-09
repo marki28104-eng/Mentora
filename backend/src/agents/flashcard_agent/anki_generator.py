@@ -4,7 +4,7 @@ from typing import List
 
 import genanki
 
-from .schema import MultipleChoiceQuestion, LearningCard
+from .schema import PracticeQuestion, LearningCard
 
 
 class AnkiDeckGenerator:
@@ -14,7 +14,7 @@ class AnkiDeckGenerator:
         self.output_dir = Path("/tmp/anki_output")
         self.output_dir.mkdir(exist_ok=True)
 
-    def create_testing_deck(self, questions: List[MultipleChoiceQuestion], deck_name: str, pdf_filename: str = None) -> str:
+    def create_testing_deck(self, questions: List[PracticeQuestion], deck_name: str, pdf_filename: str = None) -> str:
         """Create Anki deck for multiple choice questions with clickable options."""
         # Create model for interactive multiple choice
         model = genanki.Model(
