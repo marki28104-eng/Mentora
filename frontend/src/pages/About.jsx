@@ -106,11 +106,10 @@ function About() {
   const teamMembers = [
     {
       name: 'Markus Huber',
-      role: t('team.members.markusHuber.role'),
-      bio: t('team.members.markusHuber.bio'),
+      role: t('team.members.markus.role'),
+      bio: t('team.members.markus.bio'),
       avatar: 'https://d112y698adiu2z.cloudfront.net/photos/production/user_photos/003/508/125/datas/profile.jpg',
-      linkedin: 'https://www.linkedin.com/in/markus-huber-0132282bb/',
-      github: 'https://github.com/M4RKUS28'
+      github: 'https://github.com/marki28104-eng'
     },
     {
       name: 'Luca Bozzetti',

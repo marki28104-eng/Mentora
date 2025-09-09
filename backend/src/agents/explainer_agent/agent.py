@@ -7,10 +7,10 @@ import os
 from typing import AsyncGenerator, Optional, Dict, Any
 
 from google.adk.agents import LlmAgent, BaseAgent, LoopAgent
-from google.adk.models.lite_llm import LiteLlm
+#from google.adk.models.lite_llm import LiteLlm
 from google.adk.runners import Runner
 from google.genai import types
-from litellm import max_tokens
+#from litellm import max_tokens
 
 from ..code_checker.code_checker import ESLintValidator, clean_up_response
 from ..agent import StandardAgent

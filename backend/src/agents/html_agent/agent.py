@@ -10,8 +10,6 @@ from google.adk.agents import LlmAgent
 from ..agent import StandardAgent
 from ..utils import load_instructions_from_files
 
-from google.adk.models.lite_llm import LiteLlm
-
 
 class HtmlAgent(StandardAgent):
     def __init__(self, app_name: str, session_service):

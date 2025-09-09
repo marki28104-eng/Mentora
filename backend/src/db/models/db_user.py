@@ -10,8 +10,6 @@ class User(Base):
     """Model for user accounts in the system."""
     
     __tablename__ = "users"
-
-    id = Column(Text, primary_key=True, index=True)
     id = Column(String(50), primary_key=True, index=True)
     username = Column(String(50), unique=True, index=True, nullable=False)
     email = Column(String(100), unique=True, index=True, nullable=False)

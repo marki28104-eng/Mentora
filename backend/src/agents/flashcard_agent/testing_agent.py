@@ -89,9 +89,9 @@ class TestingFlashcardAgent(StandardAgent):
                 # Add credit note to explanation
                 explanation = q_data.get("explanation", "")
                 if explanation:
-                    explanation += "\n\n---\n*Created with Mentora-AI* - [mentora.de](https://mentora.de)"
+                    explanation += "\n\n---\n*Created with Mentora-AI* - [mentora-kiro.de](https://mentora-kiro.de)"
                 else:
-                    explanation = "---\n*Created with Mentora-AI* - [mentora.de](https://mentora.de)"
+                    explanation = "---\n*Created with Mentora-AI* - [mentora-kiro.de](https://mentora-kiro.de)"
                 
                 question = MultipleChoiceQuestion(
                     question=q_data["question"],
@@ -206,9 +206,9 @@ class TestingFlashcardAgent(StandardAgent):
                     # Add credit note to explanation
                     explanation = q_data.get("explanation", "")
                     if explanation:
-                        explanation += "\n\n---\n*Created with Mentora-AI* - [mentora.de](https://mentora.de)"
+                        explanation += "\n\n---\n*Created with Mentora-AI* - [mentora-kiro.de](https://mentora-kiro.de)"
                     else:
-                        explanation = "---\n*Created with Mentora-AI* - [mentora.de](https://mentora.de)"
+                        explanation = "---\n*Created with Mentora-AI* - [mentora-kiro.de](https://mentora-kiro.de)"
                     
                     question = MultipleChoiceQuestion(
                         question=q_data["question"],

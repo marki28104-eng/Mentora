@@ -53,7 +53,7 @@
   "team": {
     "title": "Meet Our Team",
     "members": {
-      "markusHuber": {
+      "markus": {
         "role": "Software Architect & Full-Stack Developer",
         "bio": "Information Systems student at TUM (B.Sc.) with expertise in software architecture, full-stack development, and machine learning."
       },

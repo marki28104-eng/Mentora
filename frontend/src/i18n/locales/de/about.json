@@ -53,7 +53,7 @@
   "team": {
     "title": "Lernen Sie unser Team kennen",
     "members": {
-      "markusHuber": {
+      "markus": {
         "role": "Softwarearchitekt & Full-Stack-Entwickler",
         "bio": "Wirtschaftsinformatik-Student an der TUM (B.Sc.) mit Expertise in Softwarearchitektur, Full-Stack-Entwicklung und maschinellem Lernen."
       },

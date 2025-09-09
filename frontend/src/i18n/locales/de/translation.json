@@ -71,7 +71,7 @@
     },
     "testimonials": {
       "title": "Das sagen unsere Lernenden",
-      "quote1": "Mentoras KI-gesteuerter Ansatz hat mir geholfen, die Python-Programmierung schneller zu meistern, als ich es je für möglich gehalten hätte. Das personalisierte Feedback war von unschätzbarem Wert!",
+      "quote1": "mentoras KI-gesteuerter Ansatz hat mir geholfen, die Python-Programmierung schneller zu meistern, als ich es je für möglich gehalten hätte. Das personalisierte Feedback war von unschätzbarem Wert!",
       "name1": "John Doe",
       "role1": "Softwareentwickler",
       "quote2": "Die interaktiven Quizze und adaptiven Inhalte haben mir wirklich geholfen, Konzepte des maschinellen Lernens zu verstehen, mit denen ich zuvor zu kämpfen hatte.",
@@ -271,7 +271,7 @@
     "team": {
       "title": "Lernen Sie unser Team kennen",
       "members": {
-        "markusHuber": {
+        "markus": {
           "role": "Softwarearchitekt & Full-Stack-Entwickler",
           "bio": "KI-Experte mit über 15 Jahren Erfahrung in maschinellem Lernen und adaptiven Bildungssystemen."
         },

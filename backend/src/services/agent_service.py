@@ -2,6 +2,7 @@
 This file defines the service that coordinates the interaction between all the agents
 """
 import json
+import asyncio
 import traceback
 from typing import List
 from logging import getLogger
@@ -28,6 +29,7 @@ from ..agents.image_agent.agent import ImageAgent
 
 from ..agents.tester_agent import TesterAgent
 from ..agents.utils import create_text_query
+from ..db.models.db_course import CourseStatus
 from ..api.schemas.course import CourseRequest
 #from ..services.notification_service import WebSocketConnectionManager
 from ..db.models.db_course import Course
@@ -320,7 +322,7 @@ class AgentService:
             #})
             # Re-raise the exception if you want the background task to show as 'failed' in FastAPI logs
             # or if something upstream needs to handle it. For now, we handle it and inform client.
-            # raise e 
+            # raise e
 
         finally:
             print(f"[{task_id}] Finished processing create_course background task.")

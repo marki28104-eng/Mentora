@@ -8,7 +8,7 @@
 
 Welcome to the frontend of **Mentora AI**! This is a modern, responsive, and feature-rich user interface for our personalized learning platform, built with React and Vite.
 
-**🌐 Live Application:** [mentora.de](https://mentora.de)
+**🌐 Live Application:** [mentora-kiro.de](https://mentora-kiro.de)
 
 ---
 
