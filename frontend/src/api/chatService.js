@@ -11,7 +11,6 @@ export const chatService = {
       const requestBody = JSON.stringify({
         message: message  // The backend expects a 'message' field
       });
-      
       // Log the request details
       console.log('Sending request to:', `${apiWithCookies.defaults.baseURL}${url}`);
       console.log('Request body:', requestBody);
