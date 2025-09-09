@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "name": "Course Schema Validation",
+  "description": "Validates that course router endpoints remain compatible when the course schema is modified",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "backend/src/api/schemas/course.py"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "The course schema file has been modified. Please analyze the changes in backend/src/api/schemas/course.py and check if all endpoints in backend/src/api/routers/courses.py still make sense and use the correct attributes. Look for:\n\n1. Any new fields added to course schemas that should be used in endpoints\n2. Any removed or renamed fields that might break existing endpoints\n3. Type changes that could cause validation issues\n4. Missing imports or dependencies\n5. Inconsistencies between schema definitions and router usage\n\nProvide a detailed analysis of any issues found and suggest specific fixes for the course router endpoints."
+  }
+}
