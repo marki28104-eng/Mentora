@@ -47,5 +47,5 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "frontend/dist/*"   # oder "build/*" – je nach Framework
-          target: ${{ secrets.REMOTE_PATH }}
+          target: "/home/mentora-kiro/htdocs/www.mentora-kiro.de/"
           strip_components: 2
