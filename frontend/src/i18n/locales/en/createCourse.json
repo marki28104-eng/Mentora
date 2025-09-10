@@ -1,6 +1,7 @@
 {
   "title": "Create a New Learning Course",
   "mainTitle": "Create a New Learning Course",
+  "subTitle": "with Mentora",
   "form": {
     "language": {
       "label": "Course Language",
