@@ -10,7 +10,7 @@
 
 This project is a full-stack application designed to deliver cutting-edge **AI solutions for personalized learning assistance**. It leverages a powerful Python backend and a modern React frontend to offer an innovative educational platform.
 
-**🌐 Try it live:** [mentora.de](https://mentora-kir.de)
+**🌐 Try it live:** [mentora.de](https://mentora-kiro.de)
 
 
 ---
