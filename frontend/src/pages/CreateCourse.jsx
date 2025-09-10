@@ -306,7 +306,8 @@ function CreateCourse() {
                 mb="sm"
               >
                 <img 
-                  src="/logo_white_mittig.png"
+                  src="/logo_white_mittig.svg
+                  "
                   alt="Logo"
                   style={{ 
                     height: 28,

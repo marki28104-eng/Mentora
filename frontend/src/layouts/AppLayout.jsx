@@ -379,57 +379,26 @@ function AppLayout() {
               })}
             >
               <div style={{ display: "flex", alignItems: "center", height: "100%" }}>
-                <Group spacing="xs">
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
-                  >
-                    <img
-                      src={theme.colorScheme === "dark" ? "/logo_white.png" : "/logo_black.png"}
-                      alt="Logo"
-                      style={{
-                        height: 26,
-                        width: "auto",
-                        filter: "drop-shadow(0 2px 4px rgba(139, 92, 246, 0.3))",
-                        transition: "all 0.3s ease",
-                      }}
-                      className="logo-hover"
-                    />
-                  </motion.div>
-                  <motion.div
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.1, duration: 0.5 }}
-                  >
-                    <Title
-                      order={3}
-                      size="1.4rem"
-                      component={RouterLink}
-                      to="/dashboard"
-                      sx={(theme) => ({
-                        textDecoration: "none",
-                        background: `linear-gradient(135deg, ${theme.colors.teal[6]}, ${theme.colors.cyan[4]})`,
-                        backgroundClip: "text",
-                        WebkitBackgroundClip: "text",
-                        WebkitTextFillColor: "transparent",
-                        fontWeight: 800,
-                        letterSpacing: "-1px",
-                        display: "inline-block",
-                        position: "relative",
-                        padding: theme.spacing.xs,
-                        transition: "all 0.3s ease",
-                        "&:hover": {
-                          transform: "scale(1.02)",
-                          cursor: "pointer",
-                          textShadow: "0 0 8px rgba(99, 179, 237, 0.3)",
-                        },
-                      })}
-                    >
-                      {t("title", { ns: "app" })}
-                    </Title>
-                  </motion.div>
-                </Group>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
+                  component={RouterLink}
+                  to="/dashboard"
+                  style={{ textDecoration: "none", cursor: "pointer" }}
+                >
+                  <img
+                    src="/mentora_schrift_türk_2.svg"
+                    alt="Mentora"
+                    style={{
+                      height: 40,
+                      width: "auto",
+                      filter: "drop-shadow(0 2px 4px rgba(139, 92, 246, 0.3))",
+                      transition: "all 0.3s ease",
+                    }}
+                    className="logo-hover"
+                  />
+                </motion.div>
                 <Box sx={{ flexGrow: 1 }} />
                 <Group spacing="sm">
                   <motion.div
@@ -554,62 +523,22 @@ function AppLayout() {
               }}
             >
               {opened && (
-                <Group spacing="xs">
-                  <img
-                    src={
-                      theme.colorScheme === "dark"
-                        ? "/logo_white.png"
-                        : "/logo_black.png"
-                    }
-                    alt="Logo"
-                    style={{
-                      height: 28,
-                      width: "auto",
-                      filter: "drop-shadow(0 2px 4px rgba(139, 92, 246, 0.3))",
-                    }}
-                  />
-                  <Title
-                    order={3}
-                    size="1.6rem"
-                    component={RouterLink}
-                    to="/dashboard"
-                    sx={(theme) => ({
-                      // gradient text
-                      textDecoration: "none",
-                      background: `linear-gradient(135deg, ${theme.colors.teal[6]}, ${theme.colors.cyan[4]})`,
-                      backgroundClip: "text",
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                      fontWeight: 800,
-                      letterSpacing: "-1px",
-
-                      // keep the pseudo‐element for hover‐bg if you like
-                      display: "inline-block",
-                      position: "relative",
-                      padding: theme.spacing.xs,
-
-                      // smooth transition
-                      transition: "transform 0.2s ease",
-
-                      "&::before": {
-                        content: '""',
-                        position: "absolute",
-                        inset: 0,
-                        borderRadius: theme.radius.sm,
-                        background: "transparent",
-                        zIndex: -1,
-                        transition: "background 0.2s ease",
-                      },
-
-                      "&:hover": {
-                        transform: "scale(1.02)",
-                        cursor: "pointer",
-                      },
-                    })}
-                  >
-                    {t("title", { ns: "app" })}
-                  </Title>
-                </Group>
+                <img
+                  src="/schriftzug.png"
+                  alt="Mentora"
+                  component={RouterLink}
+                  to="/dashboard"
+                  style={{
+                    height: 32,
+                    width: "auto",
+                    filter: "drop-shadow(0 2px 4px rgba(139, 92, 246, 0.3))",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                  }}
+                  onClick={() => navigate("/dashboard")}
+                  onMouseEnter={(e) => e.target.style.transform = "scale(1.02)"}
+                  onMouseLeave={(e) => e.target.style.transform = "scale(1)"}
+                />
               )}
 
               <ActionIcon
