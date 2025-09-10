@@ -524,7 +524,7 @@ function AppLayout() {
             >
               {opened && (
                 <img
-                  src="/schriftzug.png"
+                  src="/mentora_schrift_türk_2.svg.png"
                   alt="Mentora"
                   component={RouterLink}
                   to="/dashboard"
