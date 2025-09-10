@@ -36,7 +36,7 @@ function Login() {
 
   // Use white logo for dark theme, black for light theme
   const logoPath =
-    colorScheme === "dark" ? "/logo_white.svg" : "/logo_black.svg";
+    colorScheme === "dark" ? "/logo_white_2.svg" : "/logo_black_2.svg";
 
   const form = useForm({
     initialValues: {
