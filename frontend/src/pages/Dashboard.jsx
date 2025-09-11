@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMediaQuery, useViewportSize } from '@mantine/hooks';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { fadeIn, slideUp, scaleIn, buttonHover, pageTransition } from '../utils/animations';
 import {
   Container,
@@ -54,10 +54,6 @@ import EnhancedSearch from '../components/EnhancedSearch';
 const useStyles = createStyles((theme) => ({
   continueSection: {
     marginBottom: theme.spacing.xl,
-    '&:hover': {
-      transform: 'translateY(-2px)',
-      transition: 'all 0.2s ease',
-    },
     width: '100%',
     '& .mantine-Card-root': {
       overflow: 'visible',
@@ -66,14 +62,45 @@ const useStyles = createStyles((theme) => ({
   continueCard: {
     display: 'flex',
     gap: theme.spacing.lg,
+    background: 'var(--bg-card)',
+    backdropFilter: 'blur(20px)',
+    border: '1px solid rgba(139, 92, 246, 0.2)',
+    borderRadius: '20px',
+    padding: theme.spacing.xl,
+    position: 'relative',
+    overflow: 'hidden',
+    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+    '&::before': {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%)',
+      opacity: 0,
+      transition: 'opacity 0.4s ease',
+      borderRadius: 'inherit',
+    },
+    '&:hover': {
+      transform: 'translateY(-8px)',
+      boxShadow: '0 25px 50px -12px rgba(139, 92, 246, 0.25)',
+      borderColor: 'rgba(139, 92, 246, 0.4)',
+    },
+    '&:hover::before': {
+      opacity: 1,
+    },
     [theme.fn.smallerThan('sm')]: {
       flexDirection: 'column',
+      padding: theme.spacing.lg,
     },
   },
   continueContent: {
     flex: 1,
     minWidth: '50%',
     maxWidth: '50%',
+    position: 'relative',
+    zIndex: 1,
     [theme.fn.smallerThan('sm')]: {
       minWidth: '100%',
       maxWidth: '100%',
@@ -83,6 +110,7 @@ const useStyles = createStyles((theme) => ({
     position: 'relative',
     width: '50%',
     overflow: 'hidden',
+    borderRadius: theme.radius.lg,
     [theme.fn.smallerThan('sm')]: {
       width: '100%',
       height: '200px',
@@ -99,22 +127,54 @@ const useStyles = createStyles((theme) => ({
     minHeight: '100%',
     objectFit: 'cover',
     objectPosition: 'center',
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.lg,
+    transition: 'transform 0.4s ease',
   },
   courseCard: {
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
-    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+    background: 'var(--bg-card)',
+    backdropFilter: 'blur(20px)',
+    border: '1px solid rgba(139, 92, 246, 0.2)',
+    borderRadius: '16px',
+    position: 'relative',
+    overflow: 'hidden',
+    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+    '&::before': {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%)',
+      opacity: 0,
+      transition: 'opacity 0.4s ease',
+      borderRadius: 'inherit',
+    },
     '&:hover': {
-      transform: 'translateY(-5px)',
-      boxShadow: theme.shadows.md,
+      transform: 'translateY(-8px)',
+      boxShadow: '0 25px 50px -12px rgba(139, 92, 246, 0.25)',
+      borderColor: 'rgba(139, 92, 246, 0.4)',
+    },
+    '&:hover::before': {
+      opacity: 1,
+    },
+    '&:hover .course-image': {
+      transform: 'scale(1.05)',
+    },
+    [theme.fn.smallerThan('sm')]: {
+      '&:hover': {
+        transform: 'none', // Disable hover transform on mobile
+      },
     },
   },
   courseImage: {
     objectFit: 'cover',
     height: '160px',
     width: '100%',
+    transition: 'transform 0.4s ease',
   },
   contentContainer: {
     maxWidth: '1200px',
@@ -133,7 +193,11 @@ const useStyles = createStyles((theme) => ({
   sectionTitle: {
     marginBottom: theme.spacing.md,
     paddingBottom: theme.spacing.xs,
-    borderBottom: `1px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[3]}`,
+    borderBottom: '1px solid rgba(139, 92, 246, 0.2)',
+    background: 'linear-gradient(135deg, var(--purple-600), var(--purple-400))',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    backgroundClip: 'text',
   },
   courseDescription: {
     flex: 1,
@@ -160,6 +224,35 @@ const useStyles = createStyles((theme) => ({
     opacity: 0,
     transition: 'all 0.3s ease',
     boxShadow: theme.shadows.sm,
+  },
+  headerButtons: {
+    '& .mantine-Button-root': {
+      borderRadius: '12px',
+      fontWeight: 600,
+      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      '&:hover': {
+        transform: 'translateY(-2px)',
+      },
+    },
+    [theme.fn.smallerThan('sm')]: {
+      flexDirection: 'column',
+      gap: theme.spacing.sm,
+      '& .mantine-Button-root': {
+        width: '100%',
+        '&:hover': {
+          transform: 'none', // Disable hover transform on mobile
+        },
+      },
+    },
+  },
+  purpleGradientButton: {
+    background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%)',
+    border: 'none',
+    color: 'white',
+    boxShadow: '0 4px 15px rgba(139, 92, 246, 0.4)',
+    '&:hover': {
+      boxShadow: '0 8px 25px rgba(139, 92, 246, 0.6)',
+    },
   },
 }));
 
@@ -375,119 +468,184 @@ function Dashboard() {
 
     return (
       <Grid.Col key={course.course_id} xs={12} sm={6} lg={4}>
-        <Card
-          withBorder
-          radius="md"
-          className={classes.courseCard}
-          style={{ cursor: 'pointer' }}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 100, damping: 10 }}
+          whileHover={{ y: -8 }}
         >
-          <Card.Section>
-            <Image
-              src={course.image_url || PlaceGolderImage}
-              height={160}
-              alt={course.title}
-              className={classes.courseImage}
-              onClick={() => navigate(`/dashboard/courses/${course.course_id}`)}
-            />
-          </Card.Section>
-
-          <Box p="md" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-            <Group position="apart" mb="xs" noWrap>
-              <Badge
-                color={statusColor}
-                variant="light"
-                size="md"
-                leftSection={<StatusIcon size={14} style={{ marginRight: 4 }} />}
-              >
-                {statusLabel}
-              </Badge>
-
-              <Group spacing="xs">
-                <ActionIcon
-                  variant="subtle"
-                  color="gray"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleRename(course);
-                  }}
-                >
-                  <IconPencil size={16} />
-                </ActionIcon>
-                <ActionIcon
-                  variant="subtle"
-                  color="red"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(course.course_id);
-                  }}
-                >
-                  <IconTrash size={16} />
-                </ActionIcon>
-              </Group>
-            </Group>
-
-            <Text
-              weight={600}
-              size="lg"
-              lineClamp={2}
-              style={{
-                cursor: 'pointer',
-                wordBreak: 'break-word',
-                minHeight: '3em',
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis'
-              }}
-              onClick={() => navigate(`/dashboard/courses/${course.course_id}`)}
-            >
-              {course.title || t('untitledCourse')}
-            </Text>
-
-            <Text
-              size="sm"
-              color="dimmed"
-              className={classes.courseDescription}
-              onClick={() => navigate(`/dashboard/courses/${course.course_id}`)}
-              style={{ cursor: 'pointer' }}
-            >
-              {course.description || t('noDescription')}
-            </Text>
-
-            <Box mt="auto" pt="md">
-              <Group position="apart" mb={4}>
-                <Text size="sm" color="dimmed">
-                  {t('yourProgress')}
-                </Text>
-                <Text size="sm" weight={600}>
-                  {progress}%
-                </Text>
-              </Group>
-              <Progress
-                value={progress}
-                size="sm"
-                radius="xl"
-                color={progress === 100 ? 'teal' : 'blue'}
-              />
-              <Button
-                fullWidth
-                variant="light"
-                color="teal"
-                mt="md"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(`/dashboard/courses/${course.course_id}`);
+          <Card
+            withBorder
+            radius="xl"
+            className={classes.courseCard}
+            style={{ cursor: 'pointer' }}
+          >
+            <Card.Section>
+              <Image
+                src={course.image_url || PlaceGolderImage}
+                height={160}
+                alt={course.title}
+                className="course-image"
+                onClick={() => navigate(`/dashboard/courses/${course.course_id}`)}
+                sx={{
+                  objectFit: 'cover',
+                  transition: 'transform 0.4s ease',
                 }}
-                leftIcon={<IconBook size={16} />}
+              />
+            </Card.Section>
+
+            <Box p="lg" style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative', zIndex: 1 }}>
+              <Group position="apart" mb="xs" noWrap>
+                <Badge
+                  variant="light"
+                  size="md"
+                  leftSection={<StatusIcon size={14} style={{ marginRight: 4 }} />}
+                  sx={{
+                    background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(168, 85, 247, 0.1))',
+                    color: 'var(--purple-600)',
+                    border: '1px solid rgba(139, 92, 246, 0.3)',
+                  }}
+                >
+                  {statusLabel}
+                </Badge>
+
+                <Group spacing="xs">
+                  <ActionIcon
+                    variant="subtle"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRename(course);
+                    }}
+                    sx={{
+                      color: 'var(--purple-500)',
+                      '&:hover': {
+                        background: 'rgba(139, 92, 246, 0.1)',
+                        transform: 'scale(1.1)',
+                      },
+                    }}
+                  >
+                    <IconPencil size={16} />
+                  </ActionIcon>
+                  <ActionIcon
+                    variant="subtle"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(course.course_id);
+                    }}
+                    sx={{
+                      color: '#ef4444',
+                      '&:hover': {
+                        background: 'rgba(239, 68, 68, 0.1)',
+                        transform: 'scale(1.1)',
+                      },
+                    }}
+                  >
+                    <IconTrash size={16} />
+                  </ActionIcon>
+                </Group>
+              </Group>
+
+              <Text
+                weight={600}
+                size="lg"
+                lineClamp={2}
+                style={{
+                  cursor: 'pointer',
+                  wordBreak: 'break-word',
+                  minHeight: '3em',
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}
+                onClick={() => navigate(`/dashboard/courses/${course.course_id}`)}
+                sx={{
+                  background: 'linear-gradient(135deg, var(--purple-600), var(--purple-400))',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, var(--purple-500), var(--purple-300))',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                  },
+                }}
               >
-                {t('openCourse')}
-              </Button>
+                {course.title || t('untitledCourse')}
+              </Text>
+
+              <Text
+                size="sm"
+                color="dimmed"
+                className={classes.courseDescription}
+                onClick={() => navigate(`/dashboard/courses/${course.course_id}`)}
+                style={{ cursor: 'pointer' }}
+              >
+                {course.description || t('noDescription')}
+              </Text>
+
+              <Box mt="auto" pt="md">
+                <Group position="apart" mb={4}>
+                  <Text size="sm" color="dimmed">
+                    {t('yourProgress')}
+                  </Text>
+                  <Text
+                    size="sm"
+                    weight={600}
+                    sx={{ color: 'var(--purple-500)' }}
+                  >
+                    {progress}%
+                  </Text>
+                </Group>
+                <Progress
+                  value={progress}
+                  size="sm"
+                  radius="xl"
+                  styles={{
+                    root: {
+                      backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                    },
+                    bar: {
+                      backgroundImage: progress === 100
+                        ? 'linear-gradient(135deg, #10b981, #059669)'
+                        : 'linear-gradient(135deg, var(--purple-500), var(--purple-400))',
+                    },
+                  }}
+                />
+                <Button
+                  fullWidth
+                  variant="light"
+                  mt="md"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/dashboard/courses/${course.course_id}`);
+                  }}
+                  leftIcon={<IconBook size={16} />}
+                  sx={{
+                    background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(168, 85, 247, 0.1))',
+                    color: 'var(--purple-600)',
+                    border: '1px solid rgba(139, 92, 246, 0.3)',
+                    borderRadius: '12px',
+                    fontWeight: 600,
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    '&:hover': {
+                      background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(168, 85, 247, 0.2))',
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 8px 25px rgba(139, 92, 246, 0.3)',
+                    },
+                  }}
+                >
+                  {t('openCourse')}
+                </Button>
+              </Box>
             </Box>
-          </Box>
-        </Card>
+          </Card>
+        </motion.div>
       </Grid.Col>
     );
   };
@@ -608,48 +766,63 @@ function Dashboard() {
 
       {/* Main content container */}
       <Box className={classes.contentContainer} mb="xl">
-        <Group position="apart" align="flex-start" mb="xl">
-          <Box>
-            <Title order={1} mb={5}>{t('myLearningJourney')}</Title>
-            <Text color="dimmed" size="lg">{t('welcomeMessage')}</Text>
-          </Box>
-          <Group spacing="md">
-            <Button
-              variant="outline"
-              color="yellow"
-              onClick={() => navigate('/pricing')}
-              sx={(theme) => ({
-                background: theme.colorScheme === 'dark'
-                  ? `linear-gradient(45deg, ${theme.colors.yellow[9]}, ${theme.colors.orange[7]})`
-                  : `linear-gradient(45deg, ${theme.colors.yellow[6]}, ${theme.colors.orange[4]})`,
-                color: theme.colorScheme === 'dark' ? theme.white : theme.black,
-                border: 'none',
-                transition: 'transform 0.2s ease',
-                '&:hover': {
-                  transform: 'translateY(-3px)',
-                },
-              })}
-            >
-              {t('upgradeToPro', 'Upgrade to Pro')}
-            </Button>
-            <Button
-              size="md"
-              color="teal"
-              onClick={() => navigate('/dashboard/create-course')}
-              leftIcon={<IconPlus size={20} />}
-              sx={(theme) => ({
-                background: theme.colorScheme === 'dark'
-                  ? `linear-gradient(45deg, ${theme.colors.teal[9]}, ${theme.colors.cyan[7]})`
-                  : `linear-gradient(45deg, ${theme.colors.teal[6]}, ${theme.colors.cyan[4]})`,
-                transition: 'transform 0.2s ease',
-                '&:hover': {
-                  transform: 'translateY(-3px)',
-                },
-              })}
-            >
-              {t('createNewCourse')}
-            </Button>
-          </Group>
+        <Group position="apart" align={isMobile ? "center" : "flex-start"} mb="xl" sx={{ flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? theme.spacing.lg : 0 }}>
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <Box>
+              <Title
+                order={1}
+                mb={5}
+                sx={{
+                  background: 'linear-gradient(135deg, var(--purple-600), var(--purple-400))',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
+                {t('myLearningJourney')}
+              </Title>
+              <Text color="dimmed" size="lg">{t('welcomeMessage')}</Text>
+            </Box>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <Group spacing="md" className={classes.headerButtons} sx={{ width: isMobile ? '100%' : 'auto' }}>
+              <Button
+                variant="outline"
+                onClick={() => navigate('/pricing')}
+                sx={{
+                  background: 'linear-gradient(135deg, #f59e0b 0%, #f97316 50%, #ea580c 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '12px',
+                  fontWeight: 600,
+                  boxShadow: '0 4px 15px rgba(245, 158, 11, 0.4)',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 8px 25px rgba(245, 158, 11, 0.6)',
+                  },
+                }}
+              >
+                {t('upgradeToPro', 'Upgrade to Pro')}
+              </Button>
+              <Button
+                size="md"
+                onClick={() => navigate('/dashboard/create-course')}
+                leftIcon={<IconPlus size={20} />}
+                className={classes.purpleGradientButton}
+              >
+                {t('createNewCourse')}
+              </Button>
+            </Group>
+          </motion.div>
         </Group>
 
         {/* Statistics Section */}
@@ -668,7 +841,15 @@ function Dashboard() {
               transition={{ delay: 0.2 }}
             >
               <Group position="apart" mb="md">
-                <Title order={3}>
+                <Title
+                  order={3}
+                  sx={{
+                    background: 'linear-gradient(135deg, var(--purple-600), var(--purple-400))',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                  }}
+                >
                   <motion.span
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -677,16 +858,24 @@ function Dashboard() {
                     {t('continueLearningTitle')}
                   </motion.span>
                 </Title>
-                <motion.div
-                  whileHover={{ x: 5 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-
-                </motion.div>
               </Group>
-              <div className={classes.continueCard}>
+              <motion.div
+                className={classes.continueCard}
+                whileHover={{ scale: 1.02 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+              >
                 <div className={classes.continueContent}>
-                  <Text weight={600} size="lg" lineClamp={1}>
+                  <Text
+                    weight={600}
+                    size="lg"
+                    lineClamp={1}
+                    sx={{
+                      background: 'linear-gradient(135deg, var(--purple-600), var(--purple-400))',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text',
+                    }}
+                  >
                     {courses[0].title}
                   </Text>
                   <Text size="sm" color="dimmed" mt={4}>
@@ -702,7 +891,13 @@ function Dashboard() {
                   <Box mt="md">
                     <Group position="apart" mb={4}>
                       <Text size="sm" weight={500}>{t('yourProgress')}</Text>
-                      <Text size="sm" weight={500}>
+                      <Text
+                        size="sm"
+                        weight={500}
+                        sx={{
+                          color: 'var(--purple-500)',
+                        }}
+                      >
                         {calculateProgress(courses[0])}%
                       </Text>
                     </Group>
@@ -711,8 +906,13 @@ function Dashboard() {
                       size="lg"
                       radius="xl"
                       styles={{
-                        root: { width: '100%' },
-                        bar: { backgroundImage: 'linear-gradient(45deg, #20c997, #12b886)' },
+                        root: {
+                          width: '100%',
+                          backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        },
+                        bar: {
+                          backgroundImage: 'linear-gradient(135deg, var(--purple-500), var(--purple-400))',
+                        },
                       }}
                     />
                     <Group position="apart" mt="md">
@@ -721,9 +921,21 @@ function Dashboard() {
                       </Text>
                       <Button
                         variant="light"
-                        color="teal"
                         rightIcon={<IconChevronRight size={16} />}
                         onClick={() => navigate(`/dashboard/courses/${courses[0].course_id}`)}
+                        sx={{
+                          background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(168, 85, 247, 0.1))',
+                          color: 'var(--purple-600)',
+                          border: '1px solid rgba(139, 92, 246, 0.3)',
+                          borderRadius: '12px',
+                          fontWeight: 600,
+                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                          '&:hover': {
+                            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(168, 85, 247, 0.2))',
+                            transform: 'translateY(-2px)',
+                            boxShadow: '0 8px 25px rgba(139, 92, 246, 0.3)',
+                          },
+                        }}
                       >
                         {t('continueButton')}
                       </Button>
@@ -740,14 +952,23 @@ function Dashboard() {
                     />
                   )}
                 </div>
-              </div>
+              </motion.div>
             </motion.div>
           </motion.div>
         )}
 
         {/* Enhanced Search - Full width */}
         <Box mb="xl" mt="xl" pt="xl">
-          <Title order={3} mb="xs">
+          <Title
+            order={3}
+            mb="xs"
+            sx={{
+              background: 'linear-gradient(135deg, var(--purple-600), var(--purple-400))',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}
+          >
             {t('searchCourses')}
           </Title>
           <Text color="dimmed" size="sm" mb="md">
@@ -807,6 +1028,18 @@ function Dashboard() {
                       onClick={() => setViewAllCourses(!viewAllCourses)}
                       rightIcon={viewAllCourses ? <IconChevronRight size={16} /> : null}
                       leftIcon={!viewAllCourses ? <IconChevronRight size={16} style={{ transform: 'rotate(-90deg)' }} /> : null}
+                      sx={{
+                        border: '2px solid var(--purple-500)',
+                        color: 'var(--purple-600)',
+                        borderRadius: '12px',
+                        fontWeight: 600,
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        '&:hover': {
+                          background: 'rgba(139, 92, 246, 0.1)',
+                          transform: 'translateY(-2px)',
+                          boxShadow: '0 8px 25px rgba(139, 92, 246, 0.3)',
+                        },
+                      }}
                     >
                       {viewAllCourses ? t('showLessButton') : t('viewAllCourses')}
                     </Button>
@@ -816,27 +1049,54 @@ function Dashboard() {
             ) : (
               <motion.div variants={item}>
                 <Paper
-                  radius="md"
+                  radius="xl"
                   p="xl"
                   withBorder
+                  className="glass-card"
                   sx={{
-                    background: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0],
+                    background: 'var(--bg-card)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(139, 92, 246, 0.2)',
                     textAlign: 'center',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%)',
+                      borderRadius: 'inherit',
+                    },
                   }}
                 >
-                  <Box mb="md">
-                    <IconBook size={48} color={theme.colors.gray[5]} />
+                  <Box mb="md" sx={{ position: 'relative', zIndex: 1 }}>
+                    <IconBook size={48} color="var(--purple-400)" />
                   </Box>
-                  <Title order={3} mb="sm">
+                  <Title
+                    order={3}
+                    mb="sm"
+                    sx={{
+                      position: 'relative',
+                      zIndex: 1,
+                      background: 'linear-gradient(135deg, var(--purple-600), var(--purple-400))',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text',
+                    }}
+                  >
                     {t('noCoursesTitle')}
                   </Title>
-                  <Text color="dimmed" mb="xl">
+                  <Text color="dimmed" mb="xl" sx={{ position: 'relative', zIndex: 1 }}>
                     {t('noCoursesDescription')}
                   </Text>
                   <Button
                     leftIcon={<IconPlus size={16} />}
                     onClick={() => navigate('/dashboard/create-course')}
-                    color="teal"
+                    className={classes.purpleGradientButton}
+                    sx={{ position: 'relative', zIndex: 1 }}
                   >
                     {t('createFirstCourse')}
                   </Button>
@@ -865,7 +1125,17 @@ function Dashboard() {
         variants={item}
         style={{ marginTop: '4rem' }}
       >
-        <Title order={2} align="center" mb="xl">
+        <Title
+          order={2}
+          align="center"
+          mb="xl"
+          sx={{
+            background: 'linear-gradient(135deg, var(--purple-600), var(--purple-400))',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+          }}
+        >
           {t('infoSection.title', 'How It Works')}
         </Title>
 
@@ -933,10 +1203,21 @@ function Dashboard() {
 
               <Button
                 variant="outline"
-                color="teal"
                 size="md"
                 mt="md"
                 onClick={() => navigate('/dashboard/create-course')}
+                sx={{
+                  border: '2px solid var(--purple-500)',
+                  color: 'var(--purple-600)',
+                  borderRadius: '12px',
+                  fontWeight: 600,
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  '&:hover': {
+                    background: 'rgba(139, 92, 246, 0.1)',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 8px 25px rgba(139, 92, 246, 0.3)',
+                  },
+                }}
               >
                 {t('infoSection.createCourseButton', 'Create Your First Course')}
               </Button>

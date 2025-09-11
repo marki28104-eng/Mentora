@@ -1,0 +1,254 @@
+/* Modern Form Checkbox and Radio Styles */
+.form-checkbox-modern {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.form-checkbox-modern .mantine-Checkbox-input,
+.form-checkbox-modern .mantine-Radio-input {
+  background: var(--bg-card);
+  border: 2px solid rgba(139, 92, 246, 0.3);
+  width: 20px;
+  height: 20px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+}
+
+.form-checkbox-modern .mantine-Checkbox-input {
+  border-radius: 6px;
+}
+
+.form-checkbox-modern .mantine-Radio-input {
+  border-radius: 50%;
+}
+
+.form-checkbox-modern .mantine-Checkbox-input:checked,
+.form-checkbox-modern .mantine-Radio-input:checked {
+  background-color: var(--purple-500);
+  border-color: var(--purple-500);
+}
+
+.form-checkbox-modern .mantine-Checkbox-input:hover,
+.form-checkbox-modern .mantine-Radio-input:hover {
+  border-color: var(--purple-400);
+  background-color: rgba(139, 92, 246, 0.05);
+  transform: scale(1.05);
+}
+
+.form-checkbox-modern .mantine-Checkbox-input:focus,
+.form-checkbox-modern .mantine-Radio-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}
+
+.form-checkbox-modern .mantine-Checkbox-label,
+.form-checkbox-modern .mantine-Radio-label {
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  padding-left: 12px;
+  line-height: 1.4;
+  transition: color 0.2s ease;
+  margin: 0;
+}
+
+.form-checkbox-modern .mantine-Checkbox-label:hover,
+.form-checkbox-modern .mantine-Radio-label:hover {
+  color: var(--purple-600);
+}
+
+.form-checkbox-modern .mantine-Checkbox-error,
+.form-checkbox-modern .mantine-Radio-error {
+  color: #ef4444;
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 6px;
+}
+
+/* Custom Checkmark */
+.form-checkbox-modern .mantine-Checkbox-input:checked::before {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+/* Custom Radio Dot */
+.form-checkbox-modern .mantine-Radio-input:checked::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background-color: white;
+  border-radius: 50%;
+}
+
+/* Error State */
+.form-checkbox-error .mantine-Checkbox-input,
+.form-checkbox-error .mantine-Radio-input {
+  border-color: #ef4444 !important;
+}
+
+.form-checkbox-error .mantine-Checkbox-input:checked,
+.form-checkbox-error .mantine-Radio-input:checked {
+  background-color: #ef4444 !important;
+  border-color: #ef4444 !important;
+}
+
+.form-checkbox-error .mantine-Checkbox-input:focus,
+.form-checkbox-error .mantine-Radio-input:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2) !important;
+}
+
+/* Filled Variant */
+.form-checkbox-filled .mantine-Checkbox-input,
+.form-checkbox-filled .mantine-Radio-input {
+  background: rgba(139, 92, 246, 0.1);
+  border: 2px solid rgba(139, 92, 246, 0.4);
+}
+
+/* Disabled State */
+.form-checkbox-modern .mantine-Checkbox-input:disabled,
+.form-checkbox-modern .mantine-Radio-input:disabled {
+  background-color: var(--bg-secondary);
+  border-color: rgba(139, 92, 246, 0.1);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.form-checkbox-modern .mantine-Checkbox-input:disabled + .mantine-Checkbox-label,
+.form-checkbox-modern .mantine-Radio-input:disabled + .mantine-Radio-label {
+  color: var(--text-tertiary);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Group Styles */
+.form-checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-checkbox-group.horizontal {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.form-checkbox-group-label {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.form-checkbox-group-error {
+  color: #ef4444;
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+/* Animation for check/uncheck */
+@keyframes checkboxCheck {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.form-checkbox-modern .mantine-Checkbox-input:checked::before {
+  animation: checkboxCheck 0.2s ease-out;
+}
+
+@keyframes radioCheck {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.3);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.form-checkbox-modern .mantine-Radio-input:checked::after {
+  animation: radioCheck 0.2s ease-out;
+}
+
+/* Hover effects for the entire checkbox/radio container */
+.form-checkbox-modern:hover .mantine-Checkbox-input:not(:disabled),
+.form-checkbox-modern:hover .mantine-Radio-input:not(:disabled) {
+  border-color: var(--purple-400);
+  background-color: rgba(139, 92, 246, 0.05);
+}
+
+.form-checkbox-modern:hover .mantine-Checkbox-label,
+.form-checkbox-modern:hover .mantine-Radio-label {
+  color: var(--purple-600);
+}
+
+/* Focus visible for accessibility */
+.form-checkbox-modern .mantine-Checkbox-input:focus-visible,
+.form-checkbox-modern .mantine-Radio-input:focus-visible {
+  outline: 2px solid var(--purple-500);
+  outline-offset: 2px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .form-checkbox-modern .mantine-Checkbox-input,
+  .form-checkbox-modern .mantine-Radio-input {
+    width: 22px;
+    height: 22px;
+  }
+  
+  .form-checkbox-modern .mantine-Checkbox-label,
+  .form-checkbox-modern .mantine-Radio-label {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  .form-checkbox-group.horizontal {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+/* Dark mode specific adjustments */
+[data-mantine-color-scheme="dark"] .form-checkbox-modern .mantine-Checkbox-input,
+[data-mantine-color-scheme="dark"] .form-checkbox-modern .mantine-Radio-input {
+  background: var(--bg-card);
+  border-color: rgba(139, 92, 246, 0.4);
+}
+
+[data-mantine-color-scheme="dark"] .form-checkbox-modern .mantine-Checkbox-input:checked,
+[data-mantine-color-scheme="dark"] .form-checkbox-modern .mantine-Radio-input:checked {
+  background-color: var(--purple-400);
+  border-color: var(--purple-400);
+}
+
+[data-mantine-color-scheme="dark"] .form-checkbox-modern .mantine-Checkbox-input:hover,
+[data-mantine-color-scheme="dark"] .form-checkbox-modern .mantine-Radio-input:hover {
+  background-color: rgba(139, 92, 246, 0.1);
+  border-color: var(--purple-300);
+}

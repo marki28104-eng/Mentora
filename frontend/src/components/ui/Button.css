@@ -1,0 +1,229 @@
+/* Modern Button Base Styles */
+.btn-modern {
+  position: relative;
+  overflow: hidden;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  font-family: 'Inter', system-ui, sans-serif;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateZ(0); /* GPU acceleration */
+}
+
+.btn-modern:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Button Variants */
+
+/* Primary Button - Purple Gradient */
+.btn-purple-primary {
+  background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%);
+  color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+.btn-purple-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.6);
+}
+
+.btn-purple-primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+/* Secondary Button - Purple Border */
+.btn-purple-secondary {
+  border: 2px solid var(--purple-500);
+  background: transparent;
+  color: var(--purple-500);
+  border-radius: 12px;
+}
+
+.btn-purple-secondary:hover:not(:disabled) {
+  background: rgba(139, 92, 246, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
+}
+
+.btn-purple-secondary:active:not(:disabled) {
+  transform: translateY(0);
+  background: rgba(139, 92, 246, 0.15);
+}
+
+/* Ghost Button - Subtle Purple */
+.btn-purple-ghost {
+  background: transparent;
+  color: var(--purple-500);
+  border: none;
+  border-radius: 8px;
+}
+
+.btn-purple-ghost:hover:not(:disabled) {
+  background: rgba(139, 92, 246, 0.1);
+  transform: translateY(-1px);
+}
+
+.btn-purple-ghost:active:not(:disabled) {
+  transform: translateY(0);
+  background: rgba(139, 92, 246, 0.15);
+}
+
+/* Gradient Button - Animated Background */
+.btn-purple-gradient {
+  background: linear-gradient(270deg, #8b5cf6, #a855f7, #9333ea, #7c3aed);
+  background-size: 400% 400%;
+  color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+  animation: gradientShift 3s ease infinite;
+}
+
+.btn-purple-gradient:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.6);
+  animation-duration: 1.5s;
+}
+
+.btn-purple-gradient:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+/* Button Sizes */
+.btn-xs {
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  border-radius: 8px;
+}
+
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  border-radius: 10px;
+}
+
+.btn-md {
+  padding: 12px 24px;
+  font-size: 1rem;
+  border-radius: 12px;
+}
+
+.btn-lg {
+  padding: 16px 32px;
+  font-size: 1.125rem;
+  border-radius: 14px;
+}
+
+.btn-xl {
+  padding: 20px 40px;
+  font-size: 1.25rem;
+  border-radius: 16px;
+}
+
+/* Button Loading State */
+.btn-modern[data-loading="true"] {
+  pointer-events: none;
+}
+
+.btn-modern[data-loading="true"]::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Ripple Effect */
+.btn-modern::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn-modern:active:not(:disabled)::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* Focus Styles for Accessibility */
+.btn-modern:focus-visible {
+  outline: 2px solid var(--purple-500);
+  outline-offset: 2px;
+}
+
+/* Dark Mode Adjustments */
+[data-mantine-color-scheme="dark"] .btn-purple-secondary {
+  border-color: var(--purple-400);
+  color: var(--purple-400);
+}
+
+[data-mantine-color-scheme="dark"] .btn-purple-ghost {
+  color: var(--purple-400);
+}
+
+[data-mantine-color-scheme="dark"] .btn-purple-secondary:hover:not(:disabled) {
+  background: rgba(139, 92, 246, 0.15);
+}
+
+[data-mantine-color-scheme="dark"] .btn-purple-ghost:hover:not(:disabled) {
+  background: rgba(139, 92, 246, 0.15);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .btn-lg {
+    padding: 14px 28px;
+    font-size: 1rem;
+  }
+  
+  .btn-xl {
+    padding: 16px 32px;
+    font-size: 1.125rem;
+  }
+}
+
+/* Accessibility - Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .btn-modern {
+    transition: none;
+  }
+  
+  .btn-modern:hover:not(:disabled) {
+    transform: none;
+  }
+  
+  .btn-purple-gradient {
+    animation: none;
+    background: var(--purple-500);
+  }
+  
+  .btn-modern::before {
+    display: none;
+  }
+}

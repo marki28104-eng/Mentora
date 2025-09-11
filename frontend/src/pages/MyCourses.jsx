@@ -24,15 +24,16 @@ import {
   rem,
   Progress,
   Badge,
+  ThemeIcon,
 } from '@mantine/core';
 import SearchBar from '../components/SearchBar';
-import { 
-  IconBook, 
-  IconAlertCircle, 
-  IconWorld, 
-  IconSearch, 
-  IconPencil, 
-  IconTrash, 
+import {
+  IconBook,
+  IconAlertCircle,
+  IconWorld,
+  IconSearch,
+  IconPencil,
+  IconTrash,
   IconCheck,
   IconLoader,
   IconFlame,
@@ -55,7 +56,7 @@ function MyCourses() {
   const [newTitle, setNewTitle] = useState('');
   const [newDescription, setNewDescription] = useState('');
   const [isPublic, setIsPublic] = useState(false);
-  
+
   const navigate = useNavigate();
   const theme = useMantineTheme();
   const { t } = useTranslation('dashboard');
@@ -155,8 +156,8 @@ function MyCourses() {
 
       // Then, update the title and description
       const updatedCourse = await courseService.updateCourse(
-        courseToRename.course_id, 
-        newTitle, 
+        courseToRename.course_id,
+        newTitle,
         newDescription
       );
 
@@ -177,7 +178,7 @@ function MyCourses() {
 
   if (loading) {
     return (
-      <Container 
+      <Container
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -212,9 +213,8 @@ function MyCourses() {
         pb="xl"
         mb="xl"
         style={{
-          borderBottom: `1px solid ${
-            theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[2]
-          }`,
+          borderBottom: `1px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[2]
+            }`,
         }}
       >
         <Group position="apart">
@@ -241,18 +241,18 @@ function MyCourses() {
           <Stack align="center" spacing="md" py="xl">
             <IconBook size={60} color={theme.colors.gray[6]} stroke={1.5} />
             <Title order={3} align="center">
-              {searchQuery 
-                ? t('noSearchResults', { defaultValue: 'Keine Kurse gefunden' }) 
+              {searchQuery
+                ? t('noSearchResults', { defaultValue: 'Keine Kurse gefunden' })
                 : t('noCoursesYet', { defaultValue: 'Noch keine Kurse vorhanden' })}
             </Title>
             <Text color="dimmed" size="sm" align="center">
-              {searchQuery 
-                ? t('tryDifferentKeywords', { defaultValue: 'Versuche es mit anderen Suchbegriffen.' }) 
+              {searchQuery
+                ? t('tryDifferentKeywords', { defaultValue: 'Versuche es mit anderen Suchbegriffen.' })
                 : t('createFirstCourse', { defaultValue: 'Erstelle deinen ersten Kurs, um loszulegen.' })}
             </Text>
             {!searchQuery && (
-              <Button 
-                leftIcon={<IconFlame size={16} />} 
+              <Button
+                leftIcon={<IconFlame size={16} />}
                 onClick={() => navigate('/dashboard/create-course')}
                 mt="md"
               >
@@ -266,102 +266,209 @@ function MyCourses() {
           {filteredCourses.map((course) => {
             const { label: statusLabel, color: statusColor, Icon: StatusIcon } = getStatusInfo(course.status);
             const progress = calculateProgress(course);
-            
+
             return (
               <Grid.Col key={course.course_id} sm={6} md={4} lg={4}>
-                <Card 
-                  shadow="sm" 
-                  p="lg" 
-                  radius="md" 
+                <Card
+                  shadow="sm"
+                  p="xl"
+                  radius="xl"
                   withBorder
+                  className="card-modern card-glass card-hoverable transition-all duration-300"
                   style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
-                  sx={{
-                    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                  sx={(theme) => ({
+                    background: 'var(--bg-card)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(139, 92, 246, 0.2)',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    minHeight: '400px',
                     '&:hover': {
-                      transform: 'translateY(-5px)',
-                      boxShadow: theme.shadows.lg,
+                      transform: 'translateY(-8px)',
+                      boxShadow: '0 25px 50px -12px rgba(139, 92, 246, 0.25)',
+                      borderColor: 'rgba(139, 92, 246, 0.4)',
                     },
-                  }}
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%)',
+                      opacity: 0,
+                      transition: 'opacity 0.4s ease',
+                      zIndex: 0,
+                    },
+                    '&:hover::before': {
+                      opacity: 1,
+                    },
+                  })}
                 >
-                  <Card.Section>
+                  <Card.Section sx={{ position: 'relative', zIndex: 1 }}>
                     <Image
                       src={course.image_url || PlaceGolderImage}
-                      height={160}
+                      height={180}
                       alt={course.title}
                       withPlaceholder
                       style={{
                         objectFit: 'cover',
                         width: '100%',
-                        height: '160px'
+                        height: '180px'
                       }}
                     />
+                    {/* Gradient overlay on image */}
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        height: '50%',
+                        background: 'linear-gradient(transparent, rgba(0,0,0,0.6))',
+                        display: 'flex',
+                        alignItems: 'flex-end',
+                        padding: '16px',
+                      }}
+                    >
+                      <Badge
+                        size="lg"
+                        radius="xl"
+                        variant="gradient"
+                        gradient={
+                          statusColor === 'green'
+                            ? { from: 'green.6', to: 'green.4' }
+                            : statusColor === 'yellow'
+                              ? { from: 'yellow.6', to: 'orange.4' }
+                              : { from: 'purple.6', to: 'purple.4' }
+                        }
+                        leftSection={<StatusIcon size={16} />}
+                        sx={{ color: 'white', fontWeight: 700 }}
+                      >
+                        {statusLabel}
+                      </Badge>
+                    </Box>
                   </Card.Section>
 
-                  <Group position="apart" mt="md" mb="xs">
-                    <Badge 
-                      color={statusColor} 
-                      variant="light"
-                      leftSection={<StatusIcon size={14} style={{ marginTop: 2 }} />}
+                  <Box sx={{ position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                    <Group position="apart" mt="md" mb="xs">
+                      <Box sx={{ flex: 1 }}>
+                        <Text
+                          weight={700}
+                          size="lg"
+                          lineClamp={2}
+                          sx={{
+                            minHeight: '3em',
+                            color: 'var(--text-primary)',
+                            lineHeight: 1.3,
+                          }}
+                        >
+                          {course.title || t('untitledCourse', { defaultValue: 'Unbenannter Kurs' })}
+                        </Text>
+                      </Box>
+
+                      <Group spacing="xs" sx={{ flexShrink: 0 }}>
+                        <ActionIcon
+                          variant="light"
+                          color="purple"
+                          size="md"
+                          radius="xl"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRename(course);
+                          }}
+                          sx={{
+                            '&:hover': {
+                              transform: 'translateY(-2px)',
+                              boxShadow: '0 4px 15px rgba(139, 92, 246, 0.3)',
+                            },
+                          }}
+                        >
+                          <IconPencil size={16} />
+                        </ActionIcon>
+
+                        <ActionIcon
+                          variant="light"
+                          color="red"
+                          size="md"
+                          radius="xl"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(course.course_id);
+                          }}
+                          sx={{
+                            '&:hover': {
+                              transform: 'translateY(-2px)',
+                              boxShadow: '0 4px 15px rgba(239, 68, 68, 0.3)',
+                            },
+                          }}
+                        >
+                          <IconTrash size={16} />
+                        </ActionIcon>
+                      </Group>
+                    </Group>
+
+                    <Text
+                      size="sm"
+                      color="dimmed"
+                      lineClamp={3}
+                      sx={{
+                        flexGrow: 1,
+                        marginBottom: '1rem',
+                        lineHeight: 1.5,
+                      }}
                     >
-                      {statusLabel}
-                    </Badge>
-                    <Group spacing="xs">
-                      <ActionIcon 
-                        variant="subtle" 
-                        color="gray" 
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRename(course);
-                        }}
-                      >
-                        <IconPencil size={16} />
-                      </ActionIcon>
-                      
-                      <ActionIcon 
-                        variant="subtle" 
-                        color="red" 
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDelete(course.course_id);
-                        }}
-                      >
-                        <IconTrash size={16} />
-                      </ActionIcon>
-                    </Group>
-                  </Group>
-                  
-                  <Text weight={500} lineClamp={2} mt="xs" mb="sm" style={{ minHeight: '3em' }}>
-                    {course.title || t('untitledCourse', { defaultValue: 'Unbenannter Kurs' })}
-                  </Text>
+                      {course.description || t('noDescription', { defaultValue: 'Keine Beschreibung' })}
+                    </Text>
 
-                  <Text size="sm" color="dimmed" lineClamp={3} style={{ flexGrow: 1, marginBottom: '1rem' }}>
-                    {course.description || t('noDescription', { defaultValue: 'Keine Beschreibung' })}
-                  </Text>
+                    {/* Modern Progress Indicator */}
+                    <Box mb="lg">
+                      <Group position="apart" mb={8}>
+                        <Group spacing={6} noWrap>
+                          <ThemeIcon size="sm" radius="xl" color="purple" variant="light">
+                            <IconClock size={12} />
+                          </ThemeIcon>
+                          <Text size="sm" color="dimmed" weight={600}>
+                            {t('progress', { defaultValue: 'Fortschritt' })}
+                          </Text>
+                        </Group>
+                        <Text size="sm" weight={700} color={progress === 100 ? 'green' : 'purple'}>
+                          {progress}%
+                        </Text>
+                      </Group>
+                      <Progress
+                        value={progress}
+                        size="md"
+                        radius="xl"
+                        color={progress === 100 ? 'green' : 'purple'}
+                        sx={{
+                          '& .mantine-Progress-bar': {
+                            background: progress === 100
+                              ? 'linear-gradient(90deg, #10b981 0%, #059669 100%)'
+                              : 'linear-gradient(90deg, var(--purple-500) 0%, var(--purple-400) 100%)',
+                          },
+                        }}
+                      />
+                    </Box>
 
-                  <Box mb="md">
-                    <Group position="apart" mb={5}>
-                      <Text size="sm" color="dimmed">
-                        {t('progress', { defaultValue: 'Fortschritt' })}
-                      </Text>
-                      <Text size="sm" weight={500}>
-                        {progress}%
-                      </Text>
-                    </Group>
-                    <Progress value={progress} size="sm" radius="xl" />
+                    <Button
+                      fullWidth
+                      variant="gradient"
+                      gradient={{ from: 'purple.6', to: 'purple.4' }}
+                      onClick={() => navigate(`/dashboard/courses/${course.course_id}`)}
+                      leftIcon={<IconBook size={16} />}
+                      className="btn-modern transition-all duration-300"
+                      sx={{
+                        fontWeight: 600,
+                        '&:hover': {
+                          transform: 'translateY(-2px)',
+                          boxShadow: '0 8px 25px rgba(139, 92, 246, 0.4)',
+                        },
+                      }}
+                    >
+                      {t('openCourse', { defaultValue: 'Open' })}
+                    </Button>
                   </Box>
-
-                  <Button 
-                    fullWidth 
-                    variant="filled"
-                    color="teal" 
-                    mt="md"
-                    onClick={() => navigate(`/dashboard/courses/${course.course_id}`)}
-                    leftIcon={<IconBook size={16} />}
-                  >
-                    {t('openCourse', { defaultValue: 'Open' })}
-                  </Button>
                 </Card>
               </Grid.Col>
             );
@@ -401,23 +508,23 @@ function MyCourses() {
             onChange={(e) => setNewTitle(e.target.value)}
             required
           />
-          
+
           <Textarea
             label={t('description', { defaultValue: 'Beschreibung' })}
             value={newDescription}
             onChange={(e) => setNewDescription(e.target.value)}
             minRows={3}
           />
-          
+
           <Switch
             label={t('publicCourse', { defaultValue: 'Öffentlich sichtbar' })}
             checked={isPublic}
             onChange={(e) => setIsPublic(e.currentTarget.checked)}
-            description={t('publicCourseDescription', { 
-              defaultValue: 'Andere Nutzer können diesen Kurs finden und darauf zugreifen.' 
+            description={t('publicCourseDescription', {
+              defaultValue: 'Andere Nutzer können diesen Kurs finden und darauf zugreifen.'
             })}
           />
-          
+
           <Group position="right" mt="md">
             <Button variant="default" onClick={() => setRenameModalOpen(false)}>
               {t('cancel', { defaultValue: 'Abbrechen' })}

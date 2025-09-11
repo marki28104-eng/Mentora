@@ -1,0 +1,158 @@
+/* Modern Form Input Styles */
+.form-input-modern {
+  position: relative;
+}
+
+.form-input-modern .mantine-TextInput-input,
+.form-input-modern .mantine-PasswordInput-input {
+  background: var(--bg-card);
+  border: 2px solid rgba(139, 92, 246, 0.2);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-primary);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  min-height: 48px;
+}
+
+.form-input-modern .mantine-TextInput-input:focus,
+.form-input-modern .mantine-PasswordInput-input:focus {
+  border-color: var(--purple-500);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  background-color: var(--bg-primary);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.form-input-modern .mantine-TextInput-input:hover,
+.form-input-modern .mantine-PasswordInput-input:hover {
+  border-color: rgba(139, 92, 246, 0.4);
+  background-color: var(--bg-primary);
+}
+
+.form-input-modern .mantine-TextInput-input::placeholder,
+.form-input-modern .mantine-PasswordInput-input::placeholder {
+  color: var(--text-tertiary);
+  font-weight: 400;
+}
+
+.form-input-modern .mantine-TextInput-label,
+.form-input-modern .mantine-PasswordInput-label {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.form-input-modern .mantine-TextInput-error,
+.form-input-modern .mantine-PasswordInput-error {
+  color: #ef4444;
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 6px;
+}
+
+/* Error State */
+.form-input-error .mantine-TextInput-input,
+.form-input-error .mantine-PasswordInput-input {
+  border-color: #ef4444 !important;
+}
+
+.form-input-error .mantine-TextInput-input:focus,
+.form-input-error .mantine-PasswordInput-input:focus {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+/* Filled Variant */
+.form-input-filled .mantine-TextInput-input,
+.form-input-filled .mantine-PasswordInput-input {
+  background: rgba(139, 92, 246, 0.05);
+  border: 2px solid rgba(139, 92, 246, 0.3);
+}
+
+.form-input-filled .mantine-TextInput-input:focus,
+.form-input-filled .mantine-PasswordInput-input:focus {
+  background: var(--bg-primary);
+}
+
+/* Password Input Visibility Toggle */
+.form-input-modern .mantine-PasswordInput-visibilityToggle {
+  color: var(--purple-500);
+  border: none;
+  background: transparent;
+  transition: all 0.2s ease;
+}
+
+.form-input-modern .mantine-PasswordInput-visibilityToggle:hover {
+  background-color: rgba(139, 92, 246, 0.1);
+  color: var(--purple-600);
+}
+
+/* Loading State */
+.form-input-modern.loading .mantine-TextInput-input,
+.form-input-modern.loading .mantine-PasswordInput-input {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Disabled State */
+.form-input-modern .mantine-TextInput-input:disabled,
+.form-input-modern .mantine-PasswordInput-input:disabled {
+  background-color: var(--bg-secondary);
+  border-color: rgba(139, 92, 246, 0.1);
+  color: var(--text-tertiary);
+  cursor: not-allowed;
+}
+
+/* Success State */
+.form-input-success .mantine-TextInput-input,
+.form-input-success .mantine-PasswordInput-input {
+  border-color: #10b981;
+}
+
+.form-input-success .mantine-TextInput-input:focus,
+.form-input-success .mantine-PasswordInput-input:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Animation for focus state */
+@keyframes inputFocus {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-1px);
+  }
+}
+
+.form-input-modern .mantine-TextInput-input:focus,
+.form-input-modern .mantine-PasswordInput-input:focus {
+  animation: inputFocus 0.2s ease-out;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .form-input-modern .mantine-TextInput-input,
+  .form-input-modern .mantine-PasswordInput-input {
+    font-size: 16px; /* Prevent zoom on iOS */
+    padding: 14px 16px;
+  }
+}
+
+/* Dark mode specific adjustments */
+[data-mantine-color-scheme="dark"] .form-input-modern .mantine-TextInput-input,
+[data-mantine-color-scheme="dark"] .form-input-modern .mantine-PasswordInput-input {
+  background: var(--bg-card);
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+[data-mantine-color-scheme="dark"] .form-input-modern .mantine-TextInput-input:focus,
+[data-mantine-color-scheme="dark"] .form-input-modern .mantine-PasswordInput-input:focus {
+  background: var(--bg-primary);
+  border-color: var(--purple-400);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}

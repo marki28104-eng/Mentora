@@ -1,0 +1,272 @@
+/* Form Validation Styles */
+
+/* Form Alert Styles */
+.form-error-alert,
+.form-success-alert,
+.form-warning-alert {
+  margin-bottom: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+}
+
+.form-error-alert {
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.form-success-alert {
+  background-color: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.form-warning-alert {
+  background-color: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+/* Field Error and Success Styles */
+.field-error {
+  color: #ef4444;
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.field-success {
+  color: #10b981;
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Validation Status Styles */
+.validation-status {
+  margin-top: 6px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.validation-status-success {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.validation-status-error {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.validation-status-warning {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+/* Form Validation Summary */
+.form-validation-summary {
+  margin-bottom: 20px;
+}
+
+.form-validation-summary ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.form-validation-summary li {
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+/* Animation for validation messages */
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.field-error,
+.field-success,
+.validation-status {
+  animation: slideInDown 0.3s ease-out;
+}
+
+/* Hover effects for interactive validation elements */
+.validation-status:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Focus states for accessibility */
+.form-error-alert:focus-visible,
+.form-success-alert:focus-visible,
+.form-warning-alert:focus-visible {
+  outline: 2px solid var(--purple-500);
+  outline-offset: 2px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .form-validation-summary {
+    margin-bottom: 16px;
+  }
+  
+  .field-error,
+  .field-success {
+    font-size: 14px;
+  }
+  
+  .validation-status {
+    padding: 6px 10px;
+  }
+}
+
+/* Dark mode adjustments */
+[data-mantine-color-scheme="dark"] .form-error-alert {
+  background-color: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+[data-mantine-color-scheme="dark"] .form-success-alert {
+  background-color: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+[data-mantine-color-scheme="dark"] .form-warning-alert {
+  background-color: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+[data-mantine-color-scheme="dark"] .validation-status-success {
+  background-color: rgba(16, 185, 129, 0.15);
+}
+
+[data-mantine-color-scheme="dark"] .validation-status-error {
+  background-color: rgba(239, 68, 68, 0.15);
+}
+
+[data-mantine-color-scheme="dark"] .validation-status-warning {
+  background-color: rgba(245, 158, 11, 0.15);
+}
+
+/* Pulse animation for critical errors */
+@keyframes errorPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+.form-error-alert.critical {
+  animation: errorPulse 2s infinite;
+}
+
+/* Success checkmark animation */
+@keyframes successCheck {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.validation-status-success .mantine-Text-root::before {
+  content: '✓';
+  margin-right: 4px;
+  animation: successCheck 0.3s ease-out;
+}
+
+/* Loading state for validation */
+.validation-loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.validation-loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  width: 12px;
+  height: 12px;
+  margin-top: -6px;
+  border: 2px solid transparent;
+  border-top: 2px solid var(--purple-500);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Stagger animation for multiple validation messages */
+.form-validation-summary .mantine-Alert-root:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.form-validation-summary .mantine-Alert-root:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.form-validation-summary .mantine-Alert-root:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+/* Improved contrast for better accessibility */
+.field-error,
+.validation-status-error {
+  color: #dc2626;
+}
+
+.field-success,
+.validation-status-success {
+  color: #059669;
+}
+
+.validation-status-warning {
+  color: #d97706;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .field-error,
+  .validation-status-error {
+    color: #b91c1c;
+    font-weight: 600;
+  }
+  
+  .field-success,
+  .validation-status-success {
+    color: #047857;
+    font-weight: 600;
+  }
+  
+  .validation-status-warning {
+    color: #b45309;
+    font-weight: 600;
+  }
+}

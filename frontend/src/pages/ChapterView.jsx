@@ -18,7 +18,7 @@ import {
 } from '@mantine/core';
 import { IconDownload } from '@tabler/icons-react';
 import { useMediaQuery } from '@mantine/hooks';
-import { IconAlertCircle, IconBookmark, IconQuestionMark, IconPhoto, IconFileText, IconCards } from '@tabler/icons-react';
+import { IconAlertCircle, IconBookmark, IconQuestionMark, IconPhoto, IconFileText, IconCards, IconCheck, IconArrowBack, IconCircleCheck, IconClock } from '@tabler/icons-react';
 import { MediaGallery } from '../components/media/MediaGallery';
 import { FileList } from '../components/media/FileList';
 import { toast } from 'react-toastify';
@@ -535,61 +535,186 @@ function ChapterView() {
       >
         {chapter && (
           <>
-            <Group position="apart" mb="xl">
-              <Box>
-                <Title order={1} mb="xs">
-                  {chapter.caption || 'Chapter'}
-                </Title>
-                <Group>
-                  {chapter.estimated_minutes && (
-                    <Text color="dimmed" size="sm">
-                      {t('estimatedTime', { minutes: chapter.estimated_minutes })}
-                    </Text>
-                  )}
-                  {chapter.is_completed && (
-                    <Badge color="green" variant="filled">
-                      {t('badge.completed')}
+            {/* Modern Chapter Header */}
+            <Paper
+              radius="xl"
+              p="xl"
+              mb="xl"
+              className="card-modern card-glass transition-all duration-300"
+              sx={(theme) => ({
+                background: 'var(--bg-card)',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(139, 92, 246, 0.2)',
+                position: 'relative',
+                overflow: 'hidden',
+              })}
+            >
+              {/* Purple gradient background accent */}
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.03) 0%, rgba(168, 85, 247, 0.03) 100%)',
+                  zIndex: 0,
+                }}
+              />
+
+              <Group position="apart" align="flex-start" sx={{ position: 'relative', zIndex: 1 }}>
+                <Box sx={{ flex: 1 }}>
+                  <Group mb="md" spacing="md">
+                    <Badge
+                      size="lg"
+                      radius="xl"
+                      variant="gradient"
+                      gradient={{ from: 'purple.6', to: 'purple.4' }}
+                      sx={{
+                        background: chapter?.is_completed
+                          ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                          : 'linear-gradient(135deg, var(--purple-600) 0%, var(--purple-400) 100%)',
+                        color: 'white',
+                        fontWeight: 700,
+                      }}
+                    >
+                      {chapter?.is_completed ? (
+                        <Group spacing={6} noWrap>
+                          <IconCircleCheck size={16} />
+                          <span>Completed</span>
+                        </Group>
+                      ) : (
+                        'In Progress'
+                      )}
                     </Badge>
-                  )}
+
+                    {chapter?.estimated_minutes && (
+                      <Group spacing={6} noWrap>
+                        <ThemeIcon size="md" radius="xl" color="purple" variant="light">
+                          <IconClock size={16} />
+                        </ThemeIcon>
+                        <Text size="sm" color="dimmed" weight={600}>
+                          {t('estimatedTime', { minutes: chapter.estimated_minutes })}
+                        </Text>
+                      </Group>
+                    )}
+                  </Group>
+
+                  <Title
+                    order={1}
+                    mb="sm"
+                    sx={(theme) => ({
+                      fontSize: '2.25rem',
+                      fontWeight: 800,
+                      background: theme.colorScheme === 'dark'
+                        ? 'linear-gradient(135deg, var(--purple-400) 0%, var(--purple-300) 100%)'
+                        : 'linear-gradient(135deg, var(--purple-700) 0%, var(--purple-500) 100%)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text',
+                      lineHeight: 1.2,
+                    })}
+                  >
+                    {chapter?.caption || 'Chapter'}
+                  </Title>
+
+                  <Text size="md" color="dimmed" sx={{ maxWidth: '600px', lineHeight: 1.6 }}>
+                    Continue your learning journey with this comprehensive chapter.
+                  </Text>
+                </Box>
+
+                <Group spacing="sm" sx={{ flexShrink: 0 }}>
+                  <Button
+                    variant="light"
+                    color="purple"
+                    leftIcon={<IconDownload size={16} />}
+                    onClick={handleDownloadPDF}
+                    loading={downloadingPDF}
+                    disabled={downloadingPDF || activeTab !== 'content'}
+                    className="btn-modern transition-all duration-300"
+                    sx={{
+                      '&:hover': {
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 8px 25px rgba(139, 92, 246, 0.3)',
+                      },
+                    }}
+                  >
+                    Download PDF
+                  </Button>
+                  <Button
+                    variant="gradient"
+                    gradient={{ from: 'green.6', to: 'green.4' }}
+                    onClick={markChapterComplete}
+                    loading={markingComplete}
+                    disabled={markingComplete || chapter?.is_completed}
+                    className="btn-modern transition-all duration-300"
+                    sx={{
+                      '&:hover': {
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 8px 25px rgba(16, 185, 129, 0.4)',
+                      },
+                    }}
+                  >
+                    {chapter?.is_completed ? t('badge.completed') : t('buttons.markComplete')}
+                  </Button>
                 </Group>
-              </Box>
-
-              <Group spacing="sm">
-                <Button
-                  variant="outline"
-                  color="blue"
-                  leftIcon={<IconDownload size={16} />}
-                  onClick={handleDownloadPDF}
-                  loading={downloadingPDF}
-                  disabled={downloadingPDF || activeTab !== 'content'}
-                >
-                  Download PDF
-                </Button>
-                <Button
-                  color="green"
-                  onClick={markChapterComplete}
-                  loading={markingComplete}
-                  disabled={markingComplete}
-                >
-                  {t('buttons.markComplete')}
-                </Button>
               </Group>
-            </Group>
+            </Paper>
 
-            <Tabs value={activeTab} onTabChange={handleTabChange} mb="xl">
+            {/* Modern Tabs with Purple Theming */}
+            <Tabs
+              value={activeTab}
+              onTabChange={handleTabChange}
+              mb="xl"
+              sx={(theme) => ({
+                '& .mantine-Tabs-tabsList': {
+                  background: 'var(--bg-card)',
+                  backdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(139, 92, 246, 0.2)',
+                  borderRadius: '16px',
+                  padding: '8px',
+                  gap: '4px',
+                },
+                '& .mantine-Tabs-tab': {
+                  border: 'none',
+                  borderRadius: '12px',
+                  padding: '12px 20px',
+                  fontWeight: 600,
+                  color: theme.colorScheme === 'dark' ? theme.colors.gray[4] : theme.colors.gray[6],
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  '&:hover': {
+                    background: 'rgba(139, 92, 246, 0.1)',
+                    color: 'var(--purple-500)',
+                    transform: 'translateY(-2px)',
+                  },
+                  '&[data-active]': {
+                    background: 'linear-gradient(135deg, var(--purple-500) 0%, var(--purple-400) 100%)',
+                    color: 'white',
+                    boxShadow: '0 4px 15px rgba(139, 92, 246, 0.4)',
+                    transform: 'translateY(-2px)',
+                  },
+                },
+              })}
+            >
               <Tabs.List>
-                <Tabs.Tab value="content" icon={<IconBookmark size={14} />}>{t('tabs.content')}</Tabs.Tab>
-                {/* <Tabs.Tab value="flashcards" icon={<IconCards size={14} />}>Flashcards</Tabs.Tab>*/}
+                <Tabs.Tab value="content" icon={<IconBookmark size={16} />}>
+                  {t('tabs.content')}
+                </Tabs.Tab>
+                {/* <Tabs.Tab value="flashcards" icon={<IconCards size={16} />}>Flashcards</Tabs.Tab>*/}
                 {images.length > 0 && (
-                  <Tabs.Tab value="images" icon={<IconPhoto size={14} />}>{t('tabs.images')}</Tabs.Tab>
+                  <Tabs.Tab value="images" icon={<IconPhoto size={16} />}>
+                    {t('tabs.images')} ({images.length})
+                  </Tabs.Tab>
                 )}
                 {files.length > 0 && (
-                  <Tabs.Tab value="files" icon={<IconFileText size={14} />}>{t('tabs.files')}</Tabs.Tab>
+                  <Tabs.Tab value="files" icon={<IconFileText size={16} />}>
+                    {t('tabs.files')} ({files.length})
+                  </Tabs.Tab>
                 )}
                 {hasQuestions && (
                   <Tabs.Tab
                     value="quiz"
-                    icon={<IconQuestionMark size={14} />}
+                    icon={<IconQuestionMark size={16} />}
                     className={isBlinking ? 'quiz-tab-blinking' : ''}
                   >
                     {questionCount > 0 ? t('tabs.quiz', { count: questionCount }) : 'Quiz'}
@@ -597,24 +722,74 @@ function ChapterView() {
                 )}
               </Tabs.List>
 
-              <Tabs.Panel value="content" pt="xs" style={{ width: '100%' }}>
+              <Tabs.Panel value="content" pt="md" style={{ width: '100%' }}>
                 <FullscreenContentWrapper>
-                  <Paper shadow="xs" p="md" withBorder ref={contentRef} style={{ width: '100%' }}>
-                    <div className="markdown-content" style={{ width: '100%' }}>
+                  <Paper
+                    ref={contentRef}
+                    className="card-modern card-glass transition-all duration-300"
+                    sx={{
+                      background: 'var(--bg-card)',
+                      backdropFilter: 'blur(20px)',
+                      border: '1px solid rgba(139, 92, 246, 0.2)',
+                      borderRadius: '16px',
+                      padding: '32px',
+                      width: '100%',
+                      position: 'relative',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {/* Subtle gradient overlay */}
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.02) 0%, rgba(168, 85, 247, 0.02) 100%)',
+                        zIndex: 0,
+                      }}
+                    />
+                    <div className="markdown-content" style={{ width: '100%', position: 'relative', zIndex: 1 }}>
                       <AiCodeWrapper>{chapter.content}</AiCodeWrapper>
                     </div>
                   </Paper>
                 </FullscreenContentWrapper>
               </Tabs.Panel>
+
               {/* 
-              <Tabs.Panel value="flashcards" pt="xs" style={{ width: '100%' }}>
-                <Paper shadow="xs" p="md" withBorder style={{ width: '100%' }}>
+              <Tabs.Panel value="flashcards" pt="md" style={{ width: '100%' }}>
+                <Paper 
+                  className="card-modern card-glass transition-all duration-300"
+                  sx={{
+                    background: 'var(--bg-card)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(139, 92, 246, 0.2)',
+                    borderRadius: '16px',
+                    padding: '32px',
+                    width: '100%',
+                  }}
+                >
                   <FlashcardDeck courseId={courseId} chapterId={chapterId} />
                 </Paper>
               </Tabs.Panel>
               */}
-              <Tabs.Panel value="images" pt="xs" style={{ width: '100%' }}>
-                <Paper shadow="xs" p="md" withBorder style={{ width: '100%' }}>
+
+              <Tabs.Panel value="images" pt="md" style={{ width: '100%' }}>
+                <Paper
+                  className="card-modern card-glass transition-all duration-300"
+                  sx={{
+                    background: 'var(--bg-card)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(139, 92, 246, 0.2)',
+                    borderRadius: '16px',
+                    padding: '32px',
+                    width: '100%',
+                  }}
+                >
+                  <Title order={3} mb="lg" sx={{ color: 'var(--purple-600)', fontWeight: 700 }}>
+                    Chapter Images ({images.length})
+                  </Title>
                   <MediaGallery
                     images={images}
                     onDelete={handleDeleteImage}
@@ -624,8 +799,21 @@ function ChapterView() {
                 </Paper>
               </Tabs.Panel>
 
-              <Tabs.Panel value="files" pt="xs" style={{ width: '100%' }}>
-                <Paper shadow="xs" p="md" withBorder style={{ width: '100%' }}>
+              <Tabs.Panel value="files" pt="md" style={{ width: '100%' }}>
+                <Paper
+                  className="card-modern card-glass transition-all duration-300"
+                  sx={{
+                    background: 'var(--bg-card)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(139, 92, 246, 0.2)',
+                    borderRadius: '16px',
+                    padding: '32px',
+                    width: '100%',
+                  }}
+                >
+                  <Title order={3} mb="lg" sx={{ color: 'var(--purple-600)', fontWeight: 700 }}>
+                    Chapter Files ({files.length})
+                  </Title>
                   <FileList
                     files={files}
                     onDelete={handleDeleteFile}
@@ -635,38 +823,82 @@ function ChapterView() {
                 </Paper>
               </Tabs.Panel>
 
-              <Tabs.Panel value="quiz" pt="xs" style={{ width: '100%' }}>
-                <Quiz
-                  key={quizKey}
-                  courseId={courseId}
-                  chapterId={chapterId}
-                  onQuestionCountChange={(count) => {
-                    setQuestionCount(count);
-                    setHasQuestions(count > 0);
+              <Tabs.Panel value="quiz" pt="md" style={{ width: '100%' }}>
+                <Paper
+                  className="card-modern card-glass transition-all duration-300"
+                  sx={{
+                    background: 'var(--bg-card)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(139, 92, 246, 0.2)',
+                    borderRadius: '16px',
+                    padding: '32px',
+                    width: '100%',
                   }}
-                  style={{ width: '100%' }}
-                />
+                >
+                  <Quiz
+                    key={quizKey}
+                    courseId={courseId}
+                    chapterId={chapterId}
+                    onQuestionCountChange={(count) => {
+                      setQuestionCount(count);
+                      setHasQuestions(count > 0);
+                    }}
+                    style={{ width: '100%' }}
+                  />
+                </Paper>
               </Tabs.Panel>
             </Tabs>
 
-            <Group position="apart" mt="md">
-              <Button
-                variant="outline"
-                onClick={() => navigate(`/dashboard/courses/${courseId}`)}
-              >
-                {t('buttons.backToCourse')}
-              </Button>
-              <Group spacing="sm">
+            {/* Modern Footer Navigation */}
+            <Paper
+              radius="xl"
+              p="lg"
+              mt="xl"
+              className="card-modern card-glass transition-all duration-300"
+              sx={{
+                background: 'var(--bg-card)',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(139, 92, 246, 0.2)',
+              }}
+            >
+              <Group position="apart">
                 <Button
-                  color="green"
-                  onClick={markChapterComplete}
-                  loading={markingComplete}
-                  disabled={markingComplete || chapter?.is_completed}
+                  variant="light"
+                  color="purple"
+                  leftIcon={<IconArrowBack size={16} />}
+                  onClick={() => navigate(`/dashboard/courses/${courseId}`)}
+                  className="btn-modern transition-all duration-300"
+                  sx={{
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 8px 25px rgba(139, 92, 246, 0.3)',
+                    },
+                  }}
                 >
-                  {chapter?.is_completed ? t('badge.completed') : t('buttons.markComplete')}
+                  {t('buttons.backToCourse')}
                 </Button>
+
+                <Group spacing="sm">
+                  <Button
+                    variant="gradient"
+                    gradient={{ from: 'green.6', to: 'green.4' }}
+                    onClick={markChapterComplete}
+                    loading={markingComplete}
+                    disabled={markingComplete || chapter?.is_completed}
+                    rightIcon={<IconCheck size={16} />}
+                    className="btn-modern transition-all duration-300"
+                    sx={{
+                      '&:hover': {
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 8px 25px rgba(16, 185, 129, 0.4)',
+                      },
+                    }}
+                  >
+                    {chapter?.is_completed ? t('badge.completed') : t('buttons.markComplete')}
+                  </Button>
+                </Group>
               </Group>
-            </Group>
+            </Paper>
           </>
         )}
       </Container>
