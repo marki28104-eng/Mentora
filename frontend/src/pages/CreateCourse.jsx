@@ -318,8 +318,9 @@ function CreateCourse() {
                 gradient={{ from: 'teal', to: 'cyan' }}
                 mb="sm"
               >
-                <img
-                  src="/logo_white_mittig.png"
+                <img 
+                  src="/logo_white_2.svg
+                  "
                   alt="Logo"
                   style={{
                     height: 28,
@@ -399,7 +400,7 @@ function CreateCourse() {
                 disabled={isUploading || isSubmitting}
               >
                 {(props) => (
-                  <Card
+                  <Card 
                     {...props}
                     p="md"
                     withBorder
@@ -482,9 +483,9 @@ function CreateCourse() {
             )}
 
             {isUploading && (
-              <Alert
+              <Alert 
                 icon={<IconUpload size={16} />}
-                title={t('alert.uploading.title') || 'Uploading files...'}
+                title={t('alert.uploading.title') || 'Uploading files...'} 
                 color="blue"
               >
                 {t('alert.uploading.message') || 'Please wait while your files are being uploaded.'}
@@ -497,9 +498,9 @@ function CreateCourse() {
         return (
           <Stack spacing="">
             <Box ta="center" mb="sm">
-              <ThemeIcon
-                size={60}
-                radius="xl"
+              <ThemeIcon 
+                size={60} 
+                radius="xl" 
                 variant="gradient"
                 gradient={{ from: 'blue', to: 'teal' }}
                 mb="sm"
@@ -518,9 +519,9 @@ function CreateCourse() {
                   size={160}
                   thickness={10}
                   roundCaps
-                  sections={[{
-                    value: (form.values.time_hours / 30) * 100,
-                    color: theme.colors.blue[6]
+                  sections={[{ 
+                    value: (form.values.time_hours / 30) * 100, 
+                    color: theme.colors.blue[6] 
                   }]}
                   label={
                     <Stack align="center" spacing={2}>
@@ -548,7 +549,7 @@ function CreateCourse() {
                   { value: 15, label: '15h' },
                   { value: 20, label: '20h' },
                   { value: 25, label: '25h' },
-                  { value: 30, label: '30h' },
+                  { value: 30, label: '30h'},
                 ]}
                 styles={{
                   track: { height: 8 },

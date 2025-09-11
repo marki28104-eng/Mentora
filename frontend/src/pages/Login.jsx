@@ -36,7 +36,7 @@ function Login() {
 
   // Use white logo for dark theme, black for light theme
   const logoPath =
-    colorScheme === "dark" ? "/logo_white.png" : "/logo_black.png";
+    colorScheme === "dark" ? "/logo_white_2.svg" : "/logo_black_2.svg";
 
   const form = useForm({
     initialValues: {
@@ -127,12 +127,12 @@ function Login() {
   return (
     <Container align="center" size={460} my={40}>
       <Group position="center"  align="center" spacing="xs" mb={20}>
-        <Image src={logoPath} width={80} mb="md" alt="Mentora Logo" />
+        <Image src={logoPath} width={80} alt="Mentora Logo" style={{ marginBottom: 7 }} />
         <Stack spacing="xxs">
           <Title order={1} size={32} weight={700} align="center">
             {t("welcomeBack")}
           </Title>
-          <Text color="dimmed" size="lg" align="center" mb="xl">
+          <Text color="dimmed" size="lg" align="center" mb="l">
             {t("signInToContinue")}
           </Text>
         </Stack>

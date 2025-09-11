@@ -36,7 +36,7 @@ function Register() {
   const theme = useMantineTheme();
   
   // Use white logo for dark theme, black for light theme
-  const logoPath = colorScheme === 'dark' ? '/logo_white.png' : '/logo_black.png';
+  const logoPath = colorScheme === 'dark' ? '/logo_white_2.svg' : '/logo_black_2.svg';
 
   const form = useForm({
     initialValues: {

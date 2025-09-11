@@ -253,7 +253,7 @@ function MyCourses() {
             {!searchQuery && (
               <Button 
                 leftIcon={<IconFlame size={16} />} 
-                onClick={() => navigate('/create-course')}
+                onClick={() => navigate('/dashboard/create-course')}
                 mt="md"
               >
                 {t('createCourseButton', { defaultValue: 'Kurs erstellen' })}

@@ -8,7 +8,7 @@
     "noCourseFound": "No course found with this ID."
   },
   "creation": {
-    "title": "Course Creation in Progress",
+    "title": "This will take a while. Grab a coffee and come back!",
     "statusInitializing": "Initializing course creation...",
     "statusCreatingChapters": "AI is crafting your chapters...",
     "statusFinalizing": "Finalizing course structure...",

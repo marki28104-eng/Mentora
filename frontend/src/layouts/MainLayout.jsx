@@ -1,10 +1,9 @@
 import { Outlet, useLocation } from 'react-router-dom';
 import { useMediaQuery } from '@mantine/hooks';
-import { 
-  AppShell, 
-  Header, 
-  Group, 
-  Title,
+import {
+  AppShell,
+  Header,
+  Group,
   useMantineTheme,
   ActionIcon,
   Box,
@@ -17,17 +16,14 @@ import {
   UnstyledButton,
   Text,
 } from '@mantine/core';
-import { 
+import {
   IconSettings,
-  IconSun, 
-  IconMoonStars, 
-  IconUser, 
+  IconSun,
+  IconMoonStars,
+  IconUser,
   IconLogout,
   IconInfoCircle,
-  IconSparkles,
-  IconHome2,
-  IconChartLine,
-  IconShieldCheck
+  IconHome2
 } from '@tabler/icons-react';
 import AppFooter from '../components/AppFooter';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
@@ -62,7 +58,7 @@ function MainLayout() {
   };
 
   return (
-      <AppShell
+    <AppShell
       styles={{
         main: {
           background: dark ? theme.colors.dark[8] : theme.colors.gray[0],
@@ -77,15 +73,15 @@ function MainLayout() {
         },
       }}
       header={
-        <Header 
-          height={{ base: 60, md: 70 }} 
+        <Header
+          height={{ base: 60, md: 70 }}
           p="md"
           sx={(theme) => ({
-            background: dark 
+            background: dark
               ? `linear-gradient(135deg, ${theme.colors.dark[7]} 0%, ${theme.colors.dark[8]} 100%)`
               : `linear-gradient(135deg, ${theme.white} 0%, ${theme.colors.gray[0]} 100%)`,
             borderBottom: `1px solid ${dark ? theme.colors.dark[6] : theme.colors.gray[2]}`,
-            boxShadow: dark 
+            boxShadow: dark
               ? `0 4px 12px ${theme.colors.dark[9]}50`
               : `0 4px 12px ${theme.colors.gray[3]}30`,
             zIndex: 200,
@@ -93,67 +89,31 @@ function MainLayout() {
           })}
         >
           <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-            <Group spacing="xs">
-              {(!isMobile || isAuthenticated) && (
-                <img 
-                  src={theme.colorScheme === 'dark' ? "/logo_white.png" : "/logo_black.png"}
-                  alt="Logo"
-                  style={{ 
-                    height: 28,
+            {(!isMobile || isAuthenticated) && (
+              <RouterLink
+                to={isAuthenticated ? "/dashboard" : "/"}
+                style={{ textDecoration: "none" }}
+              >
+                <img
+                  src="/mentora_schrift_türk_2.svg"
+                  alt="Mentora"
+                  style={{
+                    height: 40,
                     width: 'auto',
                     filter: 'drop-shadow(0 2px 4px rgba(139, 92, 246, 0.3))',
-                  }} 
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                  }}
+                  onMouseEnter={(e) => e.target.style.transform = "scale(1.02)"}
+                  onMouseLeave={(e) => e.target.style.transform = "scale(1)"}
                 />
-              )}
-              <Title
-                    order={3}
-                    size="1.6rem"
-                    component={RouterLink}
-                    to={isAuthenticated ? "/dashboard" : "/"}
-                    sx={(theme) => ({
-                      // gradient text
-                      textDecoration: "none",
-                      background: `linear-gradient(135deg, ${theme.colors.teal[6]}, ${theme.colors.cyan[4]})`,
-                      backgroundClip: "text",
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                      fontWeight: 800,
-                      letterSpacing: "-1px",
+              </RouterLink>
+            )}
 
-                      // keep the pseudo‐element for hover‐bg if you like
-                      display: "inline-block",
-                      position: "relative",
-                      padding: theme.spacing.xs,
-
-                      // smooth transition
-                      transition: "transform 0.2s ease",
-
-                      "&::before": {
-                        content: '""',
-                        position: "absolute",
-                        inset: 0,
-                        borderRadius: theme.radius.sm,
-                        background: "transparent",
-                        zIndex: -1,
-                        transition: "background 0.2s ease",
-                      },
-
-                      "&:hover": {
-                        transform: "scale(1.02)",
-                        cursor: "pointer",
-                      },
-
-                      
-                    })}
-                  >
-                    {t("title", { ns: "app" })}
-                  </Title>
-            </Group>
-            
             <Box sx={{ flexGrow: 1 }} />
-            
+
             <Box sx={{ flexGrow: 1, '@media (min-width: 769px)': { display: 'none' } }} />
-            
+
             <Group spacing="md">
               {(!isMobile || isAuthenticated) && (
                 <ActionIcon
@@ -174,7 +134,7 @@ function MainLayout() {
                   {dark ? <IconSun size={20} /> : <IconMoonStars size={20} />}
                 </ActionIcon>
               )}
-              
+
               {isAuthenticated && user ? (
                 <Menu shadow="md" width={220} withinPortal={true} zIndex={300}>
                   <Menu.Target>
@@ -210,9 +170,9 @@ function MainLayout() {
                         </Avatar>
                         <Box>
                           <Text size="sm" weight={500}>{user.username}</Text>
-                          <Badge 
-                            size="xs" 
-                            variant="light" 
+                          <Badge
+                            size="xs"
+                            variant="light"
                             color="cyan"
                             sx={{ textTransform: 'none' }}
                           >
@@ -225,14 +185,14 @@ function MainLayout() {
                   <Menu.Dropdown
                     sx={{
                       border: `1px solid ${dark ? theme.colors.dark[4] : theme.colors.gray[3]}`,
-                      boxShadow: dark 
+                      boxShadow: dark
                         ? `0 8px 24px ${theme.colors.dark[9]}70`
                         : `0 8px 24px ${theme.colors.gray[4]}40`,
                       zIndex: 300,
                     }}
                   >
-                    <Menu.Item 
-                      icon={<IconHome2 size={14} />} 
+                    <Menu.Item
+                      icon={<IconHome2 size={14} />}
                       onClick={() => navigate('/dashboard')}
                       sx={{
                         '&:hover': {
@@ -254,8 +214,8 @@ function MainLayout() {
                       {t('statistics', { ns: 'navigation' })}
                     </Menu.Item>
                     */}
-                    <Menu.Item 
-                      icon={<IconSettings size={14} />} 
+                    <Menu.Item
+                      icon={<IconSettings size={14} />}
                       onClick={() => navigate('/dashboard/settings')}
                       sx={{
                         '&:hover': {
@@ -266,8 +226,8 @@ function MainLayout() {
                       {t('settings', { ns: 'navigation' })}
                     </Menu.Item>
                     <Divider />
-                    <Menu.Item 
-                      icon={<IconInfoCircle size={14} />} 
+                    <Menu.Item
+                      icon={<IconInfoCircle size={14} />}
                       onClick={() => navigate('/about')}
                       sx={{
                         '&:hover': {
@@ -277,8 +237,8 @@ function MainLayout() {
                     >
                       {t('about', { ns: 'navigation' })}
                     </Menu.Item>
-                    <Menu.Item 
-                      icon={<IconLogout size={14} />} 
+                    <Menu.Item
+                      icon={<IconLogout size={14} />}
                       onClick={handleLogout}
                       color="red"
                       sx={{
@@ -294,7 +254,7 @@ function MainLayout() {
               ) : (
                 !['/auth/login', '/auth/signup'].includes(pathname) && (
                   <Group spacing="xs">
-                    <Button 
+                    <Button
                       component={RouterLink}
                       to="/auth/login"
                       variant="outline"
@@ -335,7 +295,7 @@ function MainLayout() {
         <Outlet />
       </Box>
       <AppFooter />
-      </AppShell>
+    </AppShell>
   );
 }
 

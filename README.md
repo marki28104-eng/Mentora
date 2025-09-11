@@ -12,7 +12,6 @@ This project is a full-stack application designed to deliver cutting-edge **AI s
 
 **🌐 Try it live:** [mentora.de](https://mentora-kiro.de)
 
-
 ---
 
 <picture>
