@@ -19,9 +19,14 @@ from .api.routers import notes
 from .api.routers import chat
 from .api.routers import search as search_router
 from .api.routers import flashcard
+from .api.routers import analytics
+from .api.routers import dashboard
+from .api.routers import ml_recommendations
+from .api.routers import advanced_analytics
 from .api.schemas import user as user_schema
 from .db.database import engine, SessionLocal
 from .db.models import db_user as user_model
+from .db.models import db_analytics  # Import analytics models to register with Base
 from .utils import auth
 
 from .core.routines import update_stuck_courses
@@ -30,8 +35,7 @@ from .core.lifespan import lifespan
 
 
 
-# Create database tables
-user_model.Base.metadata.create_all(bind=engine)
+# Database tables will be created in the lifespan function
 
 # Create output directory for flashcard files
 output_dir = Path("/tmp/anki_output") if os.path.exists("/tmp") else Path("./anki_output")
@@ -82,6 +86,10 @@ app.include_router(notes.router)
 app.include_router(questions.router)
 app.include_router(chat.router)
 app.include_router(flashcard.router)
+app.include_router(analytics.router)
+app.include_router(dashboard.router)
+app.include_router(ml_recommendations.router)
+app.include_router(advanced_analytics.router)
 
 # Mount static files for flashcard downloads
 app.mount("/output", StaticFiles(directory=str(output_dir)), name="output")

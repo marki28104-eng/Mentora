@@ -2,10 +2,11 @@ from datetime import datetime, timedelta, timezone
 from typing import Dict, Optional
 
 from authlib.integrations.starlette_client import OAuth
-from fastapi import HTTPException, status, Request, Cookie, Response
+from fastapi import HTTPException, status, Request, Cookie, Response, Depends
 from jose import JWTError, jwt
 from typing import Optional
 from passlib.context import CryptContext
+from sqlalchemy.orm import Session
 
 from ..config import settings
 from ..config.settings import (ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM,
@@ -185,4 +186,20 @@ oauth.register(
     api_base_url='https://discord.com/api/',
     client_kwargs={'scope': 'identify email'},
 )
+
+
+async def get_current_user(request: Request) -> str:
+    """
+    Dependency function to get the current user from the request.
+    Returns the user_id from the JWT token in cookies.
+    """
+    access_token = await get_access_token_from_cookie(request)
+    if not access_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated: Access token missing",
+        )
+    
+    user_id = verify_token(access_token)
+    return user_id
 

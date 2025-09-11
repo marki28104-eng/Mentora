@@ -50,6 +50,7 @@ import PlaceGolderImage from '../assets/place_holder_image.png';
 import DashboardStats from '../components/DashboardStats';
 import LearningAnalytics from '../components/LearningAnalytics';
 import EnhancedSearch from '../components/EnhancedSearch';
+import PersonalizedRecommendations from '../components/PersonalizedRecommendations';
 
 const useStyles = createStyles((theme) => ({
   continueSection: {
@@ -743,6 +744,18 @@ function Dashboard() {
               </div>
             </motion.div>
           </motion.div>
+        )}
+
+        {/* Personalized Recommendations */}
+        {user && (
+          <Box mb="xl" mt="xl" pt="xl">
+            <motion.div variants={item}>
+              <PersonalizedRecommendations
+                userId={user.id}
+                onRecommendationClick={(rec) => navigate(`/dashboard/courses/${rec.course_id}`)}
+              />
+            </motion.div>
+          </Box>
         )}
 
         {/* Enhanced Search - Full width */}

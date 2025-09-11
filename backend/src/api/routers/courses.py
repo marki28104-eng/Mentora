@@ -19,6 +19,9 @@ from ..schemas.course import (
     CourseRequest,
     Chapter as ChapterSchema,
     UpdateCoursePublicStatusRequest,
+    PersonalizedChapter,
+    CourseRecommendation,
+    PacingData,
 )
 
 from ...config.settings import ( MAX_COURSE_CREATIONS, MAX_PRESENT_COURSES )
@@ -186,34 +189,70 @@ async def get_course_chapters(
     return chapter_schemas
 
 
-@router.get("/{course_id}/chapters/{chapter_id}", response_model=ChapterSchema)
+@router.get("/{course_id}/chapters/{chapter_id}", response_model=PersonalizedChapter)
 async def get_chapter_by_id(
         course_id: int,
         chapter_id: int,
+        personalized: bool = True,
         current_user: User = Depends(get_current_active_user),
         db: Session = Depends(get_db)
 ):
     """
-    Get a specific chapter by ID within a course.
+    Get a specific chapter by ID within a course with optional personalization.
     Only accessible if the course belongs to the current user.
     """
     # First verify course ownership
     course = await verify_course_ownership(course_id, str(current_user.id), db)
     
-    # Find the specific chapter
-    chapter = course_service.get_chapter_by_id(course_id, chapter_id, db)
-    
-    # Build chapter response
-    return ChapterSchema(
-        id=chapter.id,  
-        index=chapter.index,
-        caption=chapter.caption,
-        summary=chapter.summary or "",
-        content=chapter.content,
-        image_url=chapter.image_url,
-        time_minutes=chapter.time_minutes,
-        is_completed=chapter.is_completed  
-    )
+    if personalized:
+        # Get personalized chapter content
+        personalized_content = await course_service.get_personalized_chapter_content(
+            db=db,
+            user_id=str(current_user.id),
+            course_id=course_id,
+            chapter_id=chapter_id
+        )
+        
+        chapter = personalized_content["chapter"]
+        
+        # Build enhanced response with personalization data
+        return PersonalizedChapter(
+            id=chapter.id,
+            index=chapter.index,
+            caption=chapter.caption,
+            summary=chapter.summary or "",
+            content=chapter.content,
+            image_url=chapter.image_url,
+            time_minutes=chapter.time_minutes,
+            is_completed=chapter.is_completed,
+            personalization={
+                "is_personalized": personalized_content["personalized"],
+                "adaptations": personalized_content["adaptations"],
+                "content_modifications": personalized_content["content_modifications"],
+                "learning_style": personalized_content.get("learning_style", "unknown")
+            }
+        )
+    else:
+        # Find the specific chapter (non-personalized)
+        chapter = course_service.get_chapter_by_id(course_id, chapter_id, db)
+        
+        # Build standard chapter response with empty personalization
+        return PersonalizedChapter(
+            id=chapter.id,  
+            index=chapter.index,
+            caption=chapter.caption,
+            summary=chapter.summary or "",
+            content=chapter.content,
+            image_url=chapter.image_url,
+            time_minutes=chapter.time_minutes,
+            is_completed=chapter.is_completed,
+            personalization={
+                "is_personalized": False,
+                "adaptations": {},
+                "content_modifications": {},
+                "learning_style": "unknown"
+            }
+        )
 
 
 
@@ -469,3 +508,68 @@ async def mark_chapter_incomplete(
         "chapter_id": chapter.id,
         "is_completed": updated_chapter.is_completed
     }
+
+
+# -------- PERSONALIZATION ENDPOINTS ----------
+
+@router.get("/recommendations", response_model=List[CourseRecommendation])
+async def get_personalized_recommendations(
+        topic: Optional[str] = None,
+        max_recommendations: int = 5,
+        current_user: User = Depends(get_current_active_user),
+        db: Session = Depends(get_db)
+):
+    """
+    Get personalized course recommendations for the current user.
+    """
+    recommendations = await course_service.get_personalized_course_recommendations(
+        db=db,
+        user_id=str(current_user.id),
+        topic=topic,
+        max_recommendations=max_recommendations
+    )
+    
+    # Convert to CourseRecommendation schema objects
+    return [
+        CourseRecommendation(
+            course_id=rec["course_id"],
+            title=rec["title"],
+            recommendation_score=rec["recommendation_score"],
+            reason=rec["reason"],
+            recommended_difficulty=rec["recommended_difficulty"],
+            estimated_completion_time=rec["estimated_completion_time"],
+            topic_match_score=rec["topic_match_score"],
+            learning_style_match=rec["learning_style_match"]
+        )
+        for rec in recommendations
+    ]
+
+
+@router.get("/{course_id}/pacing", response_model=PacingData)
+async def get_adaptive_pacing(
+        course_id: int,
+        current_user: User = Depends(get_current_active_user),
+        db: Session = Depends(get_db)
+):
+    """
+    Get adaptive pacing recommendations for a specific course.
+    """
+    # Verify course ownership
+    await verify_course_ownership(course_id, str(current_user.id), db)
+    
+    pacing_data = await course_service.get_adaptive_course_pacing(
+        db=db,
+        user_id=str(current_user.id),
+        course_id=course_id
+    )
+    
+    # Convert to PacingData schema
+    return PacingData(
+        has_adjustment=pacing_data["has_adjustment"],
+        current_pace=pacing_data["current_pace"],
+        recommended_pace=pacing_data["recommended_pace"],
+        adjustment_factor=pacing_data["adjustment_factor"],
+        reason=pacing_data["reason"],
+        confidence=pacing_data.get("confidence"),
+        next_review_date=pacing_data.get("next_review_date")
+    )

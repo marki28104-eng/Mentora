@@ -1,4 +1,4 @@
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Any
 from pydantic import BaseModel, Field
 from datetime import datetime
 
@@ -49,3 +49,50 @@ class CourseInfo(BaseModel):
 class UpdateCoursePublicStatusRequest(BaseModel):
     """Schema for updating the public status of a course."""
     is_public: bool
+
+
+class PersonalizationData(BaseModel):
+    """Schema for personalization data in chapter responses."""
+    is_personalized: bool
+    adaptations: Dict[str, Any] = {}
+    content_modifications: Dict[str, Any] = {}
+    learning_style: str = "unknown"
+
+
+class PersonalizedChapter(BaseModel):
+    """Schema for a personalized chapter response."""
+    id: int
+    index: int
+    caption: str
+    summary: str
+    content: str
+    time_minutes: int
+    is_completed: bool = False
+    image_url: Optional[str] = None
+    personalization: PersonalizationData
+
+    class Config:
+        from_attributes = True
+
+
+class CourseRecommendation(BaseModel):
+    """Schema for course recommendations."""
+    course_id: int
+    title: str
+    recommendation_score: float
+    reason: str
+    recommended_difficulty: str
+    estimated_completion_time: int
+    topic_match_score: float
+    learning_style_match: float
+
+
+class PacingData(BaseModel):
+    """Schema for adaptive pacing data."""
+    has_adjustment: bool
+    current_pace: float
+    recommended_pace: float
+    adjustment_factor: float
+    reason: str
+    confidence: Optional[float] = None
+    next_review_date: Optional[str] = None

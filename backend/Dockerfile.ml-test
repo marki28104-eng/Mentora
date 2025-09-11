@@ -1,0 +1,33 @@
+# Simplified Dockerfile for testing ML dependencies
+FROM python:3.10-slim
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# Install system dependencies for ML packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    g++ \
+    libc6-dev \
+    libffi-dev \
+    libssl-dev \
+    libgomp1 \
+    libopenblas-dev \
+    liblapack-dev \
+    libblas-dev \
+    gfortran \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set work directory
+WORKDIR /app
+
+# Copy requirements and install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy test script
+COPY test_ml_dependencies.py .
+
+# Run the test by default
+CMD ["python", "test_ml_dependencies.py"]

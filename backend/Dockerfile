@@ -8,10 +8,14 @@ ENV PYTHONUNBUFFERED 1
 # Set work directory
 WORKDIR /usr/src/app
 
-# Install system dependencies required for some Python packages (if any)
-# For example, if you were using psycopg2 for PostgreSQL and needed build tools:
-# RUN apt-get update && apt-get install -y --no-install-recommends gcc libpq-dev \
-#    && rm -rf /var/lib/apt/lists/*
+# Install system dependencies required for ML packages and analytics
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    g++ \
+    libc6-dev \
+    libffi-dev \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install pipenv (if you were using it, otherwise skip)
 # RUN pip install --upgrade pip
@@ -27,10 +31,17 @@ RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requir
 # --- Final Stage ---
 FROM python:3.10-slim
 
-# Install Node.js and npm
+# Install Node.js, npm, and runtime dependencies for ML packages
 RUN apt-get update && apt-get install -y curl gnupg \
     && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
     && apt-get install -y nodejs \
+    # Runtime dependencies for ML packages
+    && apt-get install -y --no-install-recommends \
+        libgomp1 \
+        libopenblas-dev \
+        liblapack-dev \
+        libblas-dev \
+        gfortran \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user with proper home directory

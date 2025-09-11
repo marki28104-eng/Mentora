@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  backend:
+    environment:
+      # Advanced Analytics Configuration
+      - ANALYTICS_MODEL_RETRAIN_INTERVAL_HOURS=24
+      - ANALYTICS_SESSION_CLEANUP_INTERVAL_HOURS=24
+      - ANALYTICS_MIN_DATA_POINTS_FOR_TRAINING=50
+      - ANALYTICS_ENABLE_REAL_TIME_PERSONALIZATION=true
+      - ANALYTICS_ENABLE_PREDICTIVE_MODELS=true
+      - ANALYTICS_ENABLE_COHORT_ANALYSIS=true
+      
+      # Umami Analytics (if using external analytics)
+      - UMAMI_API_URL=${UMAMI_API_URL:-}
+      - UMAMI_API_TOKEN=${UMAMI_API_TOKEN:-}
+      - UMAMI_WEBSITE_ID=${UMAMI_WEBSITE_ID:-}
+      
+      # ML Model Configuration
+      - PYTHONPATH=/home/app/web/app
+      
+    # Add health check for analytics endpoints
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/advanced-analytics/analytics-status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    # Increase memory limit for ML operations
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G

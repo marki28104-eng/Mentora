@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, Integer, String, Text, DateTime # Added Text and DateTime
+from sqlalchemy import Boolean, Column, Integer, String, Text, DateTime, JSON # Added Text and DateTime
 from datetime import datetime, timezone
 from ..database import Base
 from sqlalchemy.dialects.mysql import LONGTEXT
@@ -26,6 +26,9 @@ class User(Base):
     is_verified = Column(Boolean, default=False)  # New field for email verification status
     verification_token = Column(String(100), nullable=True)  # Token for email verification
     is_subscribed = Column(Boolean, default=False)  # New field for subscription status
+    
+    # Privacy and consent management
+    settings = Column(JSON, nullable=True)  # User settings including consent preferences
 
 
 
