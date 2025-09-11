@@ -125,22 +125,7 @@ function About() {
       bio: t('team.members.sebastianRogg.bio'),
       avatar: 'https://avatars.githubusercontent.com/u/144535689?v=4',
       linkedin: 'https://www.linkedin.com/in/sebastian-rogg/',
-    },
-    {
-      name: 'Matthias Meierlohr',
-      role: t('team.members.matthiasMeierlohr.role'),
-      bio: t('team.members.matthiasMeierlohr.bio'),
-      avatar: 'TODO',
-      linkedin: 'https://www.linkedin.com/in/matthias-meierlohr',
-      github: 'https://github.com/Maths24'
-    },
-    {
-      name: 'Jonas Hörter',
-      role: t('team.members.jonasHoerter.role'),
-      bio: t('team.members.jonasHoerter.bio'),
-      avatar: 'https://poker-spade.de/static/media/Jonas.2327447cc8a67b962465.jpeg',
-      linkedin: 'https://www.linkedin.com/in/jonas-hörter-4b22562bb/',
-    },
+    }
   ];
 
   return (

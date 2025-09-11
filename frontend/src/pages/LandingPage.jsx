@@ -750,7 +750,7 @@ function LandingPage() {
               <Box className={classes.videoContainer} style={styles}>
                 <iframe
                   className={classes.videoIframe}
-                  src="https://www.youtube.com/embed/JImJJ9RcCog?si=lxImpxOlKnm3VAAV" // IMPORTANT: Replace with your actual video ID
+                  src="https://youtu.be/I0Nb0O1pSxM"
                   title="YouTube video player"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
