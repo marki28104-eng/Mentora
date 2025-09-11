@@ -40,11 +40,18 @@ import {
   IconPlayerPlay,
 } from '@tabler/icons-react';
 import { courseService } from '../api/courseService';
+import { useUmamiTracker } from '../components/UmamiTracker';
 
 function CourseView() {
   const { t } = useTranslation('courseView');
   const { courseId } = useParams();
   const navigate = useNavigate();
+  const {
+    trackEvent,
+    trackCourseStart,
+    trackContentInteraction,
+    trackTimeSpent
+  } = useUmamiTracker();
 
   const [course, setCourse] = useState(null);
   const [chapters, setChapters] = useState([]); // ADDED: Dedicated state for chapters
@@ -74,7 +81,7 @@ function CourseView() {
   // NEW: Monitor when course content becomes ready
   useEffect(() => {
     if (course && course.title && course.description && course.image_url &&
-        course.title !== 'None' && course.description !== 'None') {
+      course.title !== 'None' && course.description !== 'None') {
       setContentReady(true);
     }
   }, [course]);
@@ -119,6 +126,17 @@ function CourseView() {
         setCourse(courseData);
         setChapters(currentChapters); // ADDED: Populate the new chapters state
         setError(null);
+
+        // Track course start with difficulty level
+        trackCourseStart(courseId, courseData.difficulty || 'intermediate');
+
+        // Track course view for additional analytics
+        trackEvent('course_view', {
+          course_id: courseId,
+          course_name: courseData.title,
+          course_status: courseData.status,
+          chapter_count: currentChapters.length
+        });
 
         // Initialize creationProgressUI if course is in creating state
         if (courseData.status === 'CourseStatus.CREATING') {
@@ -185,8 +203,8 @@ function CourseView() {
         } else if (polledData.status === 'CourseStatus.CREATING') {
           setCreationProgressUI({
             statusText: t('creation.statusCreatingChapters', {
-                chaptersCreated: currentChapters_length,
-                totalChapters: totalChapters || t('creation.unknownTotal')
+              chaptersCreated: currentChapters_length,
+              totalChapters: totalChapters || t('creation.unknownTotal')
             }),
             percentage: progressPercent,
             chaptersCreated: currentChapters_length,
@@ -226,7 +244,7 @@ function CourseView() {
 
   if (loading && !course) {
     return (
-      <Container 
+      <Container
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -373,16 +391,16 @@ function CourseView() {
       </Modal>
 
       {showNonCriticalError && (
-         <Alert
-         icon={<IconAlertCircle size={16} />}
-         title={t('errors.genericTitle')}
-         color="orange"
-         mb="lg"
-         withCloseButton
-         onClose={() => setError(null)}
-       >
-         {error}
-       </Alert>
+        <Alert
+          icon={<IconAlertCircle size={16} />}
+          title={t('errors.genericTitle')}
+          color="orange"
+          mb="lg"
+          withCloseButton
+          onClose={() => setError(null)}
+        >
+          {error}
+        </Alert>
       )}
 
       {course?.status === "CourseStatus.CREATING" && (
@@ -632,7 +650,27 @@ function CourseView() {
                       variant="gradient"
                       gradient={{ from: 'teal', to: 'cyan' }}
                       rightIcon={<IconChevronRight size={16} />}
-                      onClick={() => navigate(`/dashboard/courses/${courseId}/chapters/${chapters[0]?.id}`)}
+                      onClick={() => {
+                        // Track content interaction for course navigation
+                        trackContentInteraction(
+                          courseId,
+                          'interactive',
+                          0,
+                          {
+                            chapter_id: chapters[0]?.id,
+                            chapter_name: chapters[0]?.title,
+                            navigation_method: 'start_button'
+                          }
+                        );
+
+                        trackEvent('chapter_start', {
+                          course_id: courseId,
+                          chapter_id: chapters[0]?.id,
+                          chapter_name: chapters[0]?.title,
+                          navigation_method: 'start_button'
+                        });
+                        navigate(`/dashboard/courses/${courseId}/chapters/${chapters[0]?.id}`);
+                      }}
                       mt="md"
                     >
                       {learningPercentage > 0 ? t('buttons.continueLearning') : t('buttons.startLearning')}
@@ -833,8 +871,8 @@ function CourseView() {
                       color="dimmed"
                       size="sm"
                       mt="xs"  // Changed from "md" to "xs" for less spacing
-                      sx={{ 
-                        flex: 1, 
+                      sx={{
+                        flex: 1,
                         height: '5.5rem',  // Fixed height instead of minHeight
                         overflow: 'auto',  // Make it scrollable
                         paddingRight: '4px',  // Small padding for scrollbar space
@@ -864,7 +902,28 @@ function CourseView() {
                       fullWidth
                       mt="md"
                       rightIcon={chapter.is_completed ? <IconCircleCheck size={16} /> : <IconChevronRight size={16} />}
-                      onClick={() => navigate(`/dashboard/courses/${courseId}/chapters/${chapter.id}`)}
+                      onClick={() => {
+                        // Track content interaction for chapter navigation
+                        trackContentInteraction(
+                          courseId,
+                          'interactive',
+                          0,
+                          {
+                            chapter_id: chapter.id,
+                            chapter_name: chapter.title,
+                            navigation_method: 'chapter_list',
+                            chapter_completed: chapter.is_completed
+                          }
+                        );
+
+                        trackEvent('chapter_start', {
+                          course_id: courseId,
+                          chapter_id: chapter.id,
+                          chapter_name: chapter.title,
+                          navigation_method: 'chapter_list'
+                        });
+                        navigate(`/dashboard/courses/${courseId}/chapters/${chapter.id}`);
+                      }}
                       disabled={chapter.id === null}
                       sx={(theme) =>
                         chapter.is_completed
@@ -897,7 +956,7 @@ function CourseView() {
 
             {course.status === "CourseStatus.CREATING" &&
               creationProgressUI.estimatedTotal > chapters.length &&
-              Array.from({ length: creationProgressUI.estimatedTotal - chapters.length }).map((_,idx) => {
+              Array.from({ length: creationProgressUI.estimatedTotal - chapters.length }).map((_, idx) => {
                 const placeholderIndex = chapters.length + idx;
                 return (
                   <Card
@@ -946,9 +1005,9 @@ function CourseView() {
                     <Box mt="md" sx={{ flex: 1 }}>
                       <Text weight={500} color="dimmed">{t('creation.placeholderChapterTitle', { chapterNumber: placeholderIndex + 1 })}</Text>
                       <Box mt="sm" mb="lg">
-                        <Box sx={{height: '1rem', width: '80%', backgroundColor: 'rgba(128,128,128,0.2)', borderRadius: '4px', marginBottom: '0.5rem'}} />
-                        <Box sx={{height: '1rem', width: '60%', backgroundColor: 'rgba(128,128,128,0.2)', borderRadius: '4px', marginBottom: '0.5rem'}} />
-                        <Box sx={{height: '1rem', width: '70%', backgroundColor: 'rgba(128,128,128,0.2)', borderRadius: '4px'}} />
+                        <Box sx={{ height: '1rem', width: '80%', backgroundColor: 'rgba(128,128,128,0.2)', borderRadius: '4px', marginBottom: '0.5rem' }} />
+                        <Box sx={{ height: '1rem', width: '60%', backgroundColor: 'rgba(128,128,128,0.2)', borderRadius: '4px', marginBottom: '0.5rem' }} />
+                        <Box sx={{ height: '1rem', width: '70%', backgroundColor: 'rgba(128,128,128,0.2)', borderRadius: '4px' }} />
                       </Box>
                     </Box>
                     <Button variant="light" color="gray" fullWidth mt="md" disabled>

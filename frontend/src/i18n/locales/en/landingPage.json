@@ -40,9 +40,11 @@
     "cta": "Create Your Custom Course"
   },
   "award": {
-    "title": "EMEA Regional Winner",
-    "subtitle": "Google Cloud Agent Development Kit Hackathon",
-    "body": "Out of 10,000+ global participants, our platform was recognized for excellence in building innovative multi-agent AI systems. This award highlights our commitment to pushing the boundaries of automated content creation and data analysis."
+    "title": "Powered by Kiro AI",
+    "subtitle": "Built with the Future of Development",
+    "body": "Mentora showcases what's possible when you build with Kiro - the AI-powered IDE that revolutionizes development. From intelligent code generation to automated testing, Kiro accelerated our development process and helped us create a more robust, scalable platform.",
+    "tryKiro": "Experience Kiro",
+    "learnMore": "See How We Built This"
   },
   "testimonials": {
     "title": "Trusted by Ambitious Learners",

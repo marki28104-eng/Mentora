@@ -1,25 +1,25 @@
 import { useState, forwardRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Container, 
-  Title, 
-  Text, 
-  Paper, 
-  Stepper, 
-  Button, 
-  Group, 
-  TextInput, 
-  Textarea, 
-  Select, 
-  NumberInput, 
-  Box, 
-  FileInput, 
-  Image, 
-  List, 
-  ThemeIcon, 
-  Progress, 
-  Stack, 
+import {
+  Container,
+  Title,
+  Text,
+  Paper,
+  Stepper,
+  Button,
+  Group,
+  TextInput,
+  Textarea,
+  Select,
+  NumberInput,
+  Box,
+  FileInput,
+  Image,
+  List,
+  ThemeIcon,
+  Progress,
+  Stack,
   useMantineTheme,
   LoadingOverlay,
   Center,
@@ -35,16 +35,16 @@ import {
   ActionIcon,
 
 } from '@mantine/core';
-import { 
-  IconBook, 
-  IconClock, 
-  IconGlobe, 
-  IconBrain, 
-  IconUpload, 
-  IconFile, 
-  IconPhoto, 
-  IconCheck, 
-  IconArrowRight, 
+import {
+  IconBook,
+  IconClock,
+  IconGlobe,
+  IconBrain,
+  IconUpload,
+  IconFile,
+  IconPhoto,
+  IconCheck,
+  IconArrowRight,
   IconArrowLeft,
   IconSparkles,
   IconTarget,
@@ -58,6 +58,7 @@ import {
 import { useForm } from '@mantine/form';
 import { toast } from 'react-toastify';
 import { courseService } from '../api/courseService';
+import { useUmamiTracker } from '../components/UmamiTracker';
 import ReactCountryFlag from 'react-country-flag';
 import PremiumModal from '../components/PremiumModal';
 
@@ -80,8 +81,9 @@ const LanguageSelectItem = forwardRef(({ label, countryCode, ...others }, ref) =
 function CreateCourse() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation('createCourse');
+  const { trackEvent } = useUmamiTracker();
   const theme = useMantineTheme();
-  
+
   const [activeStep, setActiveStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -108,26 +110,26 @@ function CreateCourse() {
   });
 
   const steps = [
-    { 
-      label: t('stepper.details.label') || 'Learning Goal', 
+    {
+      label: t('stepper.details.label') || 'Learning Goal',
       description: t('stepper.details.description') || 'What do you want to learn?',
       icon: <IconBrain size={20} />,
       color: 'teal'
     },
-    { 
-      label: t('stepper.uploads.label') || 'Time Investment', 
+    {
+      label: t('stepper.uploads.label') || 'Time Investment',
       description: 'How much time to invest?',
       icon: <IconClock size={20} />,
       color: 'blue'
     },
-    { 
-      label: t('stepper.review.label') || 'Course Settings', 
+    {
+      label: t('stepper.review.label') || 'Course Settings',
       description: 'Difficulty and language',
       icon: <IconTarget size={20} />,
       color: 'cyan'
     },
-    { 
-      label: 'Review & Create', 
+    {
+      label: 'Review & Create',
       description: 'Confirm your choices',
       icon: <IconCheck size={20} />,
       color: 'green'
@@ -202,7 +204,7 @@ function CreateCourse() {
           await handleImageUpload(file);
         }
       }
-      form.setFieldValue(type === 'document' ? 'documents' : 'images', 
+      form.setFieldValue(type === 'document' ? 'documents' : 'images',
         [...form.values[type === 'document' ? 'documents' : 'images'], ...files]);
     }
   };
@@ -236,28 +238,39 @@ function CreateCourse() {
         picture_ids: imageIds,
       });
 
+      // Track course creation
+      trackEvent('course_creation', {
+        course_type: 'custom',
+        source_type: documentIds.length > 0 ? 'upload' : 'text_input',
+        difficulty: form.values.difficulty,
+        language: form.values.language,
+        time_hours: form.values.time_hours,
+        document_count: documentIds.length,
+        image_count: imageIds.length
+      });
+
       console.log('Course creation initiated:', data);
       navigate(`/dashboard/courses/${data.course_id}`);
-      
-    } catch (err) { 
+
+    } catch (err) {
       console.error('Error initiating course creation:', err);
       // Handle specific error cases
-      
+
       if (err.response?.status === 429) {
         // Handle rate limiting or course limit errors
         const errorData = err.response?.data?.detail || {};
         console.log('Error data:', errorData);
-        
-        if (errorData.code === 'MAX_COURSE_CREATIONS_REACHED' || 
-            errorData.code === 'MAX_PRESENT_COURSES_REACHED') {
+
+        if (errorData.code === 'MAX_COURSE_CREATIONS_REACHED' ||
+          errorData.code === 'MAX_PRESENT_COURSES_REACHED') {
           const errorMessage = t(`errors.${errorData.code === 'MAX_COURSE_CREATIONS_REACHED' ? 'maxCoursesCreated' : 'maxActiveCourses'}`, { limit: errorData.limit });
           console.log('Showing premium modal for error:', errorMessage);
-          
+
           // Set limit reached state and show premium modal
           setIsLimitReached(true);
           setShowPremiumModal(true);
           console.log('showPremiumModal set to:', true, 'with limitReached: true');
-          
+
           // Use setTimeout to ensure state update is processed
           setTimeout(() => {
             toast.error(errorMessage, {
@@ -298,17 +311,17 @@ function CreateCourse() {
         return (
           <Stack spacing="lg">
             <Box ta="center" mb="sm">
-              <ThemeIcon 
-                size={60} 
-                radius="xl" 
+              <ThemeIcon
+                size={60}
+                radius="xl"
                 variant="gradient"
                 gradient={{ from: 'teal', to: 'cyan' }}
                 mb="sm"
               >
-                <img 
+                <img
                   src="/logo_white_mittig.png"
                   alt="Logo"
-                  style={{ 
+                  style={{
                     height: 28,
                     width: 'auto',
                     filter: 'drop-shadow(0 2px 4px rgba(139, 92, 246, 0.3))',
@@ -352,7 +365,7 @@ function CreateCourse() {
                 disabled={isUploading || isSubmitting}
               >
                 {(props) => (
-                  <Card 
+                  <Card
                     {...props}
                     p="md"
                     withBorder
@@ -386,7 +399,7 @@ function CreateCourse() {
                 disabled={isUploading || isSubmitting}
               >
                 {(props) => (
-                  <Card 
+                  <Card
                     {...props}
                     p="md"
                     withBorder
@@ -422,7 +435,7 @@ function CreateCourse() {
                 <Group grow>
                   {uploadedDocuments.length > 0 && (
                     <div>
-                     {/* <Text size="sm" weight={500} mb="xs">{t('form.documents.uploadedTitle') || 'Documents'}</Text> */}
+                      {/* <Text size="sm" weight={500} mb="xs">{t('form.documents.uploadedTitle') || 'Documents'}</Text> */}
                       <List size="sm" spacing="xs">
                         {uploadedDocuments.map((doc, index) => (
                           <List.Item key={doc.id} icon={<IconFileText size={14} />}>
@@ -469,9 +482,9 @@ function CreateCourse() {
             )}
 
             {isUploading && (
-              <Alert 
+              <Alert
                 icon={<IconUpload size={16} />}
-                title={t('alert.uploading.title') || 'Uploading files...'} 
+                title={t('alert.uploading.title') || 'Uploading files...'}
                 color="blue"
               >
                 {t('alert.uploading.message') || 'Please wait while your files are being uploaded.'}
@@ -484,9 +497,9 @@ function CreateCourse() {
         return (
           <Stack spacing="">
             <Box ta="center" mb="sm">
-              <ThemeIcon 
-                size={60} 
-                radius="xl" 
+              <ThemeIcon
+                size={60}
+                radius="xl"
                 variant="gradient"
                 gradient={{ from: 'blue', to: 'teal' }}
                 mb="sm"
@@ -505,9 +518,9 @@ function CreateCourse() {
                   size={160}
                   thickness={10}
                   roundCaps
-                  sections={[{ 
-                    value: (form.values.time_hours / 30) * 100, 
-                    color: theme.colors.blue[6] 
+                  sections={[{
+                    value: (form.values.time_hours / 30) * 100,
+                    color: theme.colors.blue[6]
                   }]}
                   label={
                     <Stack align="center" spacing={2}>
@@ -535,12 +548,12 @@ function CreateCourse() {
                   { value: 15, label: '15h' },
                   { value: 20, label: '20h' },
                   { value: 25, label: '25h' },
-                  { value: 30, label: '30h'},
+                  { value: 30, label: '30h' },
                 ]}
                 styles={{
                   track: { height: 8 },
-                  thumb: { 
-                    width: 24, 
+                  thumb: {
+                    width: 24,
                     height: 24,
                     border: `3px solid ${theme.colors.blue[6]}`,
                     backgroundColor: theme.white
@@ -593,11 +606,11 @@ function CreateCourse() {
                       sx={{
                         cursor: 'pointer',
                         transition: 'all 0.2s ease',
-                        backgroundColor: form.values.difficulty === option.value 
+                        backgroundColor: form.values.difficulty === option.value
                           ? (theme.colorScheme === 'dark' ? theme.colors.teal[9] : theme.colors.teal[0])
                           : 'transparent',
-                        borderColor: form.values.difficulty === option.value 
-                          ? theme.colors.teal[6] 
+                        borderColor: form.values.difficulty === option.value
+                          ? theme.colors.teal[6]
                           : (theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[3]),
                         '&:hover': {
                           borderColor: theme.colors.teal[6],
@@ -656,9 +669,9 @@ function CreateCourse() {
         return (
           <Stack spacing="lg">
             <Box ta="center" mb="sm">
-              <ThemeIcon 
-                size={60} 
-                radius="xl" 
+              <ThemeIcon
+                size={60}
+                radius="xl"
                 variant="gradient"
                 gradient={{ from: 'green', to: 'teal' }}
                 mb="sm"
@@ -675,8 +688,8 @@ function CreateCourse() {
               <Stack spacing="md">
                 <Group position="apart">
                   <Text weight={600} color="dimmed">{t('form.topic.label') || 'Learning Goal'}</Text>
-                  <ActionIcon 
-                    variant="subtle" 
+                  <ActionIcon
+                    variant="subtle"
                     onClick={() => setActiveStep(0)}
                     title="Edit"
                   >
@@ -791,8 +804,8 @@ function CreateCourse() {
   if (isSubmitting) {
     return (
       <>
-        <PremiumModal 
-          opened={showPremiumModal} 
+        <PremiumModal
+          opened={showPremiumModal}
           onClose={() => {
             setShowPremiumModal(false);
             setIsLimitReached(false);
@@ -815,120 +828,120 @@ function CreateCourse() {
 
   return (
     <>
-      <PremiumModal 
-        opened={showPremiumModal} 
+      <PremiumModal
+        opened={showPremiumModal}
         onClose={() => {
           setShowPremiumModal(false);
           setIsLimitReached(false);
-        }} 
+        }}
         limitReached={isLimitReached}
       />
       <Container size="lg" py="xl">
-      
-      <Paper 
-        radius="lg" 
-        withBorder 
-        sx={{
-          overflow: 'hidden',
-          background: theme.colorScheme === 'dark' 
-            ? `linear-gradient(135deg, ${theme.colors.dark[7]}, ${theme.colors.dark[6]})`
-            : `linear-gradient(135deg, ${theme.white}, ${theme.colors.gray[0]})`,
-        }}
-      >
-        {/* Header */}
-        <Box 
-          p="lg" 
+
+        <Paper
+          radius="lg"
+          withBorder
           sx={{
-            background: theme.colorScheme === 'dark' 
-              ? `linear-gradient(45deg, ${theme.colors.teal[9]}, ${theme.colors.cyan[8]})`
-              : `linear-gradient(45deg, ${theme.colors.teal[6]}, ${theme.colors.cyan[5]})`,
-            color: 'white',
-            position: 'relative'
+            overflow: 'hidden',
+            background: theme.colorScheme === 'dark'
+              ? `linear-gradient(135deg, ${theme.colors.dark[7]}, ${theme.colors.dark[6]})`
+              : `linear-gradient(135deg, ${theme.white}, ${theme.colors.gray[0]})`,
           }}
         >
-          <Group position="apart" align="flex-start" mb="md">
-            <Box>
-              <Title order={2} mb={5} style={{ color: 'white' }}>{t('mainTitle') || 'Create a New Learning Course'}</Title>
-              <Text color="white">{t('subtitle') || 'Design your personalized learning experience'}</Text>
-            </Box>
-          </Group>
+          {/* Header */}
+          <Box
+            p="lg"
+            sx={{
+              background: theme.colorScheme === 'dark'
+                ? `linear-gradient(45deg, ${theme.colors.teal[9]}, ${theme.colors.cyan[8]})`
+                : `linear-gradient(45deg, ${theme.colors.teal[6]}, ${theme.colors.cyan[5]})`,
+              color: 'white',
+              position: 'relative'
+            }}
+          >
+            <Group position="apart" align="flex-start" mb="md">
+              <Box>
+                <Title order={2} mb={5} style={{ color: 'white' }}>{t('mainTitle') || 'Create a New Learning Course'}</Title>
+                <Text color="white">{t('subtitle') || 'Design your personalized learning experience'}</Text>
+              </Box>
+            </Group>
 
-          {/* Progress indicator */}
-          <Progress 
-            value={(activeStep + 1) / steps.length * 100} 
-            color="white"
-            mt="md"
-            size="sm"
-            radius="xl"
-          />
-        </Box>
-
-        {/* Content */}
-        <Box p="lg" style={{ minHeight: 350 }}>
-          {renderStepContent()}
-        </Box>
-
-        {/* Error Alert */}
-        {error && (
-          <Box px="lg">
-            <Alert 
-              icon={<IconAlertCircle size={16} />}
-              title={t('form.error.alertTitle') || 'Error'} 
-              color="red" 
-              mb="md"
-              onClose={() => setError(null)}
-              withCloseButton
-            >
-              {error}
-            </Alert>
+            {/* Progress indicator */}
+            <Progress
+              value={(activeStep + 1) / steps.length * 100}
+              color="white"
+              mt="md"
+              size="sm"
+              radius="xl"
+            />
           </Box>
-        )}
 
-        {/* Footer */}
-        <Box 
-          p="lg" 
-          pt="sm"
-          sx={{
-            borderTop: `1px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[3]}`,
-            backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0]
-          }}
-        >
-          <Group position="apart">
-            <Button
-              variant="subtle"
-              leftIcon={<IconArrowLeft size={16} />}
-              onClick={prevStep}
-              disabled={activeStep === 0 || isSubmitting || isUploading}
-            >
-              {t('buttons.back') || 'Previous'}
-            </Button>
+          {/* Content */}
+          <Box p="lg" style={{ minHeight: 350 }}>
+            {renderStepContent()}
+          </Box>
 
-            {activeStep < steps.length - 1 ? (
-              <Button
-                rightIcon={<IconArrowRight size={16} />}
-                onClick={nextStep}
-                disabled={!isStepValid(activeStep) || isUploading}
-                variant="gradient"
-                gradient={{ from: 'teal', to: 'cyan' }}
+          {/* Error Alert */}
+          {error && (
+            <Box px="lg">
+              <Alert
+                icon={<IconAlertCircle size={16} />}
+                title={t('form.error.alertTitle') || 'Error'}
+                color="red"
+                mb="md"
+                onClose={() => setError(null)}
+                withCloseButton
               >
-                {t('buttons.nextStep') || 'Next Step'}
-              </Button>
-            ) : (
+                {error}
+              </Alert>
+            </Box>
+          )}
+
+          {/* Footer */}
+          <Box
+            p="lg"
+            pt="sm"
+            sx={{
+              borderTop: `1px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[3]}`,
+              backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0]
+            }}
+          >
+            <Group position="apart">
               <Button
-                leftIcon={<IconSparkles size={16} />}
-                onClick={handleSubmit}
-                disabled={!isStepValid(activeStep) || isSubmitting || isUploading}
-                loading={isSubmitting}
-                variant="gradient"
-                gradient={{ from: 'green', to: 'teal' }}
-                size="md"
+                variant="subtle"
+                leftIcon={<IconArrowLeft size={16} />}
+                onClick={prevStep}
+                disabled={activeStep === 0 || isSubmitting || isUploading}
               >
-                {isSubmitting ? (t('buttons.creating') || 'Creating Course...') : (t('buttons.createCourse') || 'Create Course')}
+                {t('buttons.back') || 'Previous'}
               </Button>
-            )}
-          </Group>
-        </Box>
-      </Paper>
+
+              {activeStep < steps.length - 1 ? (
+                <Button
+                  rightIcon={<IconArrowRight size={16} />}
+                  onClick={nextStep}
+                  disabled={!isStepValid(activeStep) || isUploading}
+                  variant="gradient"
+                  gradient={{ from: 'teal', to: 'cyan' }}
+                >
+                  {t('buttons.nextStep') || 'Next Step'}
+                </Button>
+              ) : (
+                <Button
+                  leftIcon={<IconSparkles size={16} />}
+                  onClick={handleSubmit}
+                  disabled={!isStepValid(activeStep) || isSubmitting || isUploading}
+                  loading={isSubmitting}
+                  variant="gradient"
+                  gradient={{ from: 'green', to: 'teal' }}
+                  size="md"
+                >
+                  {isSubmitting ? (t('buttons.creating') || 'Creating Course...') : (t('buttons.createCourse') || 'Create Course')}
+                </Button>
+              )}
+            </Group>
+          </Box>
+        </Paper>
       </Container>
     </>
   );

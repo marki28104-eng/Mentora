@@ -18,6 +18,8 @@ import {
   useMantineTheme,
   keyframes,
   createStyles,
+  Badge,
+  Flex,
 } from "@mantine/core";
 
 import {
@@ -26,17 +28,21 @@ import {
   IconChartBar,
   IconUser,
   IconArrowRight,
-  IconTrophy, // Added for the new award section
+  IconTrophy,
+  IconSparkles,
+  IconRocket,
+  IconTarget,
+  IconBolt,
+  IconGhost,
 } from "@tabler/icons-react";
 import { useAuth } from "../contexts/AuthContext";
 
 import { useMediaQuery } from '@mantine/hooks';
 
-// ... other imports
-import { HeroAnimation } from "../components/HeroAnimation"; // <-- ADD THIS LINE
+import { HeroAnimation } from "../components/HeroAnimation";
 
 const fadeIn = keyframes({
-  from: { opacity: 0, transform: "translateY(20px)" },
+  from: { opacity: 0, transform: "translateY(30px)" },
   to: { opacity: 1, transform: "translateY(0)" },
 });
 
@@ -51,20 +57,29 @@ const float = keyframes({
 });
 
 const pulse = keyframes({
-  '0%': { boxShadow: '0 0 0 0 rgba(0, 144, 158, 0.4)' },
-  '70%': { boxShadow: '0 0 0 15px rgba(0, 144, 158, 0)' },
-  '100%': { boxShadow: '0 0 0 0 rgba(0, 144, 158, 0)' }
+  '0%': { boxShadow: '0 0 0 0 rgba(139, 92, 246, 0.4)' },
+  '70%': { boxShadow: '0 0 0 20px rgba(139, 92, 246, 0)' },
+  '100%': { boxShadow: '0 0 0 0 rgba(139, 92, 246, 0)' }
+});
+
+const gradientShift = keyframes({
+  '0%': { backgroundPosition: '0% 50%' },
+  '50%': { backgroundPosition: '100% 50%' },
+  '100%': { backgroundPosition: '0% 50%' }
 });
 
 const useStyles = createStyles((theme) => ({
   hero: {
     position: 'relative',
-    paddingTop: theme.spacing.xl * 8,
-    paddingBottom: theme.spacing.xl * 8,
+    paddingTop: theme.spacing.xl * 6,
+    paddingBottom: theme.spacing.xl * 6,
     minHeight: 'calc(100vh - 80px)',
     display: 'flex',
     alignItems: 'center',
     overflow: 'hidden',
+    background: theme.colorScheme === 'dark'
+      ? 'linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #0f0f23 100%)'
+      : 'linear-gradient(135deg, #fafafa 0%, #f8fafc 25%, #f1f5f9 50%, #ffffff 100%)',
     '&::before': {
       content: '""',
       position: 'absolute',
@@ -72,25 +87,38 @@ const useStyles = createStyles((theme) => ({
       left: 0,
       right: 0,
       bottom: 0,
-      background: theme.colorScheme === 'dark' 
-        ? 'radial-gradient(ellipse at top, rgba(12, 20, 44, 0.8) 0%, rgba(6, 11, 26, 0.9) 100%)' 
-        : 'radial-gradient(ellipse at top, rgba(255, 255, 255, 0.9) 0%, rgba(240, 249, 255, 0.9) 100%)',
-      zIndex: -1,
+      background: theme.colorScheme === 'dark'
+        ? 'radial-gradient(ellipse 800px 600px at 50% 0%, rgba(139, 92, 246, 0.15) 0%, transparent 50%)'
+        : 'radial-gradient(ellipse 800px 600px at 50% 0%, rgba(139, 92, 246, 0.08) 0%, transparent 50%)',
+      zIndex: 1,
+    },
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      top: '20%',
+      right: '-10%',
+      width: '40%',
+      height: '60%',
+      background: theme.colorScheme === 'dark'
+        ? 'radial-gradient(ellipse, rgba(168, 85, 247, 0.1) 0%, transparent 70%)'
+        : 'radial-gradient(ellipse, rgba(168, 85, 247, 0.05) 0%, transparent 70%)',
+      borderRadius: '50%',
+      zIndex: 1,
     },
   },
-  
+
   heroContent: {
     position: 'relative',
-    zIndex: 2,
-    animation: `${fadeIn} 0.8s ease-out`,
+    zIndex: 3,
+    animation: `${fadeIn} 1s ease-out`,
     [theme.fn.smallerThan('md')]: {
       textAlign: 'center',
     },
   },
-  
+
   heroImage: {
     position: 'relative',
-    zIndex: 1,
+    zIndex: 2,
     '&::before': {
       content: '""',
       position: 'absolute',
@@ -98,7 +126,7 @@ const useStyles = createStyles((theme) => ({
       height: '120%',
       top: '-10%',
       left: '-10%',
-      background: 'radial-gradient(circle, rgba(0,144,158,0.2) 0%, rgba(0,144,158,0) 70%)',
+      background: 'radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, rgba(139, 92, 246, 0) 70%)',
       borderRadius: '50%',
       zIndex: -1,
       animation: `${pulse} 4s infinite`,
@@ -108,78 +136,32 @@ const useStyles = createStyles((theme) => ({
     },
   },
 
+  badge: {
+    background: theme.colorScheme === 'dark'
+      ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(168, 85, 247, 0.2) 100%)'
+      : 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%)',
+    border: `1px solid ${theme.colorScheme === 'dark' ? 'rgba(139, 92, 246, 0.3)' : 'rgba(139, 92, 246, 0.2)'}`,
+    color: theme.colorScheme === 'dark' ? '#c4b5fd' : '#7c3aed',
+    fontWeight: 600,
+    fontSize: '0.75rem',
+    letterSpacing: '0.5px',
+    textTransform: 'uppercase',
+  },
+
   featureCard: {
     height: '100%',
-    background: theme.colorScheme === 'dark' 
-      ? 'rgba(17, 25, 40, 0.5)' 
-      : 'rgba(255, 255, 255, 0.7)',
-    backdropFilter: 'blur(10px)',
-    border: '1px solid',
-    borderColor: theme.colorScheme === 'dark' 
-      ? 'rgba(255, 255, 255, 0.1)' 
-      : 'rgba(0, 0, 0, 0.05)',
-    borderRadius: theme.radius.lg,
-    padding: theme.spacing.xl,
-    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-    '&:hover': {
-      transform: 'translateY(-8px) scale(1.01)',
-      boxShadow: theme.shadows.xl,
-      borderColor: theme.colorScheme === 'dark' 
-        ? theme.colors.teal[7] 
-        : theme.colors.teal[3],
-      '& .featureIcon': {
-        transform: 'scale(1.1)',
-        background: theme.fn.linearGradient(45, theme.colors.teal[6], theme.colors.cyan[5]),
-      },
-    },
-  },
-
-  featureIcon: {
-    width: 60,
-    height: 60,
-    borderRadius: '50%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: theme.spacing.lg,
-    transition: 'all 0.3s ease',
-    background: theme.fn.linearGradient(45, 
-      theme.colorScheme === 'dark' ? theme.colors.teal[9] : theme.colors.teal[1], 
-      theme.colorScheme === 'dark' ? theme.colors.cyan[8] : theme.colors.cyan[0]
-    ),
-  },
-
-  section: {
-    padding: '60px 0',
-    position: 'relative',
-    overflow: 'hidden',
-    '& + &': {
-      marginTop: '60px',
-    },
-    [theme.fn.smallerThan('sm')]: {
-      padding: '40px 0',
-      '& + &': {
-        marginTop: '40px',
-      },
-    },
-    '&:nth-of-type(even)': {
-      background: theme.colorScheme === 'dark' 
-        ? 'linear-gradient(180deg, rgba(12, 20, 44, 0.9) 0%, rgba(6, 11, 26, 0.95) 100%)' 
-        : 'linear-gradient(180deg, rgba(240, 249, 255, 0.9) 0%, rgba(255, 255, 255, 0.9) 100%)',
-      padding: `${theme.spacing.xl * 8}px 0`,
-      [theme.fn.smallerThan('sm')]: {
-        padding: `${theme.spacing.xl * 4}px 0`,
-      },
-    },
-  },
-
-  gradient: {
-    position: 'relative',
     background: theme.colorScheme === 'dark'
-      ? 'linear-gradient(135deg, rgba(0, 144, 158, 0.15) 0%, rgba(0, 179, 196, 0.1) 100%)'
-      : 'linear-gradient(135deg, rgba(0, 144, 158, 0.08) 0%, rgba(0, 179, 196, 0.05) 100%)',
+      ? 'rgba(15, 15, 35, 0.6)'
+      : 'rgba(255, 255, 255, 0.8)',
+    backdropFilter: 'blur(20px)',
+    border: '1px solid',
+    borderColor: theme.colorScheme === 'dark'
+      ? 'rgba(139, 92, 246, 0.2)'
+      : 'rgba(139, 92, 246, 0.1)',
     borderRadius: theme.radius.xl,
-    padding: theme.spacing.xl * 2,
+    padding: theme.spacing.xl * 1.5,
+    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+    position: 'relative',
     overflow: 'hidden',
     '&::before': {
       content: '""',
@@ -188,7 +170,96 @@ const useStyles = createStyles((theme) => ({
       left: 0,
       right: 0,
       bottom: 0,
-      opacity: theme.colorScheme === 'dark' ? 0.2 : 0.1,
+      background: theme.colorScheme === 'dark'
+        ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%)'
+        : 'linear-gradient(135deg, rgba(139, 92, 246, 0.02) 0%, rgba(168, 85, 247, 0.02) 100%)',
+      opacity: 0,
+      transition: 'opacity 0.4s ease',
+      zIndex: 0,
+    },
+    '&:hover': {
+      transform: 'translateY(-12px)',
+      boxShadow: theme.colorScheme === 'dark'
+        ? '0 25px 50px -12px rgba(139, 92, 246, 0.25)'
+        : '0 25px 50px -12px rgba(139, 92, 246, 0.15)',
+      borderColor: theme.colorScheme === 'dark'
+        ? 'rgba(139, 92, 246, 0.4)'
+        : 'rgba(139, 92, 246, 0.3)',
+      '&::before': {
+        opacity: 1,
+      },
+      '& .featureIcon': {
+        transform: 'scale(1.1) rotate(5deg)',
+        background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
+        boxShadow: '0 8px 25px rgba(139, 92, 246, 0.4)',
+      },
+    },
+  },
+
+  featureIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: theme.radius.xl,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: theme.spacing.lg,
+    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+    background: theme.colorScheme === 'dark'
+      ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(168, 85, 247, 0.2) 100%)'
+      : 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%)',
+    border: `1px solid ${theme.colorScheme === 'dark' ? 'rgba(139, 92, 246, 0.3)' : 'rgba(139, 92, 246, 0.2)'}`,
+    position: 'relative',
+    zIndex: 1,
+  },
+
+  section: {
+    padding: '80px 0',
+    position: 'relative',
+    overflow: 'hidden',
+    [theme.fn.smallerThan('sm')]: {
+      padding: '60px 0',
+    },
+    '&:nth-of-type(even)': {
+      background: theme.colorScheme === 'dark'
+        ? 'linear-gradient(180deg, rgba(15, 15, 35, 0.4) 0%, rgba(26, 26, 46, 0.4) 100%)'
+        : 'linear-gradient(180deg, rgba(248, 250, 252, 0.8) 0%, rgba(241, 245, 249, 0.8) 100%)',
+      '&::before': {
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: theme.colorScheme === 'dark'
+          ? 'radial-gradient(ellipse 1200px 800px at 50% 50%, rgba(139, 92, 246, 0.03) 0%, transparent 50%)'
+          : 'radial-gradient(ellipse 1200px 800px at 50% 50%, rgba(139, 92, 246, 0.02) 0%, transparent 50%)',
+        zIndex: 0,
+      },
+    },
+  },
+
+  gradient: {
+    position: 'relative',
+    background: theme.colorScheme === 'dark'
+      ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(168, 85, 247, 0.1) 100%)'
+      : 'linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(168, 85, 247, 0.05) 100%)',
+    borderRadius: theme.radius.xl,
+    padding: theme.spacing.xl * 3,
+    overflow: 'hidden',
+    border: `1px solid ${theme.colorScheme === 'dark' ? 'rgba(139, 92, 246, 0.2)' : 'rgba(139, 92, 246, 0.1)'}`,
+    backdropFilter: 'blur(20px)',
+    '&::before': {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: theme.colorScheme === 'dark'
+        ? 'linear-gradient(45deg, rgba(139, 92, 246, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%)'
+        : 'linear-gradient(45deg, rgba(139, 92, 246, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%)',
+      opacity: 0.5,
       zIndex: 0,
     },
   },
@@ -196,60 +267,79 @@ const useStyles = createStyles((theme) => ({
   ctaButton: {
     position: 'relative',
     overflow: 'hidden',
-    padding: '12px 28px',
+    padding: '14px 32px',
     borderRadius: theme.radius.xl,
     fontWeight: 600,
-    letterSpacing: '0.5px',
+    letterSpacing: '0.3px',
     textTransform: 'none',
-    transition: 'all 0.3s ease',
+    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+    fontSize: '1rem',
     '&:hover': {
-      transform: 'translateY(-2px)',
-      boxShadow: theme.shadows.md,
+      transform: 'translateY(-3px)',
     },
   },
 
   primaryButton: {
-    background: theme.fn.linearGradient(45, theme.colors.teal[6], theme.colors.cyan[5]),
+    background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%)',
+    backgroundSize: '200% 200%',
     color: 'white',
+    border: 'none',
+    boxShadow: '0 4px 15px rgba(139, 92, 246, 0.4)',
+    animation: `${gradientShift} 3s ease infinite`,
     '&:hover': {
-      background: theme.fn.linearGradient(45, theme.colors.teal[7], theme.colors.cyan[6]),
+      background: 'linear-gradient(135deg, #7c3aed 0%, #9333ea 50%, #8b5cf6 100%)',
+      boxShadow: '0 8px 25px rgba(139, 92, 246, 0.6)',
+      transform: 'translateY(-3px) scale(1.02)',
     },
   },
 
   secondaryButton: {
     border: '2px solid',
-    borderColor: theme.colorScheme === 'dark' ? theme.colors.teal[7] : theme.colors.teal[5],
-    color: theme.colorScheme === 'dark' ? theme.colors.teal[2] : theme.colors.teal[7],
+    borderColor: theme.colorScheme === 'dark' ? '#8b5cf6' : '#7c3aed',
+    color: theme.colorScheme === 'dark' ? '#c4b5fd' : '#7c3aed',
+    background: 'transparent',
     '&:hover': {
-      background: theme.colorScheme === 'dark' 
-        ? 'rgba(0, 199, 181, 0.1)' 
-        : 'rgba(0, 184, 217, 0.05)',
+      background: theme.colorScheme === 'dark'
+        ? 'rgba(139, 92, 246, 0.1)'
+        : 'rgba(139, 92, 246, 0.05)',
+      borderColor: theme.colorScheme === 'dark' ? '#a855f7' : '#8b5cf6',
+      transform: 'translateY(-3px)',
     },
   },
 
   floatingShape: {
     position: 'absolute',
     borderRadius: '50%',
-    filter: 'blur(40px)',
-    opacity: 0.1,
+    filter: 'blur(60px)',
+    opacity: theme.colorScheme === 'dark' ? 0.15 : 0.08,
     zIndex: 0,
   },
 
   shape1: {
-    width: '400px',
-    height: '400px',
-    background: theme.colors.teal[6],
-    top: '-100px',
-    right: '-100px',
-    animation: `${float} 8s ease-in-out infinite`,
+    width: '500px',
+    height: '500px',
+    background: 'linear-gradient(135deg, #8b5cf6, #a855f7)',
+    top: '-150px',
+    right: '-150px',
+    animation: `${float} 12s ease-in-out infinite`,
   },
 
   shape2: {
-    width: '300px',
-    height: '300px',
-    background: theme.colors.cyan[5],
-    bottom: '50px',
+    width: '350px',
+    height: '350px',
+    background: 'linear-gradient(135deg, #a855f7, #9333ea)',
+    bottom: '100px',
     left: '-100px',
+    animation: `${float} 15s ease-in-out 2s infinite`,
+  },
+
+  shape3: {
+    width: '250px',
+    height: '250px',
+    background: 'linear-gradient(135deg, #c084fc, #8b5cf6)',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
     animation: `${float} 10s ease-in-out 1s infinite`,
   },
 
@@ -305,10 +395,11 @@ function LandingPage() {
       {/* Floating shapes for visual interest */}
       <Box className={cx(classes.floatingShape, classes.shape1)} />
       <Box className={cx(classes.floatingShape, classes.shape2)} />
-      
+      <Box className={cx(classes.floatingShape, classes.shape3)} />
+
       {/* Hero Section */}
-      <Box 
-        className={classes.hero} 
+      <Box
+        className={classes.hero}
         id="home"
         sx={{
           paddingTop: isMobile ? '6rem !important' : undefined,
@@ -317,70 +408,79 @@ function LandingPage() {
         <Container size="xl" px="md">
           <Grid gutter={50} align="center">
             <Grid.Col md={6} className={classes.heroContent}>
-                <Transition mounted={visible} transition="slide-up" duration={600} delay={200}>
-                  {(styles) => (
-                    <div style={styles}>
-                      <Text 
-                        size="sm" 
-                        weight={700} 
-                        color="teal" 
-                        mb="sm"
-                        style={{ letterSpacing: '2px' }}
+              <Transition mounted={visible} transition="slide-up" duration={800} delay={200}>
+                {(styles) => (
+                  <div style={styles}>
+                    <Badge
+                      className={classes.badge}
+                      leftSection={<IconSparkles size={14} />}
+                      size="lg"
+                      radius="xl"
+                      mb="xl"
+                    >
+                      {t('hero.pretitle', 'AI-Powered Learning Platform')}
+                    </Badge>
+
+                    <Title
+                      order={1}
+                      size={isMobile ? 42 : 64}
+                      weight={800}
+                      mb="lg"
+                      sx={{
+                        lineHeight: 1.1,
+                        background: theme.colorScheme === 'dark'
+                          ? 'linear-gradient(135deg, #ffffff 0%, #c4b5fd 50%, #a855f7 100%)'
+                          : 'linear-gradient(135deg, #1f2937 0%, #7c3aed 50%, #8b5cf6 100%)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text',
+                        backgroundSize: '200% 200%',
+                        animation: `${gradientShift} 4s ease infinite`,
+                        display: 'inline-block',
+                        fontFamily: 'system-ui, -apple-system, sans-serif',
+                      }}
+                    >
+                      {t('hero.title', 'Transform Learning with Intelligent AI')}
+                    </Title>
+
+                    <Text
+                      size="xl"
+                      color={theme.colorScheme === 'dark' ? 'gray.4' : 'gray.6'}
+                      mb="xl"
+                      style={{
+                        maxWidth: '85%',
+                        lineHeight: 1.7,
+                        fontSize: '1.125rem',
+                        fontWeight: 400,
+                      }}
+                    >
+                      {t('hero.subtitle', 'Create personalized courses, generate interactive content, and track progress with our advanced AI-powered educational platform designed for the future of learning.')}
+                    </Text>
+
+                    <Flex gap="md" wrap="wrap">
+                      <Button
+                        size="lg"
+                        rightSection={<IconRocket size={18} />}
+                        onClick={() => navigate(isAuthenticated ? '/dashboard' : '/auth/signup')}
+                        className={cx(classes.ctaButton, classes.primaryButton)}
+                        radius="xl"
                       >
-                        {t('hero.pretitle', 'NEXT-GENERATION AI LEARNING')}
-                      </Text>
-                      <Title 
-                        order={1} 
-                        size={56} 
-                        weight={800} 
-                        mb="md"
-                        sx={{
-                          lineHeight: 1.2,
-                          background: theme.colorScheme === 'dark' 
-                            ? 'linear-gradient(90deg, #fff 0%, #a5d8ff 100%)' 
-                            : 'linear-gradient(90deg, #1a1b1e 0%, #4dabf7 100%)',
-                          WebkitBackgroundClip: 'text',
-                          WebkitTextFillColor: 'transparent',
-                          backgroundClip: 'text',
-                          backgroundSize: '100%',
-                          backgroundRepeat: 'no-repeat',
-                          transition: 'background 0.3s ease',
-                          display: 'inline-block' // Ensures the gradient is properly contained
-                        }}
+                        {isAuthenticated ? t('goToDashboard', 'Go to Dashboard') : t('getStarted', 'Start Building')}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        leftSection={<IconTarget size={18} />}
+                        onClick={() => scrollToSection('demo')}
+                        className={cx(classes.ctaButton, classes.secondaryButton)}
+                        radius="xl"
                       >
-                        {t('hero.title', 'Unlock Your Potential with AI-Powered Learning')}
-                      </Title>
-                      <Text 
-                        size="xl" 
-                        color={theme.colorScheme === 'dark' ? 'dimmed' : 'gray.7'} 
-                        mb="xl"
-                        style={{ maxWidth: '90%', lineHeight: 1.6 }}
-                      >
-                        {t('hero.subtitle', 'Create, manage, and deliver engaging courses with intelligent tools designed for modern educators and learners.')}
-                      </Text>
-                      <Group spacing="md">
-                        <Button
-                          size={isMobile ? "md" : "lg"}
-                          rightIcon={<IconArrowRight size={isMobile ? 16 : 20} />}
-                          onClick={() => navigate(isAuthenticated ? '/dashboard' : '/auth/signup')}
-                          className={cx(classes.ctaButton, classes.primaryButton)}
-                          radius="xl"
-                        >
-                          {isAuthenticated ? t('goToDashboard', 'Go to Dashboard') : t('getStarted', 'Get Started Free')}
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size={isMobile ? "md" : "lg"}
-                          onClick={() => scrollToSection('features')}
-                          className={cx(classes.ctaButton, classes.secondaryButton)}
-                          radius="xl"
-                        >
-                          {t('learnMore', 'Learn More')}
-                        </Button>
-                      </Group>
-                    </div>
-                  )}
-                </Transition>
+                        {t('watchDemo', 'Watch Demo')}
+                      </Button>
+                    </Flex>
+                  </div>
+                )}
+              </Transition>
             </Grid.Col>
 
 
@@ -389,8 +489,8 @@ function LandingPage() {
             <Grid.Col md={6}>
               <Transition mounted={visible} transition="pop" duration={800} delay={400}>
                 {(styles) => (
-                  <div 
-                    className={classes.heroImage} 
+                  <div
+                    className={classes.heroImage}
                     style={{
                       ...styles,
                       display: 'flex',
@@ -411,22 +511,36 @@ function LandingPage() {
       {/* Features Section */}
       <Box id="features" className={classes.section}>
         <Container>
-          <Title order={2} align="center" mb="xl" fz="2.25rem">
-            {t("features.title", "Why Choose Our Platform?")}
-          </Title>
+          <Stack align="center" spacing="md" mb="xl">
+            <Badge
+              size="lg"
+              radius="xl"
+              variant="light"
+              color="violet"
+              leftSection={<IconBolt size={16} />}
+            >
+              {t("features.badge", "Powerful Features")}
+            </Badge>
+            <Title order={2} align="center" fz="2.5rem" fw={800}>
+              {t("features.title", "Everything You Need to Succeed")}
+            </Title>
+            <Text size="xl" color="dimmed" align="center" maw={600}>
+              {t("features.subtitle", "Comprehensive tools designed to transform how you create, deliver, and track educational content.")}
+            </Text>
+          </Stack>
 
           <Grid gutter="xl">
             <Grid.Col sm={6} md={3}>
               <Transition mounted={visible} transition="pop" duration={600} delay={200}>
                 {(styles) => (
-                  <Card shadow="sm" p="xl" radius="md" withBorder className={classes.featureCard} style={styles}>
+                  <Card className={classes.featureCard} style={styles}>
                     <Stack spacing="lg">
-                      <ThemeIcon size={50} radius="md" variant="light" color="cyan">
-                        <IconBrain size={30} />
-                      </ThemeIcon>
+                      <Box className={cx(classes.featureIcon, 'featureIcon')}>
+                        <IconBrain size={28} color="#8b5cf6" />
+                      </Box>
                       <Stack spacing={8}>
-                        <Title order={3} fz="lg" fw={600}>{t("features.feature1Title", "AI Content Generation")}</Title>
-                        <Text size="sm" c="dimmed" lh={1.55}>{t("features.feature1Text", "Instantly create lesson plans, quizzes, and course materials with our advanced AI.")}</Text>
+                        <Title order={3} fz="lg" fw={700}>{t("features.feature1Title", "AI Content Generation")}</Title>
+                        <Text size="sm" c="dimmed" lh={1.6}>{t("features.feature1Text", "Generate comprehensive lesson plans, interactive quizzes, and engaging course materials instantly with advanced AI.")}</Text>
                       </Stack>
                     </Stack>
                   </Card>
@@ -437,14 +551,14 @@ function LandingPage() {
             <Grid.Col sm={6} md={3}>
               <Transition mounted={visible} transition="pop" duration={600} delay={400}>
                 {(styles) => (
-                  <Card shadow="sm" p="xl" radius="md" withBorder className={classes.featureCard} style={styles}>
+                  <Card className={classes.featureCard} style={styles}>
                     <Stack spacing="lg">
-                      <ThemeIcon size={50} radius="md" variant="light" color="teal">
-                        <IconChartBar size={30} />
-                      </ThemeIcon>
+                      <Box className={cx(classes.featureIcon, 'featureIcon')}>
+                        <IconChartBar size={28} color="#8b5cf6" />
+                      </Box>
                       <Stack spacing={8}>
-                        <Title order={3} fz="lg" fw={600}>{t("features.feature2Title", "Insightful Analytics")}</Title>
-                        <Text size="sm" c="dimmed" lh={1.55}>{t("features.feature2Text", "Track student progress and engagement with powerful, easy-to-understand dashboards.")}</Text>
+                        <Title order={3} fz="lg" fw={700}>{t("features.feature2Title", "Smart Analytics")}</Title>
+                        <Text size="sm" c="dimmed" lh={1.6}>{t("features.feature2Text", "Track learning progress with intelligent insights and beautiful dashboards that reveal student engagement patterns.")}</Text>
                       </Stack>
                     </Stack>
                   </Card>
@@ -455,14 +569,14 @@ function LandingPage() {
             <Grid.Col sm={6} md={3}>
               <Transition mounted={visible} transition="pop" duration={600} delay={600}>
                 {(styles) => (
-                  <Card shadow="sm" p="xl" radius="md" withBorder className={classes.featureCard} style={styles}>
+                  <Card className={classes.featureCard} style={styles}>
                     <Stack spacing="lg">
-                      <ThemeIcon size={50} radius="md" variant="light" color="blue">
-                        <IconUser size={30} />
-                      </ThemeIcon>
+                      <Box className={cx(classes.featureIcon, 'featureIcon')}>
+                        <IconBolt size={28} color="#8b5cf6" />
+                      </Box>
                       <Stack spacing={8}>
-                        <Title order={3} fz="lg" fw={600}>{t("features.feature3Title", "Personalized Learning")}</Title>
-                        <Text size="sm" c="dimmed" lh={1.55}>{t("features.feature3Text", "Adapt learning paths for each student, providing a unique and effective educational experience.")}</Text>
+                        <Title order={3} fz="lg" fw={700}>{t("features.feature3Title", "Adaptive Learning")}</Title>
+                        <Text size="sm" c="dimmed" lh={1.6}>{t("features.feature3Text", "Personalize every learning journey with AI that adapts to individual pace, style, and knowledge level.")}</Text>
                       </Stack>
                     </Stack>
                   </Card>
@@ -473,14 +587,14 @@ function LandingPage() {
             <Grid.Col sm={6} md={3}>
               <Transition mounted={visible} transition="pop" duration={600} delay={800}>
                 {(styles) => (
-                  <Card shadow="sm" p="xl" radius="md" withBorder className={classes.featureCard} style={styles}>
+                  <Card className={classes.featureCard} style={styles}>
                     <Stack spacing="lg">
-                      <ThemeIcon size={50} radius="md" variant="light" color="grape">
-                        <IconCheck size={30} />
-                      </ThemeIcon>
+                      <Box className={cx(classes.featureIcon, 'featureIcon')}>
+                        <IconRocket size={28} color="#8b5cf6" />
+                      </Box>
                       <Stack spacing={8}>
-                        <Title order={3} fz="lg" fw={600}>{t("features.feature4Title", "Effortless Management")}</Title>
-                        <Text size="sm" c="dimmed" lh={1.55}>{t("features.feature4Text", "A simple, intuitive interface makes course creation and administration a breeze.")}</Text>
+                        <Title order={3} fz="lg" fw={700}>{t("features.feature4Title", "Rapid Deployment")}</Title>
+                        <Text size="sm" c="dimmed" lh={1.6}>{t("features.feature4Text", "Launch courses in minutes with our streamlined interface and automated content optimization.")}</Text>
                       </Stack>
                     </Stack>
                   </Card>
@@ -490,26 +604,71 @@ function LandingPage() {
           </Grid>
         </Container>
       </Box>
-      
+
       {/* Award Section */}
       <Box id="award" className={classes.section}>
         <Container>
           <Transition mounted={visible} transition="fade" duration={800} delay={400}>
             {(styles) => (
               <Box className={classes.gradient} style={styles}>
-                <Stack align="center" spacing="lg" sx={{ textAlign: 'center' }}>
-                  <ThemeIcon size={80} radius="xl" variant="gradient" gradient={{ from: 'yellow', to: 'orange' }}>
-                    <IconTrophy size={40} />
-                  </ThemeIcon>
-                  <Title order={2} size="2.5rem">
-                    {t('award.title', 'EMEA Regional Winner')}
+                <Stack align="center" spacing="xl" sx={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
+                  <Box
+                    sx={{
+                      width: 100,
+                      height: 100,
+                      borderRadius: theme.radius.xl,
+                      background: theme.colorScheme === 'dark'
+                        ? 'linear-gradient(135deg, #1f2937 0%, #374151 50%, #4b5563 100%)'
+                        : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%)',
+                      border: `2px solid ${theme.colorScheme === 'dark' ? '#8b5cf6' : '#7c3aed'}`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: theme.colorScheme === 'dark'
+                        ? '0 10px 30px rgba(139, 92, 246, 0.3)'
+                        : '0 10px 30px rgba(124, 58, 237, 0.2)',
+                      animation: `${float} 6s ease-in-out infinite`,
+                    }}
+                  >
+                    <IconGhost size={48} color={theme.colorScheme === 'dark' ? '#8b5cf6' : '#7c3aed'} />
+                  </Box>
+                  <Title order={2} size="2.75rem" fw={800}>
+                    {t('award.title', 'Powered by Kiro AI')}
                   </Title>
-                  <Title order={3} size="1.5rem" weight={500} color="dimmed" mt={-15}>
-                    {t('award.subtitle', 'Google Cloud Agent Development Kit Hackathon')}
+                  <Title order={3} size="1.25rem" weight={500} color="dimmed" mt={-10}>
+                    {t('award.subtitle', 'Built with the Future of Development')}
                   </Title>
-                  <Text size="lg" maw={700}>
-                    {t('award.body', 'Out of 10,000+ global participants, our platform was recognized for excellence in building innovative multi-agent AI systems. This award highlights our commitment to pushing the boundaries of automated content creation and data analysis.')}
+                  <Text size="lg" maw={800} lh={1.7}>
+                    {t('award.body', 'Mentora showcases what\'s possible when you build with Kiro - the AI-powered IDE that revolutionizes development. From intelligent code generation to automated testing, Kiro accelerated our development process and helped us create a more robust, scalable platform.')}
                   </Text>
+                  <Group spacing="md" mt="xl">
+                    <Button
+                      component="a"
+                      href="https://kiro.ai"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      variant="outline"
+                      size="md"
+                      radius="xl"
+                      leftSection={<IconRocket size={18} />}
+                      className={cx(classes.ctaButton, classes.secondaryButton)}
+                    >
+                      {t('award.tryKiro', 'Experience Kiro')}
+                    </Button>
+                    <Button
+                      component="a"
+                      href="https://kiro.ai/docs"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      variant="subtle"
+                      size="md"
+                      radius="xl"
+                      leftSection={<IconArrowRight size={18} />}
+                      color="violet"
+                    >
+                      {t('award.learnMore', 'See How We Built This')}
+                    </Button>
+                  </Group>
                 </Stack>
               </Box>
             )}
@@ -564,19 +723,28 @@ function LandingPage() {
           </Grid>
         </Container>
       </Box>
-      
+
       {/* NEW: Product Demo Section */}
       <Box id="demo" className={classes.section}>
         <Container>
           <Stack align="center" spacing="md" sx={{ textAlign: 'center' }}>
-            <Title order={2} fz="2.25rem">
-              {t("demo.title", "See Our Platform in Action")}
+            <Badge
+              size="lg"
+              radius="xl"
+              variant="light"
+              color="violet"
+              leftSection={<IconTarget size={16} />}
+            >
+              {t("demo.badge", "Live Demo")}
+            </Badge>
+            <Title order={2} fz="2.5rem" fw={800}>
+              {t("demo.title", "See Mentora in Action")}
             </Title>
-            <Text size="xl" color="dimmed" maw={700}>
-              {t("demo.subtitle", "Watch a quick walkthrough to see how our AI-powered tools can streamline your workflow and enhance the learning experience.")}
+            <Text size="xl" color="dimmed" maw={800} lh={1.6}>
+              {t("demo.subtitle", "Experience the power of AI-driven course creation. Watch how our platform transforms learning materials into engaging, interactive educational experiences in minutes.")}
             </Text>
           </Stack>
-          
+
           <Transition mounted={visible} transition="pop" duration={800} delay={400}>
             {(styles) => (
               <Box className={classes.videoContainer} style={styles}>
@@ -595,61 +763,105 @@ function LandingPage() {
 
       {/* Testimonial Section */}
       <Box id="testimonials" className={classes.section}>
-          <Container>
-            <Title order={2} align="center" mb={30}>
-              {t("testimonials.title", "Loved by Educators & Learners")}
+        <Container>
+          <Stack align="center" spacing="md" mb="xl">
+            <Badge
+              size="lg"
+              radius="xl"
+              variant="light"
+              color="violet"
+              leftSection={<IconUser size={16} />}
+            >
+              {t("testimonials.badge", "Success Stories")}
+            </Badge>
+            <Title order={2} align="center" fz="2.5rem" fw={800}>
+              {t("testimonials.title", "Trusted by Thousands")}
             </Title>
-            <Grid>
-              <Grid.Col sm={12} md={4}>
-                <Transition mounted={visible} transition="fade" duration={1000} delay={200}>
-                  {(styles) => (
-                    <Card shadow="sm" p="lg" radius="md" withBorder style={styles}>
-                      <Text italic size="lg" mb="md">{t("testimonials.quote1", "This platform transformed how I create content. The AI saves me hours of work every week!")}</Text>
-                      <Group>
-                        <div style={{width: 40, height: 40, borderRadius: "50%", backgroundColor: theme.colors.gray[2], display: "flex", alignItems: "center", justifyContent: "center"}}>JD</div>
-                        <div>
-                          <Text weight={500}>{t("testimonials.name1", "Jane Doe")}</Text>
-                          <Text size="xs" color="dimmed">{t("testimonials.role1", "University Professor")}</Text>
-                        </div>
-                      </Group>
-                    </Card>
-                  )}
-                </Transition>
-              </Grid.Col>
-              <Grid.Col sm={12} md={4}>
-                <Transition mounted={visible} transition="fade" duration={1000} delay={400}>
-                  {(styles) => (
-                    <Card shadow="sm" p="lg" radius="md" withBorder style={styles}>
-                      <Text italic size="lg" mb="md">{t("testimonials.quote2", "As a student, the personalized feedback is incredible. I feel like I have a personal tutor.")}</Text>
-                      <Group>
-                        <div style={{width: 40, height: 40, borderRadius: "50%", backgroundColor: theme.colors.gray[3], display: "flex", alignItems: "center", justifyContent: "center"}}>JS</div>
-                        <div>
-                          <Text weight={500}>{t("testimonials.name2", "John Smith")}</Text>
-                          <Text size="xs" color="dimmed">{t("testimonials.role2", "Online Learner")}</Text>
-                        </div>
-                      </Group>
-                    </Card>
-                  )}
-                </Transition>
-              </Grid.Col>
-              <Grid.Col sm={12} md={4}>
-                <Transition mounted={visible} transition="fade" duration={1000} delay={600}>
-                  {(styles) => (
-                    <Card shadow="sm" p="lg" radius="md" withBorder style={styles}>
-                      <Text italic size="lg" mb="md">{t("testimonials.quote3", "The analytics dashboard is a game-changer for understanding student engagement.")}</Text>
-                      <Group>
-                        <div style={{width: 40, height: 40, borderRadius: "50%", backgroundColor: theme.colors.gray[3], display: "flex", alignItems: "center", justifyContent: "center"}}>RJ</div>
-                        <div>
-                          <Text weight={500}>{t("testimonials.name3", "Robert Johnson")}</Text>
-                          <Text size="xs" color="dimmed">{t("testimonials.role3", "Corporate Trainer")}</Text>
-                        </div>
-                      </Group>
-                    </Card>
-                  )}
-                </Transition>
-              </Grid.Col>
-            </Grid>
-          </Container>
+          </Stack>
+          <Grid>
+            <Grid.Col sm={12} md={4}>
+              <Transition mounted={visible} transition="fade" duration={1000} delay={200}>
+                {(styles) => (
+                  <Card shadow="sm" p="lg" radius="md" withBorder style={styles}>
+                    <Text italic size="lg" mb="md">{t("testimonials.quote1", "This platform transformed how I create content. The AI saves me hours of work every week!")}</Text>
+                    <Group>
+                      <div style={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: "50%",
+                        background: "linear-gradient(135deg, #8b5cf6, #a855f7)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "white",
+                        fontWeight: 600,
+                        fontSize: "1rem"
+                      }}>JD</div>
+                      <div>
+                        <Text weight={500}>{t("testimonials.name1", "Jane Doe")}</Text>
+                        <Text size="xs" color="dimmed">{t("testimonials.role1", "University Professor")}</Text>
+                      </div>
+                    </Group>
+                  </Card>
+                )}
+              </Transition>
+            </Grid.Col>
+            <Grid.Col sm={12} md={4}>
+              <Transition mounted={visible} transition="fade" duration={1000} delay={400}>
+                {(styles) => (
+                  <Card shadow="sm" p="lg" radius="md" withBorder style={styles}>
+                    <Text italic size="lg" mb="md">{t("testimonials.quote2", "As a student, the personalized feedback is incredible. I feel like I have a personal tutor.")}</Text>
+                    <Group>
+                      <div style={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: "50%",
+                        background: "linear-gradient(135deg, #a855f7, #9333ea)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "white",
+                        fontWeight: 600,
+                        fontSize: "1rem"
+                      }}>JS</div>
+                      <div>
+                        <Text weight={500}>{t("testimonials.name2", "John Smith")}</Text>
+                        <Text size="xs" color="dimmed">{t("testimonials.role2", "Online Learner")}</Text>
+                      </div>
+                    </Group>
+                  </Card>
+                )}
+              </Transition>
+            </Grid.Col>
+            <Grid.Col sm={12} md={4}>
+              <Transition mounted={visible} transition="fade" duration={1000} delay={600}>
+                {(styles) => (
+                  <Card shadow="sm" p="lg" radius="md" withBorder style={styles}>
+                    <Text italic size="lg" mb="md">{t("testimonials.quote3", "The analytics dashboard is a game-changer for understanding student engagement.")}</Text>
+                    <Group>
+                      <div style={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: "50%",
+                        background: "linear-gradient(135deg, #9333ea, #7c3aed)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "white",
+                        fontWeight: 600,
+                        fontSize: "1rem"
+                      }}>RJ</div>
+                      <div>
+                        <Text weight={500}>{t("testimonials.name3", "Robert Johnson")}</Text>
+                        <Text size="xs" color="dimmed">{t("testimonials.role3", "Corporate Trainer")}</Text>
+                      </div>
+                    </Group>
+                  </Card>
+                )}
+              </Transition>
+            </Grid.Col>
+          </Grid>
+        </Container>
       </Box>
 
       {/* CTA Section */}
@@ -665,16 +877,17 @@ function LandingPage() {
                   {t("cta.subtitle", "Join thousands of educators and learners who are shaping the future of education. Get started today for free.")}
                 </Text>
                 <Button
-                    onClick={() => navigate(isAuthenticated ? '/dashboard' : '/auth/signup')}
-                    size="lg"
-                    radius="xl"
-                    className={cx(classes.ctaButton, classes.primaryButton)}
-                    px="2rem"
-                    py="0.75rem"
-                    fw={600}
-                    fz="1rem"
-                  >
-                  {isAuthenticated ? t('cta.createNextCourse', 'Create Your Next Course') : t("cta.getStarted", "Start for Free")}
+                  onClick={() => navigate(isAuthenticated ? '/dashboard' : '/auth/signup')}
+                  size="xl"
+                  radius="xl"
+                  className={cx(classes.ctaButton, classes.primaryButton)}
+                  px="3rem"
+                  py="1rem"
+                  fw={700}
+                  fz="1.125rem"
+                  rightSection={<IconRocket size={20} />}
+                >
+                  {isAuthenticated ? t('cta.createNextCourse', 'Create Your Next Course') : t("cta.getStarted", "Start Building Today")}
                 </Button>
               </Stack>
             )}

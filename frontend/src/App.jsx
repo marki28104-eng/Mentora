@@ -7,6 +7,8 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ToolbarProvider } from './contexts/ToolbarContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { PomodoroProvider } from './contexts/PomodoroContext';
+import UmamiTracker from './components/UmamiTracker';
+import LearningTracker from './components/LearningTracker';
 
 import './i18n/i18n';
 
@@ -60,7 +62,21 @@ function App() {
     <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
       <MantineProvider withGlobalStyles withNormalizeCSS theme={{
         colorScheme: colorScheme,
-        primaryColor: 'cyan',
+        primaryColor: 'violet',
+        colors: {
+          violet: [
+            '#f3f0ff',
+            '#e9e5ff',
+            '#d9d4ff',
+            '#c4b5fd',
+            '#a78bfa',
+            '#8b5cf6',
+            '#7c3aed',
+            '#6d28d9',
+            '#5b21b6',
+            '#4c1d95'
+          ],
+        },
         components: {
           Button: {
             styles: {
@@ -74,51 +90,59 @@ function App() {
         <LanguageProvider>
           <AuthProvider>
             {/*<NotificationProvider>*/}
-              <ToolbarProvider>
-                <PomodoroProvider>
-                  <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <ToolbarProvider>
+              <PomodoroProvider>
+                <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                  {/* Umami Analytics Integration */}
+                  <UmamiTracker
+                    websiteId={import.meta.env.VITE_UMAMI_WEBSITE_ID}
+                    src={import.meta.env.VITE_UMAMI_SRC}
+                    domains={import.meta.env.VITE_UMAMI_DOMAINS?.split(',')}
+                  />
+                  <LearningTracker>
                     <Routes>
-                    {/* Public routes with MainLayout */}
-                    <Route element={<MainLayout />}>
-                      <Route path="/" element={<LandingPage />} /> {/* LandingPage now at root */}
-                      <Route path="/auth/login" element={<Login />} />
-                      <Route path="/auth/signup" element={<Register />} />
-                      <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
-                      <Route path="/about" element={<About />} />
-                      <Route path="/pricing" element={<PricingPage />} />
-                      <Route path="/impressum" element={<Impressum />} />
-                      <Route path="/privacy" element={<Privacy />} />
-                    </Route>
+                      {/* Public routes with MainLayout */}
+                      <Route element={<MainLayout />}>
+                        <Route path="/" element={<LandingPage />} /> {/* LandingPage now at root */}
+                        <Route path="/auth/login" element={<Login />} />
+                        <Route path="/auth/signup" element={<Register />} />
+                        <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
+                        <Route path="/about" element={<About />} />
+                        <Route path="/pricing" element={<PricingPage />} />
+                        <Route path="/impressum" element={<Impressum />} />
+                        <Route path="/privacy" element={<Privacy />} />
+                      </Route>
                       {/* Protected routes now based at /dashboard */}
-                    <Route element={<ProtectedRoute />}>
-                      <Route path="/dashboard" element={<AppLayout />}> {/* Base path for dashboard and other protected routes */}
-                        <Route index element={<Dashboard />} /> {/* This will be /dashboard */}
-                        <Route path="public-courses" element={<PublicCourses />} />
-                        <Route path="my-courses" element={<MyCourses />} />
-                        <Route path="create-course" element={<CreateCourse />} /> {/* /dashboard/create-course */}
-                        <Route path="courses/:courseId" element={<CourseView />} /> {/* /dashboard/courses/:courseId */}
-                        <Route path="courses/:courseId/chapters/:chapterId" element={<ChapterView />} /> {/* /dashboard/courses/:courseId/chapters/:chapterId */}
-                        <Route path="settings" element={<SettingsPage />} /> {/* /dashboard/settings */}
-                        <Route path="statistics" element={<StatisticsPage />} /> {/* /dashboard/statistics */}
-                        <Route path="anki-generator" element={<AnkiGeneratorDashboard />} />
-                        <Route path="anki-generator/processing/:taskId" element={<AnkiProcessingStatus />} />
+                      <Route element={<ProtectedRoute />}>
+                        <Route path="/dashboard" element={<AppLayout />}> {/* Base path for dashboard and other protected routes */}
+                          <Route index element={<Dashboard />} /> {/* This will be /dashboard */}
+                          <Route path="public-courses" element={<PublicCourses />} />
+                          <Route path="my-courses" element={<MyCourses />} />
+                          <Route path="create-course" element={<CreateCourse />} /> {/* /dashboard/create-course */}
+                          <Route path="courses/:courseId" element={<CourseView />} /> {/* /dashboard/courses/:courseId */}
+                          <Route path="courses/:courseId/chapters/:chapterId" element={<ChapterView />} /> {/* /dashboard/courses/:courseId/chapters/:chapterId */}
+                          <Route path="settings" element={<SettingsPage />} /> {/* /dashboard/settings */}
+                          <Route path="statistics" element={<StatisticsPage />} /> {/* /dashboard/statistics */}
+                          <Route path="anki-generator" element={<AnkiGeneratorDashboard />} />
+                          <Route path="anki-generator/processing/:taskId" element={<AnkiProcessingStatus />} />
+                        </Route>
                       </Route>
-                    </Route>
                       {/* Admin-only routes - Using AppLayout for consistent interface */}
-                    <Route element={<AdminProtectedRoute />}>
-                      <Route path="/admin" element={<AppLayout />}>
-                        <Route index element={<AdminView />} />
-                        {/* Add other admin routes here */}
+                      <Route element={<AdminProtectedRoute />}>
+                        <Route path="/admin" element={<AppLayout />}>
+                          <Route index element={<AdminView />} />
+                          {/* Add other admin routes here */}
+                        </Route>
                       </Route>
-                    </Route>
 
-                    {/* Old redirects removed as new routing handles root and protected areas explicitly */}
-                    <Route path="*" element={<NotFoundPage />} /> {/* Catch-all route for 404 */}
-                  </Routes>          
-                  </BrowserRouter>
-                  <ToastContainer position="top-right" autoClose={3000} theme={colorScheme} />
-                </PomodoroProvider>
-              </ToolbarProvider>
+                      {/* Old redirects removed as new routing handles root and protected areas explicitly */}
+                      <Route path="*" element={<NotFoundPage />} /> {/* Catch-all route for 404 */}
+                    </Routes>
+                  </LearningTracker>
+                </BrowserRouter>
+                <ToastContainer position="top-right" autoClose={3000} theme={colorScheme} />
+              </PomodoroProvider>
+            </ToolbarProvider>
             {/*</NotificationProvider>*/}
           </AuthProvider>
         </LanguageProvider>

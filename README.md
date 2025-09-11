@@ -123,7 +123,7 @@ mentora-project/
 - [x] AI Quizzes (MCQs, Fill-in-the-Gap)
 - [x] Chapter-Based AI Chat Assistant
 - [X] Flashcards Generator
-- [ ] Progress/Statistics Dashboard
+- [X] Progress/Statistics Dashboard
 - [ ] Offline Mode
 - [ ] Collaborative Course Editing
 

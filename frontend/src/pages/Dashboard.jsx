@@ -45,8 +45,10 @@ import courseService from '../api/courseService';
 import statisticsService from '../api/statisticsService';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
+import { useUmamiTracker } from '../components/UmamiTracker';
 import PlaceGolderImage from '../assets/place_holder_image.png';
 import DashboardStats from '../components/DashboardStats';
+import LearningAnalytics from '../components/LearningAnalytics';
 import EnhancedSearch from '../components/EnhancedSearch';
 
 const useStyles = createStyles((theme) => ({
@@ -164,6 +166,7 @@ const useStyles = createStyles((theme) => ({
 function Dashboard() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { trackEvent } = useUmamiTracker();
   const [error, setError] = useState(null);
   const [viewAllCourses, setViewAllCourses] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -173,7 +176,7 @@ function Dashboard() {
   const [newTitle, setNewTitle] = useState('');
   const [newDescription, setNewDescription] = useState('');
   const [isPublic, setIsPublic] = useState(false);
-  
+
   const navigate = useNavigate();
   const theme = useMantineTheme();
   const { classes } = useStyles();
@@ -199,8 +202,8 @@ function Dashboard() {
 
   const item = {
     hidden: { opacity: 0, y: 20 },
-    show: { 
-      opacity: 1, 
+    show: {
+      opacity: 1,
       y: 0,
       transition: {
         type: 'spring',
@@ -229,7 +232,7 @@ function Dashboard() {
   const calculateProgress = (course) => {
     if (course.status === 'CourseStatus.COMPLETED') return 100;
     if (course.status === 'CourseStatus.CREATING') return 0;
-    
+
     return (course && course.chapter_count && course.chapter_count > 0)
       ? Math.round((100 * (course.completed_chapter_count || 0) / course.chapter_count))
       : 0;
@@ -275,8 +278,8 @@ function Dashboard() {
 
       // Then, update the title and description
       const updatedCourse = await courseService.updateCourse(
-        courseToRename.course_id, 
-        newTitle, 
+        courseToRename.course_id,
+        newTitle,
         newDescription
       );
 
@@ -298,11 +301,11 @@ function Dashboard() {
   // Fetch courses on component mount
   const fetchTotalLearnTime = useCallback(async () => {
     if (!user?.id) return;
-    
+
     try {
       setIsLoading(true);
       const data = await statisticsService.getTotalLearnTime(user.id);
-      setTotalLearnTime(data ? Math.round(data / 3600 ) : 0);
+      setTotalLearnTime(data ? Math.round(data / 3600) : 0);
     } catch (err) {
       console.error('Error fetching total learn time:', err);
       setError('Failed to load learning statistics');
@@ -322,6 +325,12 @@ function Dashboard() {
         const coursesData = await courseService.getUserCourses();
         setCourses(coursesData);
         setError(null);
+
+        // Track dashboard view
+        trackEvent('dashboard_view', {
+          course_count: coursesData.length,
+          has_courses: coursesData.length > 0
+        });
       } catch (error) {
         setError(t('loadCoursesError'));
         console.error('Error fetching courses:', error);
@@ -366,9 +375,9 @@ function Dashboard() {
 
     return (
       <Grid.Col key={course.course_id} xs={12} sm={6} lg={4}>
-        <Card 
-          withBorder 
-          radius="md" 
+        <Card
+          withBorder
+          radius="md"
           className={classes.courseCard}
           style={{ cursor: 'pointer' }}
         >
@@ -384,18 +393,18 @@ function Dashboard() {
 
           <Box p="md" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
             <Group position="apart" mb="xs" noWrap>
-              <Badge 
-                color={statusColor} 
+              <Badge
+                color={statusColor}
                 variant="light"
                 size="md"
                 leftSection={<StatusIcon size={14} style={{ marginRight: 4 }} />}
               >
                 {statusLabel}
               </Badge>
-              
+
               <Group spacing="xs">
-                <ActionIcon 
-                  variant="subtle" 
+                <ActionIcon
+                  variant="subtle"
                   color="gray"
                   size="sm"
                   onClick={(e) => {
@@ -405,8 +414,8 @@ function Dashboard() {
                 >
                   <IconPencil size={16} />
                 </ActionIcon>
-                <ActionIcon 
-                  variant="subtle" 
+                <ActionIcon
+                  variant="subtle"
                   color="red"
                   size="sm"
                   onClick={(e) => {
@@ -419,11 +428,11 @@ function Dashboard() {
               </Group>
             </Group>
 
-            <Text 
-              weight={600} 
-              size="lg" 
+            <Text
+              weight={600}
+              size="lg"
               lineClamp={2}
-              style={{ 
+              style={{
                 cursor: 'pointer',
                 wordBreak: 'break-word',
                 minHeight: '3em',
@@ -438,9 +447,9 @@ function Dashboard() {
               {course.title || t('untitledCourse')}
             </Text>
 
-            <Text 
-              size="sm" 
-              color="dimmed" 
+            <Text
+              size="sm"
+              color="dimmed"
               className={classes.courseDescription}
               onClick={() => navigate(`/dashboard/courses/${course.course_id}`)}
               style={{ cursor: 'pointer' }}
@@ -457,16 +466,16 @@ function Dashboard() {
                   {progress}%
                 </Text>
               </Group>
-              <Progress 
-                value={progress} 
-                size="sm" 
-                radius="xl" 
+              <Progress
+                value={progress}
+                size="sm"
+                radius="xl"
                 color={progress === 100 ? 'teal' : 'blue'}
               />
-              <Button 
+              <Button
                 fullWidth
-                variant="light" 
-                color="teal" 
+                variant="light"
+                color="teal"
                 mt="md"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -512,18 +521,18 @@ function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <Text>{t('deleteModal.message', { 
-            title: courses.find(c => c.course_id === courseToDeleteId)?.title || '' 
+          <Text>{t('deleteModal.message', {
+            title: courses.find(c => c.course_id === courseToDeleteId)?.title || ''
           })}</Text>
           <Group position="right" mt="md">
-            <Button 
-              variant="default" 
+            <Button
+              variant="default"
               onClick={() => setDeleteModalOpen(false)}
             >
               {t('deleteModal.cancelButton')}
             </Button>
-            <Button 
-              color="red" 
+            <Button
+              color="red"
               onClick={confirmDeleteHandler}
               leftIcon={<IconTrash size={16} />}
             >
@@ -605,9 +614,9 @@ function Dashboard() {
             <Text color="dimmed" size="lg">{t('welcomeMessage')}</Text>
           </Box>
           <Group spacing="md">
-            <Button 
+            <Button
               variant="outline"
-              color="yellow" 
+              color="yellow"
               onClick={() => navigate('/pricing')}
               sx={(theme) => ({
                 background: theme.colorScheme === 'dark'
@@ -623,9 +632,9 @@ function Dashboard() {
             >
               {t('upgradeToPro', 'Upgrade to Pro')}
             </Button>
-            <Button 
+            <Button
               size="md"
-              color="teal" 
+              color="teal"
               onClick={() => navigate('/dashboard/create-course')}
               leftIcon={<IconPlus size={20} />}
               sx={(theme) => ({
@@ -653,7 +662,7 @@ function Dashboard() {
         {/* Continue Where You Left Off Section */}
         {courses.length > 0 && (
           <motion.div variants={item} className={classes.continueSection}>
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
@@ -672,7 +681,7 @@ function Dashboard() {
                   whileHover={{ x: 5 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  
+
                 </motion.div>
               </Group>
               <div className={classes.continueCard}>
@@ -683,13 +692,13 @@ function Dashboard() {
                   <Text size="sm" color="dimmed" mt={4}>
                     {t('createdAt')}: {new Date(courses[0].created_at).toLocaleDateString()}
                   </Text>
-                  
+
                   {courses[0].description && (
                     <Text size="sm" color="dimmed" mt="sm" lineClamp={2} className={classes.courseDescription}>
                       {courses[0].description}
                     </Text>
                   )}
-                  
+
                   <Box mt="md">
                     <Group position="apart" mb={4}>
                       <Text size="sm" weight={500}>{t('yourProgress')}</Text>
@@ -721,7 +730,7 @@ function Dashboard() {
                     </Group>
                   </Box>
                 </div>
-                
+
                 <div className={classes.continueImageContainer}>
                   {courses[0].image_url && (
                     <img
@@ -745,9 +754,9 @@ function Dashboard() {
             {t('searchSubtitle')}
           </Text>
           <Box className={classes.searchContainer}>
-            <EnhancedSearch 
-              courses={courses} 
-              onSearchResultClick={handleSearchResultClick} 
+            <EnhancedSearch
+              courses={courses}
+              onSearchResultClick={handleSearchResultClick}
             />
           </Box>
         </Box>
@@ -768,88 +777,101 @@ function Dashboard() {
 
       {/* Main Content */}
       <Box mt="xl" pt="xl">
-      {loading ? (
-        <Group position="center" py="xl">
-          <Loader size="lg" variant="dots" />
-          <Text size="lg" color="dimmed">{t('loadingCourses')}</Text>
-        </Group>
-      ) : (
-        <Stack spacing="md">
-          <Title order={2} className={classes.sectionTitle}>
-            {t('recentCoursesTitle')}
-          </Title>
-          
-          {!viewAllCourses && courses.length > 3 && (
-            <Text color="dimmed" mb="md" size="sm">
-              {t('recentCoursesSubtitle')}
-            </Text>
-          )}
-          
-          {courses.length > 0 ? (
-            <>
-              <Grid gutter="lg">
-                {displayedCourses.map(renderCourseCard)}
-              </Grid>
-              
-              {courses.length > 3 && (
-                <Group position="center" mt="xl">
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setViewAllCourses(!viewAllCourses)}
-                    rightIcon={viewAllCourses ? <IconChevronRight size={16} /> : null}
-                    leftIcon={!viewAllCourses ? <IconChevronRight size={16} style={{ transform: 'rotate(-90deg)' }} /> : null}
-                  >
-                    {viewAllCourses ? t('showLessButton') : t('viewAllCourses')}
-                  </Button>
-                </Group>
-              )}
-            </>
-          ) : (
-            <motion.div variants={item}>
-              <Paper 
-                radius="md" 
-                p="xl" 
-                withBorder 
-                sx={{
-                  background: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0],
-                  textAlign: 'center',
-                }}
-              >
-                <Box mb="md">
-                  <IconBook size={48} color={theme.colors.gray[5]} />
-                </Box>
-                <Title order={3} mb="sm">
-                  {t('noCoursesTitle')}
-                </Title>
-                <Text color="dimmed" mb="xl">
-                  {t('noCoursesDescription')}
-                </Text>
-                <Button 
-                  leftIcon={<IconPlus size={16} />}
-                  onClick={() => navigate('/dashboard/create-course')}
-                  color="teal"
+        {loading ? (
+          <Group position="center" py="xl">
+            <Loader size="lg" variant="dots" />
+            <Text size="lg" color="dimmed">{t('loadingCourses')}</Text>
+          </Group>
+        ) : (
+          <Stack spacing="md">
+            <Title order={2} className={classes.sectionTitle}>
+              {t('recentCoursesTitle')}
+            </Title>
+
+            {!viewAllCourses && courses.length > 3 && (
+              <Text color="dimmed" mb="md" size="sm">
+                {t('recentCoursesSubtitle')}
+              </Text>
+            )}
+
+            {courses.length > 0 ? (
+              <>
+                <Grid gutter="lg">
+                  {displayedCourses.map(renderCourseCard)}
+                </Grid>
+
+                {courses.length > 3 && (
+                  <Group position="center" mt="xl">
+                    <Button
+                      variant="outline"
+                      onClick={() => setViewAllCourses(!viewAllCourses)}
+                      rightIcon={viewAllCourses ? <IconChevronRight size={16} /> : null}
+                      leftIcon={!viewAllCourses ? <IconChevronRight size={16} style={{ transform: 'rotate(-90deg)' }} /> : null}
+                    >
+                      {viewAllCourses ? t('showLessButton') : t('viewAllCourses')}
+                    </Button>
+                  </Group>
+                )}
+              </>
+            ) : (
+              <motion.div variants={item}>
+                <Paper
+                  radius="md"
+                  p="xl"
+                  withBorder
+                  sx={{
+                    background: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0],
+                    textAlign: 'center',
+                  }}
                 >
-                  {t('createFirstCourse')}
-                </Button>
-              </Paper>
-            </motion.div>
-          )}
-        </Stack>
-      )}
+                  <Box mb="md">
+                    <IconBook size={48} color={theme.colors.gray[5]} />
+                  </Box>
+                  <Title order={3} mb="sm">
+                    {t('noCoursesTitle')}
+                  </Title>
+                  <Text color="dimmed" mb="xl">
+                    {t('noCoursesDescription')}
+                  </Text>
+                  <Button
+                    leftIcon={<IconPlus size={16} />}
+                    onClick={() => navigate('/dashboard/create-course')}
+                    color="teal"
+                  >
+                    {t('createFirstCourse')}
+                  </Button>
+                </Paper>
+              </motion.div>
+            )}
+          </Stack>
+        )}
       </Box>
 
+      {/* Learning Analytics Section */}
+      {user && courses.length > 0 && (
+        <motion.div
+          variants={item}
+          style={{ marginTop: '3rem' }}
+        >
+          <LearningAnalytics
+            userId={user.id}
+            showDetailedView={true}
+          />
+        </motion.div>
+      )}
+
       {/* Info Section - MOVED INSIDE THE MAIN CONTAINER */}
-      <motion.div 
+      <motion.div
         variants={item}
         style={{ marginTop: '4rem' }}
       >
         <Title order={2} align="center" mb="xl">
           {t('infoSection.title', 'How It Works')}
         </Title>
-        
+
         <Grid gutter={50} align="center">
           <Grid.Col md={6}>
-            <Box 
+            <Box
               sx={{
                 position: 'relative',
                 paddingBottom: '56.25%', /* 16:9 Aspect Ratio */
@@ -877,17 +899,17 @@ function Dashboard() {
               />
             </Box>
           </Grid.Col>
-          
+
           <Grid.Col md={6}>
             <Stack spacing="md">
               <Title order={3}>
                 {t('infoSection.subtitle', 'Create Engaging Courses with Ease')}
               </Title>
-              
+
               <Text size="lg">
                 {t('infoSection.description', 'Our platform makes it simple to create, manage, and deliver beautiful online courses. Whether you\'re an educator, trainer, or subject matter expert, you can easily build interactive learning experiences.')}
               </Text>
-              
+
               <List
                 spacing="md"
                 size="lg"
@@ -908,11 +930,11 @@ function Dashboard() {
                   {t('infoSection.feature3', 'Track progress and performance')}
                 </List.Item>
               </List>
-              
-              <Button 
-                variant="outline" 
-                color="teal" 
-                size="md" 
+
+              <Button
+                variant="outline"
+                color="teal"
+                size="md"
                 mt="md"
                 onClick={() => navigate('/dashboard/create-course')}
               >

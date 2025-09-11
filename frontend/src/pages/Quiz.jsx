@@ -21,11 +21,11 @@ import {
   Stack,
   createStyles,
 } from '@mantine/core';
-import { 
-  IconBrain, 
-  IconPencil, 
-  IconCheck, 
-  IconX, 
+import {
+  IconBrain,
+  IconPencil,
+  IconCheck,
+  IconX,
   IconStar,
   IconBulb,
   IconTarget,
@@ -34,19 +34,20 @@ import {
 } from '@tabler/icons-react';
 import { toast } from 'react-toastify';
 import { courseService } from '../api/courseService';
+import { useUmamiTracker } from '../components/UmamiTracker';
 import AiCodeWrapper from "../components/AiCodeWrapper.jsx";
 import 'katex/dist/katex.min.css';
 import Latex from 'react-latex-next';
 
 const useStyles = createStyles((theme) => ({
   quizContainer: {
-    background: theme.colorScheme === 'dark' 
+    background: theme.colorScheme === 'dark'
       ? `linear-gradient(135deg, ${theme.colors.dark[8]} 0%, ${theme.colors.dark[7]} 100%)`
       : `linear-gradient(135deg, ${theme.colors.gray[0]} 0%, ${theme.white} 100%)`,
     borderRadius: theme.radius.lg,
     padding: theme.spacing.xl,
     border: `1px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[2]}`,
-    boxShadow: theme.colorScheme === 'dark' 
+    boxShadow: theme.colorScheme === 'dark'
       ? `0 8px 32px ${theme.colors.dark[9]}60`
       : `0 8px 32px ${theme.colors.gray[4]}30`,
     position: 'relative',
@@ -62,9 +63,9 @@ const useStyles = createStyles((theme) => ({
       borderRadius: `${theme.radius.lg}px ${theme.radius.lg}px 0 0`,
     },
   },
-  
+
   questionCard: {
-    background: theme.colorScheme === 'dark' 
+    background: theme.colorScheme === 'dark'
       ? `linear-gradient(145deg, ${theme.colors.dark[6]} 0%, ${theme.colors.dark[7]} 100%)`
       : `linear-gradient(145deg, ${theme.white} 0%, ${theme.colors.gray[0]} 100%)`,
     border: `1px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[2]}`,
@@ -74,15 +75,15 @@ const useStyles = createStyles((theme) => ({
     transition: 'all 0.3s ease',
     position: 'relative',
     overflow: 'hidden',
-    
+
     '&:hover': {
       transform: 'translateY(-2px)',
-      boxShadow: theme.colorScheme === 'dark' 
+      boxShadow: theme.colorScheme === 'dark'
         ? `0 12px 32px ${theme.colors.dark[9]}80`
         : `0 12px 32px ${theme.colors.gray[4]}40`,
       border: `1px solid ${theme.colors.violet[6]}40`,
     },
-    
+
     '&::before': {
       content: '""',
       position: 'absolute',
@@ -94,14 +95,14 @@ const useStyles = createStyles((theme) => ({
       opacity: 0,
       transition: 'opacity 0.3s ease',
     },
-    
+
     '&:hover::before': {
       opacity: 1,
     },
   },
-  
+
   questionHeader: {
-    background: theme.colorScheme === 'dark' 
+    background: theme.colorScheme === 'dark'
       ? `linear-gradient(135deg, ${theme.colors.violet[9]}20, ${theme.colors.blue[9]}20)`
       : `linear-gradient(135deg, ${theme.colors.violet[1]}, ${theme.colors.blue[1]})`,
     borderRadius: theme.radius.md,
@@ -109,7 +110,7 @@ const useStyles = createStyles((theme) => ({
     marginBottom: theme.spacing.lg,
     border: `1px solid ${theme.colorScheme === 'dark' ? theme.colors.violet[8] : theme.colors.violet[3]}30 : ${theme.colors.violet[3]}50`,
   },
-  
+
   pointsBadge: {
     background: `linear-gradient(135deg, ${theme.colors.violet[6]}, ${theme.colors.blue[5]})`,
     border: 'none',
@@ -131,9 +132,9 @@ const useStyles = createStyles((theme) => ({
       boxShadow: `0 4px 12px ${theme.colors.red[6]}40`,
     },
   },
-  
+
   typeBadge: {
-    background: theme.colorScheme === 'dark' 
+    background: theme.colorScheme === 'dark'
       ? `linear-gradient(135deg, ${theme.colors.dark[5]}, ${theme.colors.dark[4]})`
       : `linear-gradient(135deg, ${theme.colors.gray[1]}, ${theme.colors.gray[0]})`,
     color: theme.colorScheme === 'dark' ? theme.colors.gray[3] : theme.colors.gray[7],
@@ -150,7 +151,7 @@ const useStyles = createStyles((theme) => ({
       border: `1px solid ${theme.colors.violet[6]}30`,
     },
   },
-  
+
   radioOption: {
     padding: theme.spacing.md,
     borderRadius: theme.radius.md,
@@ -158,24 +159,24 @@ const useStyles = createStyles((theme) => ({
     marginBottom: theme.spacing.sm,
     transition: 'all 0.2s ease',
     background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.white,
-    
+
     '&:hover': {
-      background: theme.colorScheme === 'dark' 
-        ? theme.colors.dark[5] 
+      background: theme.colorScheme === 'dark'
+        ? theme.colors.dark[5]
         : theme.colors.gray[0],
       border: `1px solid ${theme.colors.violet[6]}50`,
       transform: 'translateX(4px)',
     },
-    
+
     '&[data-selected="true"]': {
-      background: theme.colorScheme === 'dark' 
+      background: theme.colorScheme === 'dark'
         ? `linear-gradient(135deg, ${theme.colors.violet[9]}30, ${theme.colors.blue[9]}30)`
         : `linear-gradient(135deg, ${theme.colors.violet[1]}, ${theme.colors.blue[1]})`,
       border: `1px solid ${theme.colors.violet[6]}`,
       transform: 'translateX(8px)',
     },
   },
-  
+
   submitButton: {
     background: `linear-gradient(135deg, ${theme.colors.violet[6]}, ${theme.colors.blue[5]})`,
     border: 'none',
@@ -184,51 +185,51 @@ const useStyles = createStyles((theme) => ({
     fontWeight: 600,
     transition: 'all 0.3s ease',
     boxShadow: `0 4px 16px ${theme.colors.violet[6]}40`,
-    
+
     '&:hover': {
       background: `linear-gradient(135deg, ${theme.colors.violet[7]}, ${theme.colors.blue[6]})`,
       transform: 'translateY(-2px)',
       boxShadow: `0 8px 24px ${theme.colors.violet[6]}50`,
     },
-    
+
     '&:disabled': {
       background: theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[3],
       transform: 'none',
       boxShadow: 'none',
     },
   },
-  
+
   feedbackAlert: {
     borderRadius: theme.radius.md,
     border: 'none',
     padding: theme.spacing.lg,
     position: 'relative',
     overflow: 'hidden',
-    
+
     '&[data-color="green"]': {
-      background: theme.colorScheme === 'dark' 
+      background: theme.colorScheme === 'dark'
         ? `linear-gradient(135deg, ${theme.colors.green[9]}30, ${theme.colors.teal[9]}30)`
         : `linear-gradient(135deg, ${theme.colors.green[1]}, ${theme.colors.teal[1]})`,
       color: theme.colorScheme === 'dark' ? theme.colors.green[3] : theme.colors.green[8],
     },
-    
+
     '&[data-color="yellow"]': {
-      background: theme.colorScheme === 'dark' 
+      background: theme.colorScheme === 'dark'
         ? `linear-gradient(135deg, ${theme.colors.yellow[9]}30, ${theme.colors.orange[9]}30)`
         : `linear-gradient(135deg, ${theme.colors.yellow[1]}, ${theme.colors.orange[1]})`,
       color: theme.colorScheme === 'dark' ? theme.colors.yellow[3] : theme.colors.yellow[8],
     },
-    
+
     '&[data-color="red"]': {
-      background: theme.colorScheme === 'dark' 
+      background: theme.colorScheme === 'dark'
         ? `linear-gradient(135deg, ${theme.colors.red[9]}30, ${theme.colors.pink[9]}30)`
         : `linear-gradient(135deg, ${theme.colors.red[1]}, ${theme.colors.pink[1]})`,
       color: theme.colorScheme === 'dark' ? theme.colors.red[3] : theme.colors.red[8],
     },
   },
-  
+
   loadingContainer: {
-    background: theme.colorScheme === 'dark' 
+    background: theme.colorScheme === 'dark'
       ? `linear-gradient(135deg, ${theme.colors.dark[7]}, ${theme.colors.dark[6]})`
       : `linear-gradient(135deg, ${theme.colors.gray[0]}, ${theme.white})`,
     borderRadius: theme.radius.lg,
@@ -236,19 +237,19 @@ const useStyles = createStyles((theme) => ({
     textAlign: 'center',
     border: `1px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[2]}`,
   },
-  
+
   emptyState: {
     textAlign: 'center',
     padding: theme.spacing.xl * 2,
-    background: theme.colorScheme === 'dark' 
+    background: theme.colorScheme === 'dark'
       ? `linear-gradient(135deg, ${theme.colors.dark[7]}, ${theme.colors.dark[6]})`
       : `linear-gradient(135deg, ${theme.colors.gray[0]}, ${theme.white})`,
     borderRadius: theme.radius.lg,
     border: `1px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[2]}`,
   },
-  
+
   questionContent: {
-    background: theme.colorScheme === 'dark' 
+    background: theme.colorScheme === 'dark'
       ? theme.colors.dark[8]
       : theme.white,
     borderRadius: theme.radius.md,
@@ -256,7 +257,7 @@ const useStyles = createStyles((theme) => ({
     border: `1px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[2]}`,
     marginBottom: theme.spacing.lg,
     position: 'relative',
-    
+
     '&::before': {
       content: '""',
       position: 'absolute',
@@ -273,9 +274,14 @@ const useStyles = createStyles((theme) => ({
 const Quiz = ({ courseId, chapterId, onQuestionCountChange }) => {
   const { t } = useTranslation('chapterView');
   const { classes } = useStyles();
+  const {
+    trackEvent,
+    trackAssessmentComplete,
+    trackContentInteraction
+  } = useUmamiTracker();
   const theme = useMantineTheme();
   const { colorScheme } = useMantineColorScheme();
-  
+
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -283,6 +289,10 @@ const Quiz = ({ courseId, chapterId, onQuestionCountChange }) => {
   const [otAnswers, setOtAnswers] = useState({});
   const [gradingQuestion, setGradingQuestion] = useState(null);
   const [questionFeedback, setQuestionFeedback] = useState({});
+
+  // Time tracking for quiz
+  const [quizStartTime, setQuizStartTime] = useState(null);
+  const [questionStartTimes, setQuestionStartTimes] = useState({});
 
   // Fetch quiz questions when component mounts
   useEffect(() => {
@@ -293,6 +303,25 @@ const Quiz = ({ courseId, chapterId, onQuestionCountChange }) => {
 
         if (questionsData && questionsData.length > 0) {
           setQuestions(questionsData);
+
+          // Initialize time tracking
+          const startTime = Date.now();
+          setQuizStartTime(startTime);
+
+          // Initialize question start times
+          const questionTimes = {};
+          questionsData.forEach(question => {
+            questionTimes[question.id] = startTime;
+          });
+          setQuestionStartTimes(questionTimes);
+
+          // Track quiz start
+          trackEvent('quiz_start', {
+            course_id: courseId,
+            chapter_id: chapterId,
+            quiz_type: 'chapter_quiz',
+            question_count: questionsData.length
+          });
 
           if (onQuestionCountChange) {
             onQuestionCountChange(questionsData.length);
@@ -350,6 +379,15 @@ const Quiz = ({ courseId, chapterId, onQuestionCountChange }) => {
   const handleMCAnswerChange = async (questionId, value) => {
     setMcAnswers(prev => ({ ...prev, [questionId]: value }));
 
+    // Track quiz answer
+    trackEvent('quiz_answer', {
+      course_id: courseId,
+      chapter_id: chapterId,
+      question_id: questionId,
+      question_type: 'multiple_choice',
+      answer_provided: true
+    });
+
     try {
       const updatedQuestion = await courseService.saveMCAnswer(courseId, chapterId, questionId, value);
 
@@ -387,6 +425,17 @@ const Quiz = ({ courseId, chapterId, onQuestionCountChange }) => {
 
   const handleOTAnswerChange = (questionId, value) => {
     setOtAnswers(prev => ({ ...prev, [questionId]: value }));
+
+    // Track quiz answer (debounced for open text)
+    if (value.trim().length > 0) {
+      trackEvent('quiz_answer', {
+        course_id: courseId,
+        chapter_id: chapterId,
+        question_id: questionId,
+        question_type: 'open_text',
+        answer_provided: true
+      });
+    }
   };
 
   const handleGradeOpenTextQuestion = async (questionId) => {
@@ -409,6 +458,22 @@ const Quiz = ({ courseId, chapterId, onQuestionCountChange }) => {
         ...prev,
         [questionId]: feedback
       }));
+
+      // Track assessment completion for individual question
+      const score = feedback.points || 0;
+      const maxScore = questions.find(q => q.id === questionId)?.type === 'OT' ? 2 : 1;
+      const scorePercentage = (score / maxScore) * 100;
+
+      // Calculate time spent on this question
+      const questionStartTime = questionStartTimes[questionId] || quizStartTime;
+      const timeSpent = questionStartTime ? Math.round((Date.now() - questionStartTime) / 1000) : 0;
+
+      trackAssessmentComplete(
+        courseId,
+        questionId.toString(),
+        scorePercentage,
+        timeSpent
+      );
 
       toast.success('Your answer has been graded! ✨');
     } catch (error) {
@@ -489,14 +554,14 @@ const Quiz = ({ courseId, chapterId, onQuestionCountChange }) => {
     questions.forEach((question) => {
       const maxPoints = question.type === 'OT' ? 2 : 1;
       totalPoints += maxPoints;
-      
+
       const feedback = questionFeedback[question.id];
       const hasAnswer = question.type === 'MC' ? mcAnswers[question.id] : otAnswers[question.id];
-      
+
       if (hasAnswer || question.users_answer) {
         answered++;
       }
-      
+
       if (feedback?.points_received !== undefined) {
         earnedPoints += feedback.points_received;
       } else if (question.points_received !== undefined) {
@@ -525,8 +590,8 @@ const Quiz = ({ courseId, chapterId, onQuestionCountChange }) => {
   if (error) {
     return (
       <Paper className={classes.loadingContainer}>
-        <Alert 
-          color="red" 
+        <Alert
+          color="red"
           title="Error"
           icon={<IconX size={20} />}
           className={classes.feedbackAlert}
@@ -575,19 +640,19 @@ const Quiz = ({ courseId, chapterId, onQuestionCountChange }) => {
             </Box>
           </Group>
         </Stack>
-        
+
         <Stack spacing="xs" align="flex-end">
-          <Badge 
-            size="lg" 
-            variant="gradient" 
+          <Badge
+            size="lg"
+            variant="gradient"
             gradient={{ from: 'violet', to: 'blue' }}
             sx={{ fontWeight: 600 }}
           >
             {stats.answered}/{stats.total} Questions
           </Badge>
-          <Progress 
-            value={(stats.answered / stats.total) * 100} 
-            size="md" 
+          <Progress
+            value={(stats.answered / stats.total) * 100}
+            size="md"
             radius="xl"
             sx={{ width: 120 }}
             color="violet"
@@ -604,10 +669,10 @@ const Quiz = ({ courseId, chapterId, onQuestionCountChange }) => {
       {questions.map((question, index) => {
         const isOT = question.type === 'OT';
         const color = getQuestionColor(question, question.id);
-        const isAnswered = isOT ? 
+        const isAnswered = isOT ?
           (otAnswers[question.id] || question.users_answer) && (questionFeedback[question.id] || question.feedback) :
           mcAnswers[question.id] || question.users_answer;
-        
+
         return (
           <Transition
             key={`${question.type}-${question.id}`}
@@ -622,18 +687,18 @@ const Quiz = ({ courseId, chapterId, onQuestionCountChange }) => {
                 <div className={classes.questionHeader}>
                   <Group position="apart" align="flex-start" mb="sm">
                     <Group spacing="md" align="center">
-                      <ThemeIcon 
-                        size={36} 
-                        radius="xl" 
-                        variant="gradient" 
+                      <ThemeIcon
+                        size={36}
+                        radius="xl"
+                        variant="gradient"
                         gradient={{ from: 'violet', to: 'blue' }}
                       >
                         <Text size="sm" weight={700}>
                           {index + 1}
                         </Text>
                       </ThemeIcon>
-                      
-                      <Badge 
+
+                      <Badge
                         className={classes.typeBadge}
                         data-type={question.type}
                         leftSection={isOT ? <IconPencil size={14} /> : <IconTarget size={14} />}
@@ -642,7 +707,7 @@ const Quiz = ({ courseId, chapterId, onQuestionCountChange }) => {
                       </Badge>
                     </Group>
 
-                    <Badge 
+                    <Badge
                       className={classes.pointsBadge}
                       data-correct={color === 'green'}
                       data-partial={color === 'yellow'}
@@ -655,12 +720,12 @@ const Quiz = ({ courseId, chapterId, onQuestionCountChange }) => {
                     </Badge>
                   </Group>
 
-                {/* Question Content */}
-                <Box className={classes.questionContent}>
-                  <AiCodeWrapper Background={false}>
-                    {question.question}
-                  </AiCodeWrapper>
-                </Box>
+                  {/* Question Content */}
+                  <Box className={classes.questionContent}>
+                    <AiCodeWrapper Background={false}>
+                      {question.question}
+                    </AiCodeWrapper>
+                  </Box>
                 </div>
 
                 {/* Question Type Specific Content */}
@@ -745,12 +810,12 @@ const Quiz = ({ courseId, chapterId, onQuestionCountChange }) => {
                             className={classes.radioOption}
                             data-selected={mcAnswers[question.id] === option}
                           >
-                            <Radio 
-                              value={option} 
+                            <Radio
+                              value={option}
                               label={
-                              <Latex>
-                                {question[`answer_${option}`]}
-                              </Latex>}
+                                <Latex>
+                                  {question[`answer_${option}`]}
+                                </Latex>}
                               styles={{
                                 radio: {
                                   '&:checked': {

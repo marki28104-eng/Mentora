@@ -25,6 +25,7 @@ import { toast } from 'react-toastify';
 import { courseService } from '../api/courseService';
 import ToolbarContainer from '../components/tools/ToolbarContainer';
 import { useToolbar } from '../contexts/ToolbarContext';
+import { useUmamiTracker } from '../components/UmamiTracker';
 import AiCodeWrapper from "../components/AiCodeWrapper.jsx";
 import { downloadChapterContentAsPDF, prepareElementForPDF } from '../utils/pdfDownload';
 import FullscreenContentWrapper from '../components/FullscreenContentWrapper';
@@ -38,6 +39,12 @@ function ChapterView() {
   const location = useLocation(); // Get location to read query params
   const { toolbarOpen, toolbarWidth } = useToolbar();
   const isMobile = useMediaQuery('(max-width: 768px)');
+  const {
+    trackEvent,
+    trackContentInteraction,
+    trackTimeSpent,
+    trackChapterComplete
+  } = useUmamiTracker();
 
   // Read tab from URL, default to 'content'
   const queryParams = new URLSearchParams(location.search);
@@ -64,6 +71,12 @@ function ChapterView() {
   const pollIntervalRef = useRef(null);
   const blinkTimeoutRef = useRef(null);
 
+  // Time tracking
+  const [sessionStartTime, setSessionStartTime] = useState(null);
+  const [tabStartTime, setTabStartTime] = useState(null);
+  const [totalTimeSpent, setTotalTimeSpent] = useState(0);
+  const timeTrackingRef = useRef(null);
+
   // Listen for URL parameter changes and update active tab
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -73,6 +86,43 @@ function ChapterView() {
 
   // Handle tab change and update URL
   const handleTabChange = (newTab) => {
+    // Track time spent on previous tab
+    if (tabStartTime && activeTab) {
+      const timeSpent = Date.now() - tabStartTime;
+      const contentType = activeTab === 'content' ? 'text' :
+        activeTab === 'quiz' ? 'quiz' :
+          activeTab === 'media' ? 'interactive' : 'text';
+
+      trackTimeSpent(courseId, chapterId, Math.round(timeSpent / 1000), contentType);
+      trackContentInteraction(courseId, contentType, Math.round(timeSpent / 1000), {
+        tab: activeTab,
+        interaction_type: 'tab_exit'
+      });
+    }
+
+    // Track tab change as content interaction
+    trackEvent('content_interaction', {
+      course_id: courseId,
+      chapter_id: chapterId,
+      interaction_type: 'tab_change',
+      content_type: newTab,
+      from_tab: activeTab,
+      to_tab: newTab
+    });
+
+    // Track new tab interaction
+    const newContentType = newTab === 'content' ? 'text' :
+      newTab === 'quiz' ? 'quiz' :
+        newTab === 'media' ? 'interactive' : 'text';
+
+    trackContentInteraction(courseId, newContentType, 0, {
+      tab: newTab,
+      interaction_type: 'tab_enter'
+    });
+
+    // Update tab start time
+    setTabStartTime(Date.now());
+
     const currentParams = new URLSearchParams(location.search);
     currentParams.set('tab', newTab);
     navigate(`${location.pathname}?${currentParams.toString()}`, { replace: true });
@@ -88,7 +138,7 @@ function ChapterView() {
     const fetchChapterAndMediaInfo = async () => {
       try {
         setLoading(true);
-        
+
         // Fetch chapter data and media info (including questions check)
         const [chapterData, imagesData, filesData, questionsData] = await Promise.all([
           courseService.getChapter(courseId, chapterId),
@@ -98,6 +148,19 @@ function ChapterView() {
         ]);
 
         setChapter(chapterData);
+
+        // Initialize time tracking
+        const startTime = Date.now();
+        setSessionStartTime(startTime);
+        setTabStartTime(startTime);
+
+        // Track chapter view
+        trackEvent('chapter_view', {
+          course_id: courseId,
+          chapter_id: chapterId,
+          chapter_name: chapterData.title,
+          tab: initialTab
+        });
 
         // Check if chapter has questions
         if (questionsData && questionsData.length > 0) {
@@ -145,7 +208,7 @@ function ChapterView() {
     if (loading) return;
 
     if (!initialLoad.current && images.every(img => img.objectUrl || img.error) &&
-        files.every(file => file.objectUrl || file.error)) {
+      files.every(file => file.objectUrl || file.error)) {
       return;
     }
 
@@ -293,6 +356,28 @@ function ChapterView() {
       if (blinkTimeoutRef.current) {
         clearTimeout(blinkTimeoutRef.current);
       }
+      if (timeTrackingRef.current) {
+        clearInterval(timeTrackingRef.current);
+      }
+
+      // Track final time spent before leaving
+      if (sessionStartTime) {
+        const totalSessionTime = Date.now() - sessionStartTime;
+        trackTimeSpent(courseId, chapterId, Math.round(totalSessionTime / 1000));
+
+        // Track final tab time if available
+        if (tabStartTime && activeTab) {
+          const finalTabTime = Date.now() - tabStartTime;
+          const contentType = activeTab === 'content' ? 'text' :
+            activeTab === 'quiz' ? 'quiz' :
+              activeTab === 'media' ? 'interactive' : 'text';
+
+          trackContentInteraction(courseId, contentType, Math.round(finalTabTime / 1000), {
+            tab: activeTab,
+            interaction_type: 'session_end'
+          });
+        }
+      }
 
     };
   }, [courseId, chapterId, images, files]);
@@ -439,8 +524,8 @@ function ChapterView() {
         `}
       </style>
 
-      <Container 
-        size="xl" 
+      <Container
+        size="xl"
         py="xl"
         style={{
           maxWidth: '100%',
@@ -502,8 +587,8 @@ function ChapterView() {
                   <Tabs.Tab value="files" icon={<IconFileText size={14} />}>{t('tabs.files')}</Tabs.Tab>
                 )}
                 {hasQuestions && (
-                  <Tabs.Tab 
-                    value="quiz" 
+                  <Tabs.Tab
+                    value="quiz"
                     icon={<IconQuestionMark size={14} />}
                     className={isBlinking ? 'quiz-tab-blinking' : ''}
                   >
@@ -527,7 +612,7 @@ function ChapterView() {
                   <FlashcardDeck courseId={courseId} chapterId={chapterId} />
                 </Paper>
               </Tabs.Panel>
-              */}  
+              */}
               <Tabs.Panel value="images" pt="xs" style={{ width: '100%' }}>
                 <Paper shadow="xs" p="md" withBorder style={{ width: '100%' }}>
                   <MediaGallery
