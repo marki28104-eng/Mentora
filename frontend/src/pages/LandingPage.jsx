@@ -644,7 +644,7 @@ function LandingPage() {
                   <Group spacing="md" mt="xl">
                     <Button
                       component="a"
-                      href="https://kiro.ai"
+                      href="https://kiro.dev"
                       target="_blank"
                       rel="noopener noreferrer"
                       variant="outline"
@@ -657,7 +657,7 @@ function LandingPage() {
                     </Button>
                     <Button
                       component="a"
-                      href="https://kiro.ai/docs"
+                      href="https://kiro.dev/docs"
                       target="_blank"
                       rel="noopener noreferrer"
                       variant="subtle"
