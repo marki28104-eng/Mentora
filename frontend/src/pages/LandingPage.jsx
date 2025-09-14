@@ -979,12 +979,21 @@ function LandingPage() {
             {(styles) => (
               <Box className={classes.videoContainer} style={styles}>
                 <iframe
-                  className={classes.videoIframe}
-                  src="https://youtu.be/I0Nb0O1pSxM"
-                  title="YouTube video player"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                ></iframe>
+                width="100%"
+                height="100%"
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  border: 'none'
+                }}
+                src="https://www.youtube.com/embed/JImJJ9RcCog"
+                title={t('infoSection.videoTitle', 'Introduction to Our Platform')}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
               </Box>
             )}
           </Transition>
