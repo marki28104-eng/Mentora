@@ -44,19 +44,20 @@ const MantineThemeProvider = ({ children }) => {
 
   const mantineTheme = {
     colorScheme: colorScheme,
-    primaryColor: 'purple',
+    primaryColor: 'violet',
     colors: {
-      purple: colorScheme === 'dark' ? [
-        '#1e1b4b', // 50 - Dark mode
-        '#312e81', // 100
-        '#3730a3', // 200
-        '#4338ca', // 300
-        '#5b21b6', // 400
-        '#7c3aed', // 500 - Primary
-        '#8b5cf6', // 600
-        '#a78bfa', // 700
-        '#c4b5fd', // 800
-        '#ddd6fe'  // 900
+      // Unified purple/violet color scheme
+      violet: colorScheme === 'dark' ? [
+        '#f5f3ff', // 50 - Slightly lighter for better contrast in dark mode
+        '#ede9fe', // 100
+        '#ddd6fe', // 200
+        '#c4b5fd', // 300
+        '#a78bfa', // 400
+        '#8b5cf6', // 500 - Primary color
+        '#7c3aed', // 600
+        '#6d28d9', // 700
+        '#5b21b6', // 800
+        '#4c1d95'  // 900
       ] : [
         '#faf5ff', // 50 - Light mode
         '#f3e8ff', // 100
@@ -69,11 +70,11 @@ const MantineThemeProvider = ({ children }) => {
         '#6b21b6', // 800
         '#581c87'  // 900
       ],
-      // Keep violet for backward compatibility during transition
-      violet: [
-        '#f3f0ff',
-        '#e9e5ff',
-        '#d9d4ff',
+      // Alias purple to use the same as violet for consistency
+      purple: colorScheme === 'dark' ? [
+        '#f5f3ff',
+        '#ede9fe',
+        '#ddd6fe',
         '#c4b5fd',
         '#a78bfa',
         '#8b5cf6',
@@ -81,6 +82,17 @@ const MantineThemeProvider = ({ children }) => {
         '#6d28d9',
         '#5b21b6',
         '#4c1d95'
+      ] : [
+        '#faf5ff',
+        '#f3e8ff',
+        '#e9d5ff',
+        '#d8b4fe',
+        '#c084fc',
+        '#a855f7',
+        '#9333ea',
+        '#7c3aed',
+        '#6b21b6',
+        '#581c87'
       ],
     },
     fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
@@ -90,6 +102,10 @@ const MantineThemeProvider = ({ children }) => {
     },
     components: {
       Button: {
+        defaultProps: {
+          variant: 'gradient',
+          gradient: { from: 'violet.6', to: 'violet.4' },
+        },
         styles: (theme) => ({
           root: {
             fontWeight: 600,
@@ -97,6 +113,10 @@ const MantineThemeProvider = ({ children }) => {
             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             '&:hover': {
               transform: 'translateY(-2px)',
+              boxShadow: theme.shadows.md,
+            },
+            '&[data-variant="gradient"]': {
+              background: `linear-gradient(135deg, ${theme.colors.violet[6]} 0%, ${theme.colors.violet[4]} 100%)`,
             },
           },
         }),
@@ -108,13 +128,17 @@ const MantineThemeProvider = ({ children }) => {
             transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
             border: `1px solid ${theme.colorScheme === 'dark'
               ? 'rgba(139, 92, 246, 0.2)'
-              : 'rgba(139, 92, 246, 0.1)'}`,
+              : 'rgba(168, 85, 247, 0.1)'}`,
+            background: theme.colorScheme === 'dark' 
+              ? 'rgba(30, 31, 59, 0.8)' 
+              : 'rgba(255, 255, 255, 0.9)',
             backdropFilter: 'blur(20px)',
             '&:hover': {
               transform: 'translateY(-4px)',
               borderColor: theme.colorScheme === 'dark'
-                ? 'rgba(139, 92, 246, 0.4)'
-                : 'rgba(139, 92, 246, 0.3)',
+                ? 'rgba(168, 85, 247, 0.4)'
+                : 'rgba(168, 85, 247, 0.3)',
+              boxShadow: theme.shadows.lg,
             },
           },
         }),
@@ -132,11 +156,18 @@ const MantineThemeProvider = ({ children }) => {
           input: {
             borderRadius: '8px',
             transition: 'all 0.2s ease',
+            borderColor: theme.colorScheme === 'dark' 
+              ? theme.colors.violet[7] + '40' 
+              : theme.colors.violet[3],
             '&:focus': {
-              borderColor: theme.colors.purple[5],
-              boxShadow: `0 0 0 2px ${theme.colors.purple[1]}`,
+              borderColor: theme.colors.violet[5],
+              boxShadow: `0 0 0 2px ${theme.colors.violet[1]}80`,
             },
           },
+          label: {
+            marginBottom: theme.spacing.xs,
+            color: theme.colorScheme === 'dark' ? theme.colors.violet[1] : theme.colors.violet[8],
+          }
         }),
       },
       Select: {
@@ -144,11 +175,34 @@ const MantineThemeProvider = ({ children }) => {
           input: {
             borderRadius: '8px',
             transition: 'all 0.2s ease',
+            borderColor: theme.colorScheme === 'dark' 
+              ? theme.colors.violet[7] + '40' 
+              : theme.colors.violet[3],
             '&:focus': {
-              borderColor: theme.colors.purple[5],
-              boxShadow: `0 0 0 2px ${theme.colors.purple[1]}`,
+              borderColor: theme.colors.violet[5],
+              boxShadow: `0 0 0 2px ${theme.colors.violet[1]}80`,
             },
           },
+          dropdown: {
+            borderRadius: '8px',
+            border: 'none',
+            boxShadow: theme.shadows.lg,
+            background: theme.colorScheme === 'dark' 
+              ? theme.colors.dark[7] 
+              : theme.white,
+          },
+          item: {
+            '&[data-selected]': {
+              background: theme.colors.violet[5],
+              '&:hover': {
+                background: theme.colors.violet[6],
+              },
+            },
+          },
+          label: {
+            marginBottom: theme.spacing.xs,
+            color: theme.colorScheme === 'dark' ? theme.colors.violet[1] : theme.colors.violet[8],
+          }
         }),
       },
       Textarea: {
@@ -156,11 +210,18 @@ const MantineThemeProvider = ({ children }) => {
           input: {
             borderRadius: '8px',
             transition: 'all 0.2s ease',
+            borderColor: theme.colorScheme === 'dark' 
+              ? theme.colors.violet[7] + '40' 
+              : theme.colors.violet[3],
             '&:focus': {
-              borderColor: theme.colors.purple[5],
-              boxShadow: `0 0 0 2px ${theme.colors.purple[1]}`,
+              borderColor: theme.colors.violet[5],
+              boxShadow: `0 0 0 2px ${theme.colors.violet[1]}80`,
             },
           },
+          label: {
+            marginBottom: theme.spacing.xs,
+            color: theme.colorScheme === 'dark' ? theme.colors.violet[1] : theme.colors.violet[8],
+          }
         }),
       },
     },

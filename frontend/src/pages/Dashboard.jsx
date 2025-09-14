@@ -795,25 +795,6 @@ function Dashboard() {
           >
             <Group spacing="md" className={classes.headerButtons} sx={{ width: isMobile ? '100%' : 'auto' }}>
               <Button
-                variant="outline"
-                onClick={() => navigate('/pricing')}
-                sx={{
-                  background: 'linear-gradient(135deg, #f59e0b 0%, #f97316 50%, #ea580c 100%)',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '12px',
-                  fontWeight: 600,
-                  boxShadow: '0 4px 15px rgba(245, 158, 11, 0.4)',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  '&:hover': {
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 8px 25px rgba(245, 158, 11, 0.6)',
-                  },
-                }}
-              >
-                {t('upgradeToPro', 'Upgrade to Pro')}
-              </Button>
-              <Button
                 size="md"
                 onClick={() => navigate('/dashboard/create-course')}
                 leftIcon={<IconPlus size={20} />}
