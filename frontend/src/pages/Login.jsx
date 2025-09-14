@@ -191,7 +191,7 @@ function Login() {
               loading={isLoading}
               style={{ height: 46 }}
               variant="gradient"
-              gradient={{ from: 'cyan', to: 'teal' }}
+              gradient={{ from: 'violet.6', to: 'violet.4' }}
             >
               {t("signIn")}
             </Button>
