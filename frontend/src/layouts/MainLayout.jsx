@@ -15,6 +15,7 @@ import {
   Divider,
   UnstyledButton,
   Text,
+
 } from '@mantine/core';
 import {
   IconSettings,
@@ -23,12 +24,15 @@ import {
   IconUser,
   IconLogout,
   IconInfoCircle,
-  IconHome2
+  IconHome2,
+
 } from '@tabler/icons-react';
 import AppFooter from '../components/AppFooter';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
+import { LoadingSpinner } from '../components/ui/LoadingSpinner';
+import MobileNavigation, { useMobileNavigation } from '../components/ui/MobileNavigation';
 
 
 function MainLayout() {
@@ -41,6 +45,7 @@ function MainLayout() {
   const { pathname } = useLocation();
   const dark = colorScheme === 'dark';
   const isMobile = useMediaQuery('(max-width: 768px)'); // Add mobile detection
+  const mobileNav = useMobileNavigation();
 
   // Logic to determine avatar source
   let avatarSrc = null;
@@ -76,23 +81,44 @@ function MainLayout() {
         <Header
           height={{ base: 60, md: 70 }}
           p="md"
+          className="glass-nav transition-all"
           sx={(theme) => ({
             background: dark
-              ? `linear-gradient(135deg, ${theme.colors.dark[7]} 0%, ${theme.colors.dark[8]} 100%)`
-              : `linear-gradient(135deg, ${theme.white} 0%, ${theme.colors.gray[0]} 100%)`,
-            borderBottom: `1px solid ${dark ? theme.colors.dark[6] : theme.colors.gray[2]}`,
+              ? 'var(--bg-card)'
+              : 'var(--bg-card)',
+            backdropFilter: 'blur(20px)',
+            borderBottom: `1px solid rgba(139, 92, 246, 0.1)`,
             boxShadow: dark
-              ? `0 4px 12px ${theme.colors.dark[9]}50`
-              : `0 4px 12px ${theme.colors.gray[3]}30`,
+              ? '0 4px 20px rgba(139, 92, 246, 0.1)'
+              : '0 4px 20px rgba(139, 92, 246, 0.05)',
             zIndex: 200,
             position: 'relative',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: dark
+                ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%)'
+                : 'linear-gradient(135deg, rgba(139, 92, 246, 0.02) 0%, rgba(168, 85, 247, 0.02) 100%)',
+              pointerEvents: 'none',
+            },
           })}
         >
-          <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            height: '100%',
+            position: 'relative',
+            zIndex: 1
+          }}>
             {(!isMobile || isAuthenticated) && (
               <RouterLink
                 to={isAuthenticated ? "/dashboard" : "/"}
                 style={{ textDecoration: "none" }}
+                className="transition-transform hover:scale-105"
               >
                 <img
                   src="/mentora_schrift_türk_2.svg"
@@ -100,12 +126,10 @@ function MainLayout() {
                   style={{
                     height: 40,
                     width: 'auto',
-                    filter: 'drop-shadow(0 2px 4px rgba(139, 92, 246, 0.3))',
+                    filter: 'drop-shadow(0 2px 8px rgba(139, 92, 246, 0.4))',
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                   }}
-                  onMouseEnter={(e) => e.target.style.transform = "scale(1.02)"}
-                  onMouseLeave={(e) => e.target.style.transform = "scale(1)"}
                 />
               </RouterLink>
             )}
@@ -115,18 +139,36 @@ function MainLayout() {
             <Box sx={{ flexGrow: 1, '@media (min-width: 769px)': { display: 'none' } }} />
 
             <Group spacing="md">
+              {/* Mobile Navigation Toggle */}
+              {isMobile && isAuthenticated && (
+                <MobileNavigation
+                  opened={mobileNav.opened}
+                  onClose={mobileNav.close}
+                  onToggle={mobileNav.toggle}
+                />
+              )}
+
               {(!isMobile || isAuthenticated) && (
                 <ActionIcon
-                  variant="outline"
-                  color={dark ? 'yellow' : 'blue'}
+                  variant="light"
+                  color="violet"
                   onClick={() => toggleColorScheme()}
                   title={t('colorSchemeToggleTitle', { ns: 'app', defaultValue: 'Toggle color scheme' })}
                   size="lg"
-                  radius="md"
+                  radius="xl"
+                  className="transition-all hover:-translate-y-1 hover:shadow-purple-md"
                   sx={{
-                    transition: 'all 0.2s ease',
+                    background: dark
+                      ? 'rgba(139, 92, 246, 0.1)'
+                      : 'rgba(139, 92, 246, 0.08)',
+                    border: `1px solid rgba(139, 92, 246, 0.2)`,
+                    color: 'var(--purple-500)',
                     '&:hover': {
-                      transform: 'scale(1.05)',
+                      background: dark
+                        ? 'rgba(139, 92, 246, 0.15)'
+                        : 'rgba(139, 92, 246, 0.12)',
+                      borderColor: 'rgba(139, 92, 246, 0.3)',
+                      color: dark ? 'var(--purple-400)' : 'var(--purple-600)',
                     },
                     display: isMobile && !isAuthenticated ? 'none' : 'flex',
                   }}
@@ -136,16 +178,22 @@ function MainLayout() {
               )}
 
               {isAuthenticated && user ? (
-                <Menu shadow="md" width={220} withinPortal={true} zIndex={300}>
+                <Menu shadow="xl" width={240} withinPortal={true} zIndex={300}>
                   <Menu.Target>
                     <UnstyledButton
+                      className="transition-all hover:-translate-y-1 hover:shadow-purple-md"
                       sx={{
                         padding: theme.spacing.xs,
-                        borderRadius: theme.radius.md,
-                        transition: 'all 0.2s ease',
+                        borderRadius: theme.radius.xl,
+                        background: dark
+                          ? 'rgba(139, 92, 246, 0.05)'
+                          : 'rgba(139, 92, 246, 0.03)',
+                        border: `1px solid rgba(139, 92, 246, 0.1)`,
                         '&:hover': {
-                          backgroundColor: dark ? theme.colors.dark[6] : theme.colors.gray[1],
-                          transform: 'scale(1.02)',
+                          background: dark
+                            ? 'rgba(139, 92, 246, 0.1)'
+                            : 'rgba(139, 92, 246, 0.08)',
+                          borderColor: 'rgba(139, 92, 246, 0.2)',
                         },
                       }}
                     >
@@ -155,14 +203,14 @@ function MainLayout() {
                           src={avatarSrc}
                           radius="xl"
                           alt={user.username || t('userAvatarAlt', { ns: 'app', defaultValue: 'User avatar' })}
-                          color="cyan"
+                          color="violet"
                           sx={{
                             cursor: 'pointer',
-                            border: `2px solid ${theme.colors.cyan[5]}40`,
-                            transition: 'all 0.2s ease',
+                            border: `2px solid rgba(139, 92, 246, 0.3)`,
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                             '&:hover': {
-                              transform: 'scale(1.05)',
-                              border: `2px solid ${theme.colors.cyan[5]}`,
+                              border: `2px solid var(--purple-500)`,
+                              boxShadow: '0 0 20px rgba(139, 92, 246, 0.4)',
                             },
                           }}
                         >
@@ -173,8 +221,13 @@ function MainLayout() {
                           <Badge
                             size="xs"
                             variant="light"
-                            color="cyan"
-                            sx={{ textTransform: 'none' }}
+                            color="violet"
+                            sx={{
+                              textTransform: 'none',
+                              background: 'rgba(139, 92, 246, 0.1)',
+                              color: 'var(--purple-600)',
+                              border: '1px solid rgba(139, 92, 246, 0.2)'
+                            }}
                           >
                             {t('onlineStatusBadge', { ns: 'app', defaultValue: 'Online' })}
                           </Badge>
@@ -183,20 +236,28 @@ function MainLayout() {
                     </UnstyledButton>
                   </Menu.Target>
                   <Menu.Dropdown
+                    className="glass-card"
                     sx={{
-                      border: `1px solid ${dark ? theme.colors.dark[4] : theme.colors.gray[3]}`,
+                      background: 'var(--bg-card)',
+                      backdropFilter: 'blur(20px)',
+                      border: `1px solid rgba(139, 92, 246, 0.2)`,
                       boxShadow: dark
-                        ? `0 8px 24px ${theme.colors.dark[9]}70`
-                        : `0 8px 24px ${theme.colors.gray[4]}40`,
+                        ? '0 20px 40px rgba(139, 92, 246, 0.15)'
+                        : '0 20px 40px rgba(139, 92, 246, 0.1)',
                       zIndex: 300,
+                      borderRadius: theme.radius.lg,
                     }}
                   >
                     <Menu.Item
-                      icon={<IconHome2 size={14} />}
+                      icon={<IconHome2 size={16} />}
                       onClick={() => navigate('/dashboard')}
+                      className="transition-colors"
                       sx={{
+                        borderRadius: theme.radius.md,
+                        margin: '4px',
                         '&:hover': {
-                          backgroundColor: dark ? theme.colors.dark[6] : theme.colors.gray[1],
+                          background: 'rgba(139, 92, 246, 0.1)',
+                          color: 'var(--purple-600)',
                         },
                       }}
                     >
@@ -215,11 +276,15 @@ function MainLayout() {
                     </Menu.Item>
                     */}
                     <Menu.Item
-                      icon={<IconSettings size={14} />}
+                      icon={<IconSettings size={16} />}
                       onClick={() => navigate('/dashboard/settings')}
+                      className="transition-colors"
                       sx={{
+                        borderRadius: theme.radius.md,
+                        margin: '4px',
                         '&:hover': {
-                          backgroundColor: dark ? theme.colors.dark[6] : theme.colors.gray[1],
+                          background: 'rgba(139, 92, 246, 0.1)',
+                          color: 'var(--purple-600)',
                         },
                       }}
                     >
@@ -227,23 +292,31 @@ function MainLayout() {
                     </Menu.Item>
                     <Divider />
                     <Menu.Item
-                      icon={<IconInfoCircle size={14} />}
+                      icon={<IconInfoCircle size={16} />}
                       onClick={() => navigate('/about')}
+                      className="transition-colors"
                       sx={{
+                        borderRadius: theme.radius.md,
+                        margin: '4px',
                         '&:hover': {
-                          backgroundColor: dark ? theme.colors.dark[6] : theme.colors.gray[1],
+                          background: 'rgba(139, 92, 246, 0.1)',
+                          color: 'var(--purple-600)',
                         },
                       }}
                     >
                       {t('about', { ns: 'navigation' })}
                     </Menu.Item>
                     <Menu.Item
-                      icon={<IconLogout size={14} />}
+                      icon={<IconLogout size={16} />}
                       onClick={handleLogout}
                       color="red"
+                      className="transition-colors"
                       sx={{
+                        borderRadius: theme.radius.md,
+                        margin: '4px',
                         '&:hover': {
                           backgroundColor: `${theme.colors.red[6]}15`,
+                          color: theme.colors.red[6],
                         },
                       }}
                     >
@@ -257,12 +330,17 @@ function MainLayout() {
                     <Button
                       component={RouterLink}
                       to="/auth/login"
-                      variant="outline"
-                      radius="md"
+                      variant="light"
+                      color="violet"
+                      radius="xl"
+                      className="transition-all hover:-translate-y-1 hover:shadow-purple-md"
                       sx={{
-                        transition: 'all 0.2s ease',
+                        background: 'rgba(139, 92, 246, 0.08)',
+                        border: '1px solid rgba(139, 92, 246, 0.2)',
+                        color: 'var(--purple-600)',
                         '&:hover': {
-                          transform: 'scale(1.05)',
+                          background: 'rgba(139, 92, 246, 0.12)',
+                          borderColor: 'rgba(139, 92, 246, 0.3)',
                         },
                       }}
                     >
@@ -272,12 +350,15 @@ function MainLayout() {
                       component={RouterLink}
                       to="/auth/signup"
                       variant="gradient"
-                      gradient={{ from: 'violet', to: 'blue' }}
-                      radius="md"
+                      gradient={{ from: 'violet', to: 'grape', deg: 135 }}
+                      radius="xl"
+                      className="btn-purple-primary transition-all hover:-translate-y-1 hover:shadow-purple-lg"
                       sx={{
-                        transition: 'all 0.2s ease',
+                        background: 'linear-gradient(135deg, var(--purple-600) 0%, var(--purple-500) 50%, var(--purple-700) 100%)',
+                        border: 'none',
+                        boxShadow: '0 4px 15px rgba(139, 92, 246, 0.4)',
                         '&:hover': {
-                          transform: 'scale(1.05)',
+                          boxShadow: '0 8px 25px rgba(139, 92, 246, 0.6)',
                         },
                       }}
                     >

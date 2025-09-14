@@ -552,14 +552,18 @@ function CourseView() {
       {course && (
         <>
           <Paper
-            radius="md"
+            radius="xl"
             p={0}
             withBorder
             mb="xl"
+            className="card-modern card-glass transition-all duration-300"
             sx={(theme) => ({
               position: 'relative',
               overflow: 'hidden',
-              backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.white,
+              background: 'var(--bg-card)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(139, 92, 246, 0.2)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
             })}
           >
             <Grid gutter={0}>
@@ -778,178 +782,236 @@ function CourseView() {
 
           <SimpleGrid
             cols={3}
-            spacing="lg"
+            spacing="xl"
             breakpoints={[
               { maxWidth: 'md', cols: 2 },
               { maxWidth: 'sm', cols: 1 },
             ]}
           >
             {chapters.map((chapter, index) => {
+              const isCompleted = chapter.is_completed;
+              const chapterProgress = isCompleted ? 100 : 0;
+
               return (
                 <Card
                   key={chapter.id || index}
                   shadow="sm"
-                  padding="lg"
-                  radius="md"
+                  padding="xl"
+                  radius="xl"
                   withBorder
+                  className="card-modern card-glass card-hoverable transition-all duration-300"
                   sx={(theme) => ({
                     position: 'relative',
                     display: 'flex',
                     flexDirection: 'column',
-                    backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.white,
-                    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                    background: 'var(--bg-card)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(139, 92, 246, 0.2)',
+                    cursor: 'pointer',
+                    overflow: 'hidden',
+                    minHeight: '280px',
                     '&:hover': {
-                      transform: 'translateY(-5px)',
-                      boxShadow: theme.shadows.md
-                    }
+                      transform: 'translateY(-8px)',
+                      boxShadow: '0 25px 50px -12px rgba(139, 92, 246, 0.25)',
+                      borderColor: 'rgba(139, 92, 246, 0.4)',
+                    },
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%)',
+                      opacity: 0,
+                      transition: 'opacity 0.4s ease',
+                      zIndex: 0,
+                    },
+                    '&:hover::before': {
+                      opacity: 1,
+                    },
                   })}
-                >
+                  onClick={() => {
+                    if (chapter.id) {
+                      trackContentInteraction(
+                        courseId,
+                        'interactive',
+                        0,
+                        {
+                          chapter_id: chapter.id,
+                          chapter_name: chapter.title || chapter.caption,
+                          navigation_method: 'chapter_card'
+                        }
+                      );
 
-                  <Card.Section sx={{ position: 'relative' }}>
-                    <Image
-                      src={chapter.image_url || "https://storage.googleapis.com/proudcity/mebanenc/uploads/2021/03/placeholder-image.png"}
-                      alt={chapter.caption || t('chapters.defaultCaptionText', { chapterNumber: index + 1 })}
-                      height={180}
+                      trackEvent('chapter_start', {
+                        course_id: courseId,
+                        chapter_id: chapter.id,
+                        chapter_name: chapter.title || chapter.caption,
+                        navigation_method: 'chapter_card'
+                      });
+                      navigate(`/dashboard/courses/${courseId}/chapters/${chapter.id}`);
+                    }
+                  }}
+                >
+                  {/* Purple accent line for completed chapters */}
+                  {isCompleted && (
+                    <Box
                       sx={{
-                        objectFit: 'cover'
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: '4px',
+                        background: 'linear-gradient(90deg, var(--purple-500) 0%, var(--purple-400) 100%)',
+                        zIndex: 2,
                       }}
                     />
+                  )}
 
-                    {chapter.is_completed && (
-                      <ThemeIcon
-                        size={40}
-                        radius="xl"
-                        color="green"
-                        variant="filled"
-                        sx={(theme) => ({
-                          position: 'absolute',
-                          top: 10,
-                          right: 10,
-                          border: `2px solid ${theme.white}`,
-                        })}
-                      >
-                        <IconCheck size={20} />
-                      </ThemeIcon>
-                    )}
-
-                    <Box
-                      sx={(theme) => ({
-                        position: 'absolute',
-                        bottom: 0,
-                        left: 0,
-                        padding: theme.spacing.xs,
-                        background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
-                        width: '100%',
-                      })}
-                    >
-                      <Badge
-                        color={chapter.is_completed ? "green" : "blue"}
-                        variant="filled"
-                      >
-                        {chapter.is_completed ? t('chapters.statusCompleted') : (learningPercentage > 0 && index === actualCompletedLearningChapters ? t('chapters.statusInProgress') : t('chapters.statusNotStarted'))}
-                      </Badge>
-
-                      {chapter.mc_questions && chapter.mc_questions.length > 0 && (
-                        <Badge color="yellow" variant="filled" ml={6}>
-                          {t('chapters.quizCount', { count: chapter.mc_questions.length })}
-                        </Badge>
-                      )}
-                    </Box>
-                  </Card.Section>
-                  <Box mt="md" mb="xs" sx={{ flex: 1 }}>
-                    <Text
-                      weight={700}
+                  {/* Chapter Number Badge */}
+                  <Group position="apart" mb="md" sx={{ position: 'relative', zIndex: 1 }}>
+                    <Badge
                       size="lg"
-                      lineClamp={2}
-                      sx={{ minHeight: '3.2rem' }}
-                    >
-                      {chapter.caption || t('chapters.defaultTitleText', { chapterNumber: index + 1 })}
-                    </Text>
-
-
-                    <Text
-                      color="dimmed"
-                      size="sm"
-                      mt="xs"  // Changed from "md" to "xs" for less spacing
+                      radius="xl"
+                      variant="gradient"
+                      gradient={{ from: 'purple.6', to: 'purple.4' }}
                       sx={{
-                        flex: 1,
-                        height: '5.5rem',  // Fixed height instead of minHeight
-                        overflow: 'auto',  // Make it scrollable
-                        paddingRight: '4px',  // Small padding for scrollbar space
-                        '&::-webkit-scrollbar': {
-                          width: '4px',
-                        },
-                        '&::-webkit-scrollbar-track': {
-                          background: 'transparent',
-                        },
-                        '&::-webkit-scrollbar-thumb': {
-                          background: '#ccc',
-                          borderRadius: '2px',
-                        },
-                        '&::-webkit-scrollbar-thumb:hover': {
-                          background: '#999',
-                        },
+                        background: isCompleted
+                          ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                          : 'linear-gradient(135deg, var(--purple-600) 0%, var(--purple-400) 100%)',
+                        color: 'white',
+                        fontWeight: 700,
                       }}
                     >
-                      {chapter.summary || t('chapters.defaultSummaryText')}
-                    </Text>
+                      {isCompleted ? (
+                        <Group spacing={4} noWrap>
+                          <IconCircleCheck size={14} />
+                          <span>Chapter {index + 1}</span>
+                        </Group>
+                      ) : (
+                        `Chapter ${index + 1}`
+                      )}
+                    </Badge>
+
+                    {chapter.estimated_minutes && (
+                      <Group spacing={4} noWrap>
+                        <ThemeIcon size="sm" radius="xl" color="purple" variant="light">
+                          <IconClock size={12} />
+                        </ThemeIcon>
+                        <Text size="xs" color="dimmed" weight={500}>
+                          {chapter.estimated_minutes}min
+                        </Text>
+                      </Group>
+                    )}
+                  </Group>
+
+                  {/* Chapter Title */}
+                  <Title
+                    order={4}
+                    mb="sm"
+                    sx={(theme) => ({
+                      position: 'relative',
+                      zIndex: 1,
+                      color: theme.colorScheme === 'dark' ? theme.white : theme.black,
+                      fontWeight: 700,
+                      lineHeight: 1.3,
+                      minHeight: '2.6em',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                    })}
+                  >
+                    {chapter.title || chapter.caption || `Chapter ${index + 1}`}
+                  </Title>
+
+                  {/* Chapter Description */}
+                  <Text
+                    size="sm"
+                    color="dimmed"
+                    mb="md"
+                    sx={{
+                      position: 'relative',
+                      zIndex: 1,
+                      flexGrow: 1,
+                      display: '-webkit-box',
+                      WebkitLineClamp: 3,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {chapter.description || 'Explore this chapter to continue your learning journey.'}
+                  </Text>
+
+                  {/* Progress Indicator */}
+                  <Box sx={{ position: 'relative', zIndex: 1 }}>
+                    <Group position="apart" mb={6}>
+                      <Text size="xs" weight={600} color="dimmed">
+                        Progress
+                      </Text>
+                      <Text size="xs" weight={700} color={isCompleted ? 'green' : 'purple'}>
+                        {chapterProgress}%
+                      </Text>
+                    </Group>
+                    <Progress
+                      value={chapterProgress}
+                      size="sm"
+                      radius="xl"
+                      color={isCompleted ? 'green' : 'purple'}
+                      sx={{
+                        '& .mantine-Progress-bar': {
+                          background: isCompleted
+                            ? 'linear-gradient(90deg, #10b981 0%, #059669 100%)'
+                            : 'linear-gradient(90deg, var(--purple-500) 0%, var(--purple-400) 100%)',
+                        },
+                      }}
+                    />
                   </Box>
 
-                  {chapter.id !== null && (
-                    <Button
-                      variant={chapter.is_completed ? "light" : "filled"}
-                      color={chapter.is_completed ? "green" : "teal"}
-                      fullWidth
-                      mt="md"
-                      rightIcon={chapter.is_completed ? <IconCircleCheck size={16} /> : <IconChevronRight size={16} />}
-                      onClick={() => {
-                        // Track content interaction for chapter navigation
+                  {/* Action Button */}
+                  <Button
+                    fullWidth
+                    mt="md"
+                    variant={isCompleted ? "light" : "gradient"}
+                    gradient={isCompleted ? undefined : { from: 'purple.6', to: 'purple.4' }}
+                    color={isCompleted ? "green" : undefined}
+                    rightIcon={<IconArrowRight size={16} />}
+                    sx={{
+                      position: 'relative',
+                      zIndex: 1,
+                      fontWeight: 600,
+                      '&:hover': {
+                        transform: 'translateY(-2px)',
+                      },
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (chapter.id) {
                         trackContentInteraction(
                           courseId,
                           'interactive',
                           0,
                           {
                             chapter_id: chapter.id,
-                            chapter_name: chapter.title,
-                            navigation_method: 'chapter_list',
-                            chapter_completed: chapter.is_completed
+                            chapter_name: chapter.title || chapter.caption,
+                            navigation_method: 'chapter_button'
                           }
                         );
 
                         trackEvent('chapter_start', {
                           course_id: courseId,
                           chapter_id: chapter.id,
-                          chapter_name: chapter.title,
-                          navigation_method: 'chapter_list'
+                          chapter_name: chapter.title || chapter.caption,
+                          navigation_method: 'chapter_button'
                         });
                         navigate(`/dashboard/courses/${courseId}/chapters/${chapter.id}`);
-                      }}
-                      disabled={chapter.id === null}
-                      sx={(theme) =>
-                        chapter.is_completed
-                          ? {}
-                          : {
-                            background: theme.colorScheme === 'dark' ?
-                              `linear-gradient(45deg, ${theme.colors.teal[9]}, ${theme.colors.blue[8]})` :
-                              `linear-gradient(45deg, ${theme.colors.teal[6]}, ${theme.colors.cyan[5]})`,
-                          }
                       }
-                    >
-                      {chapter.is_completed ? t('buttons.reviewChapter') : t('buttons.startChapter')}
-                    </Button>
-                  )}
-                  {chapter.id === null && (
-                    <Button
-                      variant="light"
-                      color="gray"
-                      fullWidth
-                      mt="md"
-                      rightIcon={<IconCircleCheck size={16} />}
-                      disabled
-                    >
-                      {t('buttons.startChapter')}
-                    </Button>
-                  )}
+                    }}
+                  >
+                    {isCompleted ? 'Review Chapter' : 'Start Chapter'}
+                  </Button>
                 </Card>
               );
             })}
@@ -1018,8 +1080,9 @@ function CourseView() {
               })}
           </SimpleGrid>
         </>
-      )}
-    </Container>
+      )
+      }
+    </Container >
   );
 }
 

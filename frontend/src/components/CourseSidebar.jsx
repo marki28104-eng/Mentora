@@ -14,8 +14,9 @@ import {
 } from '@tabler/icons-react';
 import { courseService } from '../api/courseService';
 import { useTranslation } from 'react-i18next';
-import {MainLink} from "../layouts/AppLayout.jsx";
-import {useMediaQuery} from "@mantine/hooks";
+import { MainLink } from "../layouts/AppLayout.jsx";
+import { useMediaQuery } from "@mantine/hooks";
+import { LoadingSpinner } from './ui/LoadingSpinner';
 
 const ChapterLink = ({ chapter, activeChapter, index, handleChapterClick, handleNavigation, chapterId, courseId, opened, currentTab, isExpanded, ...props }) => {
   const [hasQuestions, setHasQuestions] = useState(false);
@@ -57,105 +58,184 @@ const ChapterLink = ({ chapter, activeChapter, index, handleChapterClick, handle
     return (
       <ActionIcon
         key={chapter.id}
-        variant={"light"}
+        variant="light"
         size="xl"
-        color={chapter.is_completed ? 'green' : 'gray'}
+        color={chapter.is_completed ? 'violet' : 'gray'}
         onClick={() => handleNavigation(chapter.id, 'content')}
+        className="transition-all hover:-translate-y-1 hover:shadow-purple-md"
         style={{
           display: 'flex',
           justifyContent: 'center',
           width: '100%',
           marginBottom: theme.spacing.xs,
           minHeight: 48,
+          background: chapterId === chapter.id.toString()
+            ? 'rgba(139, 92, 246, 0.15)'
+            : chapter.is_completed
+              ? 'rgba(139, 92, 246, 0.08)'
+              : 'rgba(156, 163, 175, 0.08)',
           border: chapterId === chapter.id.toString()
-            ? `2px solid ${theme.colors.green[9]}`
-            : undefined,
+            ? `2px solid var(--purple-500)`
+            : `1px solid rgba(139, 92, 246, 0.1)`,
+          borderRadius: theme.radius.lg,
         }}
         title={`${index + 1}. ${chapter.caption}`}
       >
-        <Text size="sm" weight={600}>{index + 1}</Text>
+        <Text
+          size="sm"
+          weight={600}
+          sx={{
+            color: chapterId === chapter.id.toString()
+              ? 'var(--purple-600)'
+              : chapter.is_completed
+                ? 'var(--purple-500)'
+                : 'var(--text-secondary)'
+          }}
+        >
+          {index + 1}
+        </Text>
       </ActionIcon>
     );
   }
 
   // When expanded, render full navigation structure
   return (
-    <div style={{
-      backgroundColor: chapterId === chapter.id.toString() ? (theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]) : undefined,
-    }}>
-    <NavLink
-      key={chapter.id}
-      label={`${index + 1}. ${chapter.caption}`}
-      opened={isExpanded}
-      onClick={() => handleChapterClick(chapter.id.toString())}
+    <div
+      className="transition-all"
       style={{
-        backgroundColor: chapterId === chapter.id.toString() ? (theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1]) : undefined,
+        backgroundColor: chapterId === chapter.id.toString()
+          ? 'rgba(139, 92, 246, 0.1)'
+          : undefined,
+        borderRadius: theme.radius.md,
+        margin: '4px 0',
       }}
-      icon={
-        <ThemeIcon variant="light" size="sm" color={chapter.is_completed ? 'green' : 'gray'}>
-          {chapter.is_completed ? <IconCircleCheck size={14} /> : <IconCircleDashed size={14} />}
-        </ThemeIcon>
-      }
-      rightSection={isExpanded ? <IconChevronDown size={14} /> : <IconChevronRight size={14} />}
     >
       <NavLink
-        label="Content"
-        icon={<IconFileText size={16} />}
-        onClick={(e) => {
-          e.stopPropagation();
-          handleNavigation(chapter.id, 'content');
+        key={chapter.id}
+        label={`${index + 1}. ${chapter.caption}`}
+        opened={isExpanded}
+        onClick={() => handleChapterClick(chapter.id.toString())}
+        className="transition-all hover:bg-purple-gradient-subtle"
+        style={{
+          backgroundColor: chapterId === chapter.id.toString()
+            ? 'rgba(139, 92, 246, 0.1)'
+            : undefined,
+          borderRadius: theme.radius.md,
+          border: chapterId === chapter.id.toString()
+            ? `1px solid rgba(139, 92, 246, 0.2)`
+            : '1px solid transparent',
+          color: chapterId === chapter.id.toString()
+            ? 'var(--purple-600)'
+            : 'var(--text-primary)',
         }}
-        active={chapterId === chapter.id.toString() && currentTab === 'content'}
-        styles={{
-          root: {
-            '&:hover': {
-              backgroundColor: 'rgba(0, 0, 0, 0.05)', // Replace with your desired color
-            },
-          },
-        }}
-      />
-      {chapter.file_count > 0 && (
+        icon={
+          <ThemeIcon
+            variant="light"
+            size="sm"
+            color={chapter.is_completed ? 'violet' : 'gray'}
+            sx={{
+              background: chapter.is_completed
+                ? 'rgba(139, 92, 246, 0.1)'
+                : 'rgba(156, 163, 175, 0.1)',
+              color: chapter.is_completed
+                ? 'var(--purple-500)'
+                : 'var(--text-secondary)',
+            }}
+          >
+            {chapter.is_completed ? <IconCircleCheck size={14} /> : <IconCircleDashed size={14} />}
+          </ThemeIcon>
+        }
+        rightSection={
+          <div className="transition-transform">
+            {isExpanded ? <IconChevronDown size={14} /> : <IconChevronRight size={14} />}
+          </div>
+        }
+      >
         <NavLink
-          label="Files"
-          icon={<IconPhoto size={16} />}
+          label="Content"
+          icon={<IconFileText size={16} />}
           onClick={(e) => {
             e.stopPropagation();
-            handleNavigation(chapter.id, 'files');
+            handleNavigation(chapter.id, 'content');
           }}
-          active={chapterId === chapter.id.toString() && currentTab === 'files'}
+          active={chapterId === chapter.id.toString() && currentTab === 'content'}
+          className="transition-colors"
           styles={{
             root: {
-            '&:hover': {
-              backgroundColor: 'rgba(0, 0, 0, 0.05)', // Replace with your desired color
+              borderRadius: theme.radius.sm,
+              margin: '2px 8px',
+              '&:hover': {
+                backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                color: 'var(--purple-600)',
+              },
+              '&[data-active]': {
+                backgroundColor: 'rgba(139, 92, 246, 0.15)',
+                color: 'var(--purple-600)',
+                borderLeft: '3px solid var(--purple-500)',
+              },
             },
-          },
           }}
         />
-      )}
-      {hasQuestions && (
-        <NavLink
-          label="Quiz"
-          icon={<IconQuestionMark size={16} />}
-          onClick={(e) => {
-            e.stopPropagation();
-            handleNavigation(chapter.id, 'quiz');
-          }}
-          active={chapterId === chapter.id.toString() && currentTab === 'quiz'}
-          styles={{
-            root: {
-            '&:hover': {
-              backgroundColor: 'rgba(0, 0, 0, 0.05)', // Replace with your desired color
-            },
-          },
-          }}
-        />
-      )}
-    </NavLink>
+        {chapter.file_count > 0 && (
+          <NavLink
+            label="Files"
+            icon={<IconPhoto size={16} />}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleNavigation(chapter.id, 'files');
+            }}
+            active={chapterId === chapter.id.toString() && currentTab === 'files'}
+            className="transition-colors"
+            styles={{
+              root: {
+                borderRadius: theme.radius.sm,
+                margin: '2px 8px',
+                '&:hover': {
+                  backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                  color: 'var(--purple-600)',
+                },
+                '&[data-active]': {
+                  backgroundColor: 'rgba(139, 92, 246, 0.15)',
+                  color: 'var(--purple-600)',
+                  borderLeft: '3px solid var(--purple-500)',
+                },
+              },
+            }}
+          />
+        )}
+        {hasQuestions && (
+          <NavLink
+            label="Quiz"
+            icon={<IconQuestionMark size={16} />}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleNavigation(chapter.id, 'quiz');
+            }}
+            active={chapterId === chapter.id.toString() && currentTab === 'quiz'}
+            className="transition-colors"
+            styles={{
+              root: {
+                borderRadius: theme.radius.sm,
+                margin: '2px 8px',
+                '&:hover': {
+                  backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                  color: 'var(--purple-600)',
+                },
+                '&[data-active]': {
+                  backgroundColor: 'rgba(139, 92, 246, 0.15)',
+                  color: 'var(--purple-600)',
+                  borderLeft: '3px solid var(--purple-500)',
+                },
+              },
+            }}
+          />
+        )}
+      </NavLink>
     </div>
   );
 };
 
-const CourseSidebar = ({opened, setopen}) => {
+const CourseSidebar = ({ opened, setopen }) => {
   const { t } = useTranslation(['navigation', 'app', 'settings']);
   const navigate = useNavigate();
   const location = useLocation();
@@ -307,17 +387,16 @@ const CourseSidebar = ({opened, setopen}) => {
 
   if (loading) {
     return (
-      <Box p="md" style={{ textAlign: 'center' }}>
-        <Loader />
-        <Text size="sm" mt="sm">Loading Course...</Text>
+      <Box p="md" className="glass-card" style={{ textAlign: 'center', margin: '16px' }}>
+        <LoadingSpinner size="md" variant="purple" text="Loading Course..." />
       </Box>
     );
   }
 
-  const link = { icon: <IconHome2 size={20} />, color: 'blue', label: t('home', { ns: 'navigation' }), to: '/dashboard' }
+  const link = { icon: <IconHome2 size={20} />, color: 'violet', label: t('home', { ns: 'navigation' }), to: '/dashboard' }
 
   return (
-    <Box>
+    <Box className="nav-sidebar glass-nav">
       <MainLink
         {...link}
         key={link.label}
@@ -328,29 +407,57 @@ const CourseSidebar = ({opened, setopen}) => {
 
       {opened ? (
         <Button
-          variant="subtle"
+          variant="light"
+          color="violet"
           fullWidth
           onClick={handleCourseTitleClick}
+          className="transition-all hover:-translate-y-1 hover:shadow-purple-md"
           styles={(theme) => ({
-            root: { padding: `0 ${theme.spacing.md}px`, height: 'auto', marginBottom: theme.spacing.md, marginTop: 30 },
-            label: { whiteSpace: 'normal', fontSize: theme.fontSizes.lg, fontWeight: 700 },
+            root: {
+              padding: `${theme.spacing.md}px`,
+              height: 'auto',
+              marginBottom: theme.spacing.md,
+              marginTop: 30,
+              background: 'rgba(139, 92, 246, 0.08)',
+              border: '1px solid rgba(139, 92, 246, 0.2)',
+              borderRadius: theme.radius.lg,
+              '&:hover': {
+                background: 'rgba(139, 92, 246, 0.12)',
+                borderColor: 'rgba(139, 92, 246, 0.3)',
+              }
+            },
+            label: {
+              whiteSpace: 'normal',
+              fontSize: theme.fontSizes.lg,
+              fontWeight: 700,
+              color: 'var(--purple-600)'
+            },
           })}
         >
           {course?.title && course?.title != "None" ? course?.title : 'Course Overview'}
         </Button>
       ) : (
         <ActionIcon
-          variant="transparent"
+          variant="light"
+          color="violet"
           size="xl"
           onClick={handleCourseTitleClick}
-          style={{ display: 'flex', justifyContent: 'center', width: '100%', margin: '30px 0' }}
+          className="transition-all hover:-translate-y-1 hover:shadow-purple-md"
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            width: '100%',
+            margin: '30px 0',
+            background: 'rgba(139, 92, 246, 0.08)',
+            border: '1px solid rgba(139, 92, 246, 0.2)',
+          }}
           title={course?.title || 'Course Overview'}
         >
           <IconSchool size={24} />
         </ActionIcon>
       )}
 
-      {chapters.map((chapter, index) => 
+      {chapters.map((chapter, index) =>
         (chapter.id !== null) ? (
           <ChapterLink
             key={chapter.id}
