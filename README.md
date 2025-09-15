@@ -1,9 +1,9 @@
 # Mentora AI
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/M4RKUS28/Mentora/blob/main/frontend/public/logo_white.png?raw=true">
-  <source media="(prefers-color-scheme: light)" srcset="https://github.com/M4RKUS28/Mentora/blob/main/frontend/public/logo_black.png?raw=true">
-  <img alt="Mentora AI Logo" src="https://github.com/M4RKUS28/Mentora/blob/main/frontend/public/logo_white.png?raw=true">
+  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/marki28104-eng/Mentora/blob/main/frontend/public/logo_white.png?raw=true">
+  <source media="(prefers-color-scheme: light)" srcset="https://github.com/marki28104-eng/Mentora/blob/main/frontend/public/logo_black.png?raw=true">
+  <img alt="Mentora AI Logo" src="https://github.com/marki28104-eng/Mentora/blob/main/frontend/public/logo_white.png?raw=true">
 </picture>
 
 #### Welcome to **Mentora AI**!
