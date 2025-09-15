@@ -263,7 +263,7 @@ button:focus-visible {
 }
 
 .glass-nav {
-  background: var(--bg-card);
+  background: var(--header-bg, var(--bg-card));
   backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(139, 92, 246, 0.1);
 }

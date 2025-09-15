@@ -62,33 +62,27 @@ const useStyles = createStyles((theme) => ({
   continueCard: {
     display: 'flex',
     gap: theme.spacing.lg,
-    background: 'var(--bg-card)',
+    background: theme.colorScheme === 'dark' ? 'rgba(30, 32, 54, 0.8)' : 'rgba(255, 255, 255, 0.95)',
     backdropFilter: 'blur(20px)',
-    border: '1px solid rgba(139, 92, 246, 0.2)',
-    borderRadius: '20px',
+    border: theme.colorScheme === 'dark' 
+      ? '1px solid rgba(139, 92, 246, 0.2)' 
+      : '1px solid rgba(0, 0, 0, 0.06)',
+    borderRadius: '16px',
     padding: theme.spacing.xl,
     position: 'relative',
     overflow: 'hidden',
-    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-    '&::before': {
-      content: '""',
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%)',
-      opacity: 0,
-      transition: 'opacity 0.4s ease',
-      borderRadius: 'inherit',
-    },
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    boxShadow: theme.colorScheme === 'dark' 
+      ? '0 8px 32px rgba(0, 0, 0, 0.2)' 
+      : '0 2px 12px rgba(0, 0, 0, 0.04)',
     '&:hover': {
-      transform: 'translateY(-8px)',
-      boxShadow: '0 25px 50px -12px rgba(139, 92, 246, 0.25)',
-      borderColor: 'rgba(139, 92, 246, 0.4)',
-    },
-    '&:hover::before': {
-      opacity: 1,
+      transform: 'translateY(-4px)',
+      boxShadow: theme.colorScheme === 'dark'
+        ? '0 12px 40px rgba(139, 92, 246, 0.15)'
+        : '0 8px 30px rgba(0, 0, 0, 0.08)',
+      borderColor: theme.colorScheme === 'dark' 
+        ? 'rgba(139, 92, 246, 0.3)' 
+        : 'rgba(0, 0, 0, 0.1)',
     },
     [theme.fn.smallerThan('sm')]: {
       flexDirection: 'column',
@@ -134,13 +128,27 @@ const useStyles = createStyles((theme) => ({
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
-    background: 'var(--bg-card)',
+    background: theme.colorScheme === 'dark' ? 'rgba(30, 32, 54, 0.8)' : 'rgba(255, 255, 255, 0.95)',
     backdropFilter: 'blur(20px)',
-    border: '1px solid rgba(139, 92, 246, 0.2)',
-    borderRadius: '16px',
+    border: theme.colorScheme === 'dark' 
+      ? '1px solid rgba(139, 92, 246, 0.2)' 
+      : '1px solid rgba(0, 0, 0, 0.06)',
+    borderRadius: '12px',
     position: 'relative',
     overflow: 'hidden',
-    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    boxShadow: theme.colorScheme === 'dark' 
+      ? '0 8px 32px rgba(0, 0, 0, 0.2)' 
+      : '0 2px 12px rgba(0, 0, 0, 0.04)',
+    '&:hover': {
+      transform: 'translateY(-4px)',
+      boxShadow: theme.colorScheme === 'dark'
+        ? '0 12px 40px rgba(139, 92, 246, 0.15)'
+        : '0 8px 30px rgba(0, 0, 0, 0.08)',
+      borderColor: theme.colorScheme === 'dark' 
+        ? 'rgba(139, 92, 246, 0.3)' 
+        : 'rgba(0, 0, 0, 0.1)'
+    },
     '&::before': {
       content: '""',
       position: 'absolute',
@@ -151,15 +159,10 @@ const useStyles = createStyles((theme) => ({
       background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%)',
       opacity: 0,
       transition: 'opacity 0.4s ease',
-      borderRadius: 'inherit',
-    },
-    '&:hover': {
-      transform: 'translateY(-8px)',
-      boxShadow: '0 25px 50px -12px rgba(139, 92, 246, 0.25)',
-      borderColor: 'rgba(139, 92, 246, 0.4)',
+      borderRadius: 'inherit'
     },
     '&:hover::before': {
-      opacity: 1,
+      opacity: 0.3
     },
     '&:hover .course-image': {
       transform: 'scale(1.05)',
@@ -249,7 +252,9 @@ const useStyles = createStyles((theme) => ({
     background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%)',
     border: 'none',
     color: 'white',
-    boxShadow: '0 4px 15px rgba(139, 92, 246, 0.4)',
+    boxShadow: theme.colorScheme === 'dark' 
+      ? '0 4px 15px rgba(139, 92, 246, 0.4)'
+      : '0 4px 12px rgba(139, 92, 246, 0.3)',
     '&:hover': {
       boxShadow: '0 8px 25px rgba(139, 92, 246, 0.6)',
     },

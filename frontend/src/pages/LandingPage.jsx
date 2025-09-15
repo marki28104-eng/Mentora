@@ -807,12 +807,12 @@ function LandingPage() {
       </Box>
 
       {/* Award Section */}
-      <Box id="award" className={classes.section}>
-        <Container>
+      <Box id="award" className={classes.section} >
+        <Container >
           <Transition mounted={visibleSections.has('award')} transition="fade" duration={400} delay={200}>
             {(styles) => (
               <Box className={classes.gradient} style={styles}>
-                <Stack align="center" spacing="xl" sx={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
+                <Stack align="center" spacing="xl" sx={{ textAlign: 'center', position: 'relative', zIndex: 1 }} style={{ padding: '20px' }}>
                   <Box
                     sx={{
                       width: 100,
@@ -849,7 +849,7 @@ function LandingPage() {
                       target="_blank"
                       rel="noopener noreferrer"
                       variant="outline"
-                      size="md"
+                      size="lg"
                       radius="xl"
                       leftSection={<IconRocket size={18} />}
                       className={cx(classes.ctaButton, classes.secondaryButton)}
@@ -862,7 +862,7 @@ function LandingPage() {
                       target="_blank"
                       rel="noopener noreferrer"
                       variant="subtle"
-                      size="md"
+                      size="lg"
                       radius="xl"
                       leftSection={<IconArrowRight size={18} />}
                       color="violet"

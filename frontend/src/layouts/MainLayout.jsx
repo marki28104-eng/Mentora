@@ -65,6 +65,10 @@ function MainLayout() {
   return (
     <AppShell
       styles={{
+        root: {
+          '--app-shell-header-background-color': 'transparent',
+          '--app-shell-header-border-color': 'transparent',
+        },
         main: {
           background: dark ? theme.colors.dark[8] : theme.colors.gray[0],
           display: 'flex',
@@ -83,28 +87,13 @@ function MainLayout() {
           p="md"
           className="glass-nav transition-all"
           sx={(theme) => ({
-            background: dark
-              ? 'var(--bg-card)'
-              : 'var(--bg-card)',
+            background: 'rgba(15, 15, 35, 0.95) !important',
+            '--header-bg': 'rgba(15, 15, 35, 0.95) !important',
             backdropFilter: 'blur(20px)',
-            borderBottom: `1px solid rgba(139, 92, 246, 0.1)`,
-            boxShadow: dark
-              ? '0 4px 20px rgba(139, 92, 246, 0.1)'
-              : '0 4px 20px rgba(139, 92, 246, 0.05)',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
             zIndex: 200,
             position: 'relative',
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: dark
-                ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%)'
-                : 'linear-gradient(135deg, rgba(139, 92, 246, 0.02) 0%, rgba(168, 85, 247, 0.02) 100%)',
-              pointerEvents: 'none',
-            },
           })}
         >
           <div style={{
@@ -114,41 +103,41 @@ function MainLayout() {
             position: 'relative',
             zIndex: 1
           }}>
-            {(!isMobile || isAuthenticated) && (
-              <RouterLink
-                to={isAuthenticated ? "/dashboard" : "/"}
-                style={{ textDecoration: "none" }}
-                className="transition-transform hover:scale-105"
-              >
-                <img
-                  src="/mentora_schrift_türk_2.svg"
-                  alt="Mentora"
-                  style={{
-                    height: 40,
-                    width: 'auto',
-                    filter: 'drop-shadow(0 2px 8px rgba(139, 92, 246, 0.4))',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  }}
-                />
-              </RouterLink>
-            )}
+            
+            <RouterLink
+              to={isAuthenticated ? "/dashboard" : "/"}
+              style={{ textDecoration: "none" }}
+              className="transition-transform hover:scale-105"
+            >
+              <img
+                src="/mentora_schrift_türk_2.svg"
+                alt="Mentora"
+                style={{
+                  height: 40,
+                  width: 'auto',
+                  filter: 'drop-shadow(0 2px 8px rgba(139, 92, 246, 0.4))',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                }}
+              />
+            </RouterLink>
 
             <Box sx={{ flexGrow: 1 }} />
 
             <Box sx={{ flexGrow: 1, '@media (min-width: 769px)': { display: 'none' } }} />
 
             <Group spacing="md">
-              {/* Mobile Navigation Toggle */}
+              {/* Mobile Navigation Toggle
               {isMobile && isAuthenticated && (
                 <MobileNavigation
                   opened={mobileNav.opened}
                   onClose={mobileNav.close}
                   onToggle={mobileNav.toggle}
                 />
-              )}
+              )} */}
 
-              {(!isMobile || isAuthenticated) && (
+
+              {(!isMobile ) && (
                 <ActionIcon
                   variant="light"
                   color="violet"
@@ -217,7 +206,7 @@ function MainLayout() {
                           {!avatarSrc && user.username ? user.username.substring(0, 2).toUpperCase() : (!avatarSrc ? <IconUser size={18} /> : null)}
                         </Avatar>
                         <Box>
-                          <Text size="sm" weight={500}>{user.username}</Text>
+                          <Text size="sm" weight={500} sx={{ color: '#ffffff' }}>{user.username}</Text>
                           <Badge
                             size="xs"
                             variant="light"
@@ -326,23 +315,32 @@ function MainLayout() {
                 </Menu>
               ) : (
                 !['/auth/login', '/auth/signup'].includes(pathname) && (
-                  <Group spacing="xs">
+                  <Group spacing="xs" noWrap>
                     <Button
                       component={RouterLink}
                       to="/auth/login"
                       variant="light"
                       color="violet"
                       radius="xl"
+                      size="sm"
                       className="transition-all hover:-translate-y-1 hover:shadow-purple-md"
-                      sx={{
+                      sx={(theme) => ({
                         background: 'rgba(139, 92, 246, 0.08)',
                         border: '1px solid rgba(139, 92, 246, 0.2)',
                         color: 'var(--purple-600)',
+                        padding: '0 16px',
+                        height: 36,
+                        fontSize: theme.fontSizes.sm,
+                        '@media (min-width: 400px)': {
+                          padding: '0 20px',
+                          height: 40,
+                          fontSize: theme.fontSizes.md,
+                        },
                         '&:hover': {
                           background: 'rgba(139, 92, 246, 0.12)',
                           borderColor: 'rgba(139, 92, 246, 0.3)',
                         },
-                      }}
+                      })}
                     >
                       {t('login', { ns: 'navigation' })}
                     </Button>
@@ -352,15 +350,24 @@ function MainLayout() {
                       variant="gradient"
                       gradient={{ from: 'violet', to: 'grape', deg: 135 }}
                       radius="xl"
+                      size="sm"
                       className="btn-purple-primary transition-all hover:-translate-y-1 hover:shadow-purple-lg"
-                      sx={{
+                      sx={(theme) => ({
                         background: 'linear-gradient(135deg, var(--purple-600) 0%, var(--purple-500) 50%, var(--purple-700) 100%)',
                         border: 'none',
                         boxShadow: '0 4px 15px rgba(139, 92, 246, 0.4)',
+                        padding: '0 16px',
+                        height: 36,
+                        fontSize: theme.fontSizes.sm,
+                        '@media (min-width: 400px)': {
+                          padding: '0 20px',
+                          height: 40,
+                          fontSize: theme.fontSizes.md,
+                        },
                         '&:hover': {
                           boxShadow: '0 8px 25px rgba(139, 92, 246, 0.6)',
                         },
-                      }}
+                      })}
                     >
                       {t('register', { ns: 'navigation' })}
                     </Button>
