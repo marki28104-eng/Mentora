@@ -4,7 +4,7 @@ name: Build & Push Backend Docker Image
 on:
   push:
     paths:
-      - 'backend/**'
+      - "backend/**"
     branches:
       - main
 
@@ -31,4 +31,4 @@ jobs:
           context: ./backend
           file: ./backend/Dockerfile
           push: true
-          tags: m4rkus28/mentora:latest
+          tags: marki28104-eng/mentora:latest

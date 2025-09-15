@@ -1,7 +1,7 @@
 services:
   app:
     container_name: mentora
-    #image: m4rkus28/mentora:latest
+    #image: marki28104-eng/mentora:latest
     build:
       context: .
       dockerfile: Dockerfile
@@ -25,7 +25,7 @@ services:
       - CHROMA_SERVER_HTTP_PORT=8000
       - PERSIST_DIRECTORY=/chroma/chroma
       - CHROMA_SERVER_ALLOW_RESET=true
-      - CHROMA_SERVER_CORS_ALLOW_ORIGINS=["*"] 
+      - CHROMA_SERVER_CORS_ALLOW_ORIGINS=["*"]
     volumes:
       - chroma-data:/chroma/chroma
     restart: always

@@ -1,9 +1,9 @@
 # Mentora AI - Frontend
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/M4RKUS28/Mentora/blob/main/frontend/public/logo_white.png?raw=true">
-  <source media="(prefers-color-scheme: light)" srcset="https://github.com/M4RKUS28/Mentora/blob/main/doc/logo_black.png?raw=true">
-  <img alt="Mentora AI Logo" src="https://github.com/M4RKUS28/Mentora/blob/main/frontend/public/logo_white.png?raw=true">
+  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/marki28104-eng/Mentora/blob/main/frontend/public/logo_white.png?raw=true">
+  <source media="(prefers-color-scheme: light)" srcset="https://github.com/marki28104-eng/Mentora/blob/main/doc/logo_black.png?raw=true">
+  <img alt="Mentora AI Logo" src="https://github.com/marki28104-eng/Mentora/blob/main/frontend/public/logo_white.png?raw=true">
 </picture>
 
 Welcome to the frontend of **Mentora AI**! This is a modern, responsive, and feature-rich user interface for our personalized learning platform, built with React and Vite.
@@ -37,7 +37,7 @@ Follow these instructions to set up and run the frontend application on your loc
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/M4RKUS28/Mentora.git
+    git clone https://github.com/marki28104-eng/Mentora.git
     cd Mentora/frontend
     ```
 

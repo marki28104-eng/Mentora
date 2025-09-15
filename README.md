@@ -1,9 +1,9 @@
 # Mentora AI
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/M4RKUS28/Mentora/blob/main/frontend/public/logo_white.png?raw=true">
-  <source media="(prefers-color-scheme: light)" srcset="https://github.com/M4RKUS28/Mentora/blob/main/frontend/public/logo_black.png?raw=true">
-  <img alt="Mentora AI Logo" src="https://github.com/M4RKUS28/Mentora/blob/main/frontend/public/logo_white.png?raw=true">
+  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/marki28104-eng/Mentora/blob/main/frontend/public/logo_white.png?raw=true">
+  <source media="(prefers-color-scheme: light)" srcset="https://github.com/marki28104-eng/Mentora/blob/main/frontend/public/logo_black.png?raw=true">
+  <img alt="Mentora AI Logo" src="https://github.com/marki28104-eng/Mentora/blob/main/frontend/public/logo_white.png?raw=true">
 </picture>
 
 #### Welcome to **Mentora AI**!
@@ -15,9 +15,9 @@ This project is a full-stack application designed to deliver cutting-edge **AI s
 ---
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset=https://github.com/M4RKUS28/Mentora/blob/main/doc/dashboard_dark.png?raw=true">
-  <source media="(prefers-color-scheme: light)" srcset="https://github.com/M4RKUS28/Mentora/blob/main/doc/dashboard_white.png?raw=true">
-  <img alt="Mentora AI Logo" src="https://github.com/M4RKUS28/Mentora/blob/main/doc/logo.png?raw=true">
+  <source media="(prefers-color-scheme: dark)" srcset=https://github.com/marki28104-eng/Mentora/blob/main/doc/dashboard_dark.png?raw=true">
+  <source media="(prefers-color-scheme: light)" srcset="https://github.com/marki28104-eng/Mentora/blob/main/doc/dashboard_white.png?raw=true">
+  <img alt="Mentora AI Logo" src="https://github.com/marki28104-eng/Mentora/blob/main/doc/logo.png?raw=true">
 </picture>
 
 
@@ -73,19 +73,19 @@ This project is a full-stack application designed to deliver cutting-edge **AI s
 
 ## Course Creation process
 
-![Course Creation Process](https://github.com/M4RKUS28/Mentora/blob/main/doc/final_diagram.png?raw=true)
+![Course Creation Process](https://github.com/marki28104-eng/Mentora/blob/main/doc/final_diagram.png?raw=true)
 
 
 
 ## 📐 Software Architecture
 
-![Software Architecture](https://github.com/M4RKUS28/Mentora/blob/main/doc/Editor%20_%20Mermaid%20Chart-2025-06-18-210221.png?raw=true)
+![Software Architecture](https://github.com/marki28104-eng/Mentora/blob/main/doc/Editor%20_%20Mermaid%20Chart-2025-06-18-210221.png?raw=true)
 
 ---
 
 ## 🧪 Development Installation & Setup
 
-To run the project locally, follow the instructions in our [🛠️ Wiki - How to Run Locally](https://github.com/M4RKUS28/Mentora/wiki/How-to-run-locally)
+To run the project locally, follow the instructions in our [🛠️ Wiki - How to Run Locally](https://github.com/marki28104-eng/Mentora/wiki/How-to-run-locally)
 
 > Make sure you have Docker, Node.js, and Python 3.12+ installed.
 
@@ -140,7 +140,7 @@ mentora-project/
 ## 📞 Contact
 
 Have questions or feedback?  
-Feel free to [open an issue](https://github.com/M4RKUS28/Mentora/issues) or contact the maintainer directly via GitHub.
+Feel free to [open an issue](https://github.com/marki28104-eng/Mentora/issues) or contact the maintainer directly via GitHub.
 
 ---
 
