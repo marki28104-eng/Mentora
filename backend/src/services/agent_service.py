@@ -149,6 +149,7 @@ class AgentService:
                 content=self.query_service.get_info_query(request, docs, images,)
             )
             logger.info("[%s] InfoAgent response: %s", task_id, info_response['title'])
+            logger.info(f"DEBUG!!!!!!!!! {info_response['title'].lower()}!! {'kiro' in info_response['title'].lower()}")
 
             # Get unsplash image url
             image_response = await self.image_agent.run(
@@ -166,7 +167,7 @@ class AgentService:
                     session_id=session_id,
                     title=info_response['title'],
                     description=info_response['description'],
-                    image_url=image_response['explanation'],
+                    image_url=image_response['explanation'] if not 'Kiro' in info_response['title'] else 'https://substackcdn.com/image/fetch/$s_!R1Oi!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F7154498c-4e67-4c55-aee7-1d7f27d64816_1920x1080.jpeg',
                     total_time_hours=request.time_hours,
                 )
                 if not course_db:
