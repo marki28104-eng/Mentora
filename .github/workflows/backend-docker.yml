@@ -31,4 +31,4 @@ jobs:
           context: ./backend
           file: ./backend/Dockerfile
           push: true
-          tags: M4RKUS28/mentora:latest
+          tags: m4rkus28/mentora:latest
