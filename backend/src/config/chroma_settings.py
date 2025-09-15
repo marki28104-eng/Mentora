@@ -7,3 +7,4 @@ EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
 
 # For production, use HTTP client
 CHROMA_CLIENT_TYPE = os.getenv("CHROMA_CLIENT_TYPE", "http")  # "http" or "persistent"
+
