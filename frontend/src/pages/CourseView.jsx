@@ -411,9 +411,16 @@ function CourseView() {
           mb="xl"
           sx={(theme) => ({
             position: 'relative',
-            overflow: 'hidden', backgroundColor: theme.colorScheme === 'dark' ?
-              theme.colors.dark[6] :
-              theme.white,
+            overflow: 'hidden',
+            backgroundColor: theme.colorScheme === 'dark' ? 'rgba(30, 32, 54, 0.8)' : 'rgba(255, 255, 255, 0.95)',
+            border: theme.colorScheme === 'dark' 
+              ? '1px solid rgba(139, 92, 246, 0.2)' 
+              : '1px solid rgba(0, 0, 0, 0.06)',
+            '&:hover': {
+              borderColor: theme.colorScheme === 'dark' 
+                ? 'rgba(139, 92, 246, 0.3)' 
+                : 'rgba(0, 0, 0, 0.1)',
+            },
           })}
         >
           <Box
@@ -560,10 +567,14 @@ function CourseView() {
             sx={(theme) => ({
               position: 'relative',
               overflow: 'hidden',
-              background: 'var(--bg-card)',
+              background: theme.colorScheme === 'dark' ? 'rgba(30, 32, 54, 0.8)' : 'rgba(255, 255, 255, 0.95)',
               backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(139, 92, 246, 0.2)',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+              border: theme.colorScheme === 'dark' 
+                ? '1px solid rgba(139, 92, 246, 0.2)' 
+                : '1px solid rgba(0, 0, 0, 0.06)',
+              boxShadow: theme.colorScheme === 'dark'
+                ? '0 8px 32px rgba(0, 0, 0, 0.2)'
+                : '0 8px 32px rgba(0, 0, 0, 0.05)',
             })}
           >
             <Grid gutter={0}>
@@ -804,9 +815,16 @@ function CourseView() {
                     position: 'relative',
                     display: 'flex',
                     flexDirection: 'column',
-                    background: 'var(--bg-card)',
+                    background: theme.colorScheme === 'dark' ? 'rgba(30, 32, 54, 0.8)' : 'rgba(255, 255, 255, 0.95)',
                     backdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(139, 92, 246, 0.2)',
+                    border: theme.colorScheme === 'dark' 
+                      ? '1px solid rgba(139, 92, 246, 0.2)' 
+                      : '1px solid rgba(0, 0, 0, 0.06)',
+                    '&:hover': {
+                      borderColor: theme.colorScheme === 'dark' 
+                        ? 'rgba(139, 92, 246, 0.3)' 
+                        : 'rgba(0, 0, 0, 0.1)',
+                    },
                     cursor: 'pointer',
                     overflow: 'hidden',
                     minHeight: '280px',
@@ -1030,9 +1048,21 @@ function CourseView() {
                     sx={(theme) => ({
                       display: 'flex',
                       flexDirection: 'column',
-                      backgroundColor: theme.colorScheme === 'dark' ?
-                        theme.fn.rgba(theme.colors.dark[6], 0.8) :
-                        theme.fn.rgba(theme.white, 0.8),
+                      background: theme.colorScheme === 'dark' ? 'rgba(30, 32, 54, 0.8)' : 'rgba(255, 255, 255, 0.95)',
+                      backdropFilter: 'blur(20px)',
+                      border: theme.colorScheme === 'dark' 
+                        ? '1px solid rgba(139, 92, 246, 0.2)' 
+                        : '1px solid rgba(0, 0, 0, 0.06)',
+                      '&:hover': {
+                        borderColor: theme.colorScheme === 'dark' 
+                          ? 'rgba(139, 92, 246, 0.3)' 
+                          : 'rgba(0, 0, 0, 0.1)',
+                        transform: 'translateY(-4px)',
+                        boxShadow: theme.colorScheme === 'dark'
+                          ? '0 12px 40px rgba(139, 92, 246, 0.15)'
+                          : '0 8px 30px rgba(0, 0, 0, 0.05)',
+                      },
+                      transition: 'all 0.3s ease',
                     })}
                   >
                     <Card.Section>

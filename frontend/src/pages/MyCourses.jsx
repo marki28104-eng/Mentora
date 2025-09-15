@@ -213,18 +213,21 @@ function MyCourses() {
         pb="xl"
         mb="xl"
         style={{
-          borderBottom: `1px solid ${theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[2]
-            }`,
+          borderBottom: `1px solid ${
+            theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[2]
+          }`,
         }}
       >
-        <Group position="apart">
+        <Group position="apart" align="flex-start">
           <div>
-            <Title order={2}>{t('myCoursesTitle', { defaultValue: 'Meine Kurse' })}</Title>
+            <Title order={2} style={{ color: theme.colorScheme === 'dark' ? theme.white : theme.black }}>
+              {t('myCoursesTitle', { defaultValue: 'Meine Kurse' })}
+            </Title>
             <Text color="dimmed" mt={4}>
               {t('myCoursesSubtitle', { defaultValue: 'Verwalte und durchsuche deine persönlichen Kurse.' })}
             </Text>
           </div>
-          <IconBook size={40} color={theme.colors.blue[5]} stroke={1.5} />
+          <IconBook size={40} color={theme.colors.blue[5]} stroke={1.5} style={{ marginTop: 4 }} />
         </Group>
       </Box>
 
@@ -284,7 +287,7 @@ function MyCourses() {
                       : '1px solid rgba(0, 0, 0, 0.06)',
                     position: 'relative',
                     overflow: 'hidden',
-                    minHeight: '400px',
+                    minHeight: '480px',
                     '&:hover': {
                       transform: 'translateY(-4px)',
                       borderColor: theme.colorScheme === 'dark' 
@@ -359,23 +362,27 @@ function MyCourses() {
                   </Card.Section>
 
                   <Box sx={{ position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column' }}>
-                    <Group position="apart" mt="md" mb="xs">
-                      <Box sx={{ flex: 1 }}>
-                        <Text
-                          weight={700}
-                          size="lg"
-                          lineClamp={2}
-                          sx={{
-                            minHeight: '3em',
-                            color: 'var(--text-primary)',
-                            lineHeight: 1.3,
-                          }}
-                        >
-                          {course.title || t('untitledCourse', { defaultValue: 'Unbenannter Kurs' })}
-                        </Text>
-                      </Box>
-
-                      <Group spacing="xs" sx={{ flexShrink: 0 }}>
+                    <Group position="apart" mt="md" mb="xs" align="flex-start" style={{ width: '100%' }}>
+                    <Text
+                      weight={700}
+                      size="lg"
+                      sx={(theme) => ({
+                        color: theme.colorScheme === 'dark' ? theme.white : theme.black,
+                        lineHeight: 1.3,
+                        fontSize: '1.125rem',
+                        flex: 1,
+                        minWidth: 0,
+                        wordBreak: 'break-word',
+                        paddingRight: '8px',
+                        '&:hover': {
+                          textDecoration: 'underline',
+                          textUnderlineOffset: '2px'
+                        }
+                      })}
+                    >
+                      {course.title || t('untitledCourse', { defaultValue: 'Unbenannter Kurs' })}
+                    </Text>
+                    <Group spacing="xs" style={{ flexShrink: 0, marginTop: '2px' }}>
                         <ActionIcon
                           variant="light"
                           color="purple"
@@ -416,18 +423,43 @@ function MyCourses() {
                       </Group>
                     </Group>
 
-                    <Text
-                      size="sm"
-                      color="dimmed"
-                      lineClamp={3}
+                    <Box 
                       sx={{
                         flexGrow: 1,
                         marginBottom: '1rem',
-                        lineHeight: 1.5,
+                        overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        minHeight: '80px', // Ensure minimum height for the description area
                       }}
                     >
-                      {course.description || t('noDescription', { defaultValue: 'Keine Beschreibung' })}
-                    </Text>
+                      <Text
+                        size="sm"
+                        color="dimmed"
+                        sx={{
+                          lineHeight: 1.5,
+                          overflowY: 'auto',
+                          maxHeight: '120px', // Adjust based on your needs
+                          paddingRight: '8px',
+                          '&::-webkit-scrollbar': {
+                            width: '6px',
+                          },
+                          '&::-webkit-scrollbar-track': {
+                            background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
+                            borderRadius: '3px',
+                          },
+                          '&::-webkit-scrollbar-thumb': {
+                            background: theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[4],
+                            borderRadius: '3px',
+                            '&:hover': {
+                              background: theme.colorScheme === 'dark' ? theme.colors.dark[3] : theme.colors.gray[5],
+                            },
+                          },
+                        }}
+                      >
+                        {course.description || t('noDescription', { defaultValue: 'Keine Beschreibung' })}
+                      </Text>
+                    </Box>
 
                     {/* Modern Progress Indicator */}
                     <Box mb="lg">

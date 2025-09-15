@@ -122,33 +122,53 @@ const MantineThemeProvider = ({ children }) => {
         }),
       },
       Card: {
+        defaultProps: {
+          shadow: 'sm',
+          p: 'xl',
+          withBorder: true,
+        },
         styles: (theme) => ({
           root: {
             borderRadius: '16px',
             transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-            border: `1px solid ${theme.colorScheme === 'dark'
-              ? 'rgba(139, 92, 246, 0.2)'
-              : 'rgba(168, 85, 247, 0.1)'}`,
             background: theme.colorScheme === 'dark' 
-              ? 'rgba(30, 31, 59, 0.8)' 
-              : 'rgba(255, 255, 255, 0.9)',
+              ? 'rgba(30, 32, 54, 0.8)' 
+              : 'rgba(255, 255, 255, 0.95)',
             backdropFilter: 'blur(20px)',
+            border: theme.colorScheme === 'dark'
+              ? '1px solid rgba(139, 92, 246, 0.2)'
+              : '1px solid rgba(0, 0, 0, 0.06)',
             '&:hover': {
               transform: 'translateY(-4px)',
-              borderColor: theme.colorScheme === 'dark'
-                ? 'rgba(168, 85, 247, 0.4)'
-                : 'rgba(168, 85, 247, 0.3)',
               boxShadow: theme.shadows.lg,
+              borderColor: theme.colorScheme === 'dark'
+                ? 'rgba(139, 92, 246, 0.3)'
+                : 'rgba(0, 0, 0, 0.1)',
             },
           },
         }),
       },
       Paper: {
+        defaultProps: {
+          withBorder: true,
+          p: 'md',
+        },
         styles: (theme) => ({
           root: {
             borderRadius: '12px',
             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          },
+            background: theme.colorScheme === 'dark' 
+              ? 'rgba(30, 32, 54, 0.8)' 
+              : 'rgba(255, 255, 255, 0.95)',
+            border: theme.colorScheme === 'dark'
+              ? '1px solid rgba(139, 92, 246, 0.2)'
+              : '1px solid rgba(0, 0, 0, 0.06)',
+            '&:hover': {
+              borderColor: theme.colorScheme === 'dark'
+                ? 'rgba(139, 92, 246, 0.3)'
+                : 'rgba(0, 0, 0, 0.1)',
+            }
+          }
         }),
       },
       TextInput: {

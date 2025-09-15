@@ -542,24 +542,28 @@ function ChapterView() {
               mb="xl"
               className="card-modern card-glass transition-all duration-300"
               sx={(theme) => ({
-                background: 'var(--bg-card)',
+                background: theme.colorScheme === 'dark' ? 'rgba(30, 32, 54, 0.8)' : '#ffffff',
                 backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(139, 92, 246, 0.2)',
+                border: theme.colorScheme === 'dark' 
+                  ? '1px solid rgba(139, 92, 246, 0.2)' 
+                  : '1px solid rgba(0, 0, 0, 0.06)',
                 position: 'relative',
                 overflow: 'hidden',
               })}
             >
               {/* Purple gradient background accent */}
               <Box
-                sx={{
+                sx={(theme) => ({
                   position: 'absolute',
                   top: 0,
                   left: 0,
-                  right: 0,
-                  bottom: 0,
-                  background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.03) 0%, rgba(168, 85, 247, 0.03) 100%)',
+                  width: '100%',
+                  height: '100%',
+                  background: theme.colorScheme === 'dark' 
+                    ? 'linear-gradient(45deg, rgba(139, 92, 246, 0.1) 0%, rgba(124, 58, 237, 0.15) 100%)' 
+                    : 'linear-gradient(45deg, rgba(0, 0, 0, 0.01) 0%, rgba(0, 0, 0, 0.03) 100%)',
                   zIndex: 0,
-                }}
+                })}
               />
 
               <Group position="apart" align="flex-start" sx={{ position: 'relative', zIndex: 1 }}>
@@ -601,7 +605,17 @@ function ChapterView() {
                   </Group>
                 </Box>
 
-                <Group spacing="sm" sx={{ flexShrink: 0 }}>
+                <Group spacing="sm" sx={(theme) => ({
+                  flexShrink: 0,
+                  '& .mantine-Button-root': {
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      boxShadow: theme.colorScheme === 'dark' 
+                        ? '0 8px 25px rgba(139, 92, 246, 0.3)' 
+                        : '0 8px 25px rgba(0, 0, 0, 0.1)'
+                    }
+                  }
+                })}>
                   <Button
                     variant="light"
                     color="purple"
@@ -646,7 +660,7 @@ function ChapterView() {
               mb="xl"
               sx={(theme) => ({
                 '& .mantine-Tabs-tabsList': {
-                  background: 'var(--bg-card)',
+                  background: theme.colorScheme === 'dark' ? 'rgba(30, 32, 54, 0.8)' : '#ffffff',
                   backdropFilter: 'blur(20px)',
                   border: '1px solid rgba(139, 92, 246, 0.2)',
                   borderRadius: '16px',
@@ -705,16 +719,18 @@ function ChapterView() {
                   <Paper
                     ref={contentRef}
                     className="card-modern card-glass transition-all duration-300"
-                    sx={{
-                      background: 'var(--bg-card)',
+                    sx={(theme) => ({
+                      background: theme.colorScheme === 'dark' ? 'rgba(30, 32, 54, 0.8)' : '#ffffff',
                       backdropFilter: 'blur(20px)',
-                      border: '1px solid rgba(139, 92, 246, 0.2)',
+                      border: theme.colorScheme === 'dark' 
+                        ? '1px solid rgba(139, 92, 246, 0.2)' 
+                        : '1px solid rgba(0, 0, 0, 0.06)',
                       borderRadius: '16px',
                       padding: '32px',
                       width: '100%',
                       position: 'relative',
                       overflow: 'hidden',
-                    }}
+                    })}
                   >
                     {/* Subtle gradient overlay */}
                     <Box
@@ -739,14 +755,16 @@ function ChapterView() {
               <Tabs.Panel value="flashcards" pt="md" style={{ width: '100%' }}>
                 <Paper 
                   className="card-modern card-glass transition-all duration-300"
-                  sx={{
-                    background: 'var(--bg-card)',
+                  sx={(theme) => ({
+                    background: theme.colorScheme === 'dark' ? 'rgba(30, 32, 54, 0.8)' : '#ffffff',
                     backdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(139, 92, 246, 0.2)',
+                    border: theme.colorScheme === 'dark' 
+                      ? '1px solid rgba(139, 92, 246, 0.2)' 
+                      : '1px solid rgba(0, 0, 0, 0.06)',
                     borderRadius: '16px',
                     padding: '32px',
-                    width: '100%',
-                  }}
+                    width: '100%'
+                  })}
                 >
                   <FlashcardDeck courseId={courseId} chapterId={chapterId} />
                 </Paper>
@@ -756,16 +774,25 @@ function ChapterView() {
               <Tabs.Panel value="images" pt="md" style={{ width: '100%' }}>
                 <Paper
                   className="card-modern card-glass transition-all duration-300"
-                  sx={{
-                    background: 'var(--bg-card)',
+                  sx={(theme) => ({
+                    background: theme.colorScheme === 'dark' ? 'rgba(30, 32, 54, 0.8)' : '#ffffff',
                     backdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(139, 92, 246, 0.2)',
+                    border: theme.colorScheme === 'dark' 
+                      ? '1px solid rgba(139, 92, 246, 0.2)' 
+                      : '1px solid rgba(0, 0, 0, 0.06)',
                     borderRadius: '16px',
                     padding: '32px',
-                    width: '100%',
-                  }}
+                    width: '100%'
+                  })}
                 >
-                  <Title order={3} mb="lg" sx={{ color: 'var(--purple-600)', fontWeight: 700 }}>
+                  <Title 
+                    order={3} 
+                    mb="lg" 
+                    sx={(theme) => ({
+                      color: theme.colorScheme === 'dark' ? theme.colors.violet[4] : theme.colors.violet[7],
+                      fontWeight: 700
+                    })}
+                  >
                     Chapter Images ({images.length})
                   </Title>
                   <MediaGallery
@@ -780,16 +807,25 @@ function ChapterView() {
               <Tabs.Panel value="files" pt="md" style={{ width: '100%' }}>
                 <Paper
                   className="card-modern card-glass transition-all duration-300"
-                  sx={{
-                    background: 'var(--bg-card)',
+                  sx={(theme) => ({
+                    background: theme.colorScheme === 'dark' ? 'rgba(30, 32, 54, 0.8)' : '#ffffff',
                     backdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(139, 92, 246, 0.2)',
+                    border: theme.colorScheme === 'dark' 
+                      ? '1px solid rgba(139, 92, 246, 0.2)' 
+                      : '1px solid rgba(0, 0, 0, 0.06)',
                     borderRadius: '16px',
                     padding: '32px',
-                    width: '100%',
-                  }}
+                    width: '100%'
+                  })}
                 >
-                  <Title order={3} mb="lg" sx={{ color: 'var(--purple-600)', fontWeight: 700 }}>
+                  <Title 
+                    order={3} 
+                    mb="lg" 
+                    sx={(theme) => ({
+                      color: theme.colorScheme === 'dark' ? theme.colors.violet[4] : theme.colors.violet[7],
+                      fontWeight: 700
+                    })}
+                  >
                     Chapter Files ({files.length})
                   </Title>
                   <FileList
@@ -804,14 +840,16 @@ function ChapterView() {
               <Tabs.Panel value="quiz" pt="md" style={{ width: '100%' }}>
                 <Paper
                   className="card-modern card-glass transition-all duration-300"
-                  sx={{
-                    background: 'var(--bg-card)',
+                  sx={(theme) => ({
+                    background: theme.colorScheme === 'dark' ? 'rgba(30, 32, 54, 0.8)' : '#ffffff',
                     backdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(139, 92, 246, 0.2)',
+                    border: theme.colorScheme === 'dark' 
+                      ? '1px solid rgba(139, 92, 246, 0.2)' 
+                      : '1px solid rgba(0, 0, 0, 0.06)',
                     borderRadius: '16px',
                     padding: '32px',
-                    width: '100%',
-                  }}
+                    width: '100%'
+                  })}
                 >
                   <Quiz
                     key={quizKey}
@@ -833,11 +871,13 @@ function ChapterView() {
               p="lg"
               mt="xl"
               className="card-modern card-glass transition-all duration-300"
-              sx={{
-                background: 'var(--bg-card)',
+              sx={(theme) => ({
+                background: theme.colorScheme === 'dark' ? 'rgba(30, 32, 54, 0.8)' : '#ffffff',
                 backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(139, 92, 246, 0.2)',
-              }}
+                border: theme.colorScheme === 'dark' 
+                  ? '1px solid rgba(139, 92, 246, 0.2)' 
+                  : '1px solid rgba(0, 0, 0, 0.06)'
+              })}
             >
               <Group position="apart">
                 <Button
