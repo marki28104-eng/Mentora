@@ -34,9 +34,9 @@
   --bg-glass: rgba(255, 255, 255, 0.1);
 
   /* Text Colors - Light Mode */
-  --text-primary: #1f2937;
-  --text-secondary: #6b7280;
-  --text-tertiary: #9ca3af;
+  --text-primary: #111827;
+  --text-secondary: #374151;
+  --text-tertiary: #6b7280;
 
   /* Light mode defaults */
   color: var(--text-primary);
@@ -45,12 +45,12 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: var(--purple-600);
   text-decoration: inherit;
 }
 
 a:hover {
-  color: #535bf2;
+  color: var(--purple-700);
 }
 
 html {
@@ -79,7 +79,8 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
   cursor: pointer;
   transition: border-color 0.25s;
 }
@@ -205,14 +206,15 @@ button:focus-visible {
 }
 
 .markdown-content code {
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: var(--bg-secondary);
   border-radius: 3px;
   padding: 0.2rem 0.4rem;
   font-family: monospace;
+  color: var(--text-primary);
 }
 
 .markdown-content pre {
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: var(--bg-secondary);
   border-radius: 4px;
   padding: 1rem;
   overflow-x: auto;
@@ -227,7 +229,7 @@ button:focus-visible {
   border-left: 4px solid #ddd;
   padding-left: 1rem;
   margin-left: 0;
-  color: #777;
+  color: var(--text-secondary);
 }
 
 /* Removed Segoe Script font override */

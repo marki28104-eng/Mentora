@@ -988,7 +988,7 @@ function LandingPage() {
                 border: 'none',
                 borderRadius: 'inherit'
               }}
-              src="https://www.youtube.com/embed/JImJJ9RcCog"
+              src="https://www.youtube.com/embed/I0Nb0O1pSxM"
               title={t('infoSection.videoTitle', 'Introduction to Our Platform')}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
