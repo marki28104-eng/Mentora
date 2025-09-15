@@ -9,10 +9,10 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  
+
   /* Theme transition properties */
   transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   /* Purple Color Palette - Light Mode */
   --purple-50: #faf5ff;
@@ -48,6 +48,7 @@ a {
   color: #646cff;
   text-decoration: inherit;
 }
+
 a:hover {
   color: #535bf2;
 }
@@ -82,9 +83,11 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
+
 button:hover {
   border-color: #646cff;
 }
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
@@ -149,11 +152,11 @@ button:focus-visible {
     color: var(--text-primary);
     background-color: var(--bg-primary);
   }
-  
+
   a:hover {
     color: var(--purple-400);
   }
-  
+
   button {
     background-color: var(--bg-secondary);
   }
@@ -163,7 +166,7 @@ button:focus-visible {
   a:hover {
     color: var(--purple-600);
   }
-  
+
   button {
     background-color: var(--bg-secondary);
   }
@@ -191,7 +194,7 @@ button:focus-visible {
   margin-bottom: 1rem;
 }
 
-.markdown-content ul, 
+.markdown-content ul,
 .markdown-content ol {
   padding-left: 2rem;
   margin-bottom: 1rem;
@@ -310,6 +313,7 @@ button:focus-visible {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -321,6 +325,7 @@ button:focus-visible {
     opacity: 0;
     transform: translateX(100px) scale(0.98);
   }
+
   to {
     opacity: 1;
     transform: translateX(0) scale(1);
@@ -328,9 +333,12 @@ button:focus-visible {
 }
 
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-10px);
   }
@@ -340,9 +348,11 @@ button:focus-visible {
   0% {
     box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4);
   }
+
   70% {
     box-shadow: 0 0 0 20px rgba(139, 92, 246, 0);
   }
+
   100% {
     box-shadow: 0 0 0 0 rgba(139, 92, 246, 0);
   }
@@ -352,9 +362,11 @@ button:focus-visible {
   0% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
+
   100% {
     background-position: 0% 50%;
   }
@@ -363,23 +375,23 @@ button:focus-visible {
 /* Theme Transition Styles */
 .theme-transitioning {
   transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              color 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    color 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .theme-transitioning *,
 .theme-transitioning *::before,
 .theme-transitioning *::after {
   transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 /* Smooth transitions for all theme-aware elements */
 body,
 [data-theme] {
   transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Enhanced theme transition for cards and interactive elements */
@@ -394,14 +406,14 @@ body,
   :root {
     transition: none !important;
   }
-  
+
   .theme-transitioning,
   .theme-transitioning *,
   .theme-transitioning *::before,
   .theme-transitioning *::after {
     transition: none !important;
   }
-  
+
   *,
   *::before,
   *::after {
@@ -415,6 +427,19 @@ body,
 .gpu-accelerated {
   transform: translateZ(0);
   will-change: transform;
+}
+
+/* Optimize scroll performance */
+.scroll-optimized {
+  contain: layout style paint;
+  will-change: transform;
+}
+
+/* Reduce repaints during scroll */
+.scroll-container {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
 /* Focus styles for accessibility */
@@ -459,8 +484,8 @@ body,
 
 .transition-colors {
   transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .transition-transform {
@@ -519,7 +544,8 @@ body,
 
 /* Transform Utilities */
 .transform {
-  transform: translateZ(0); /* Enable GPU acceleration */
+  transform: translateZ(0);
+  /* Enable GPU acceleration */
 }
 
 .translate-y-1 {
@@ -714,8 +740,13 @@ body,
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Stagger Animation Utilities */
@@ -758,12 +789,29 @@ body,
   animation: fadeInUp 0.6s ease-out;
 }
 
-.chapter-card:nth-child(1) { animation-delay: 0.1s; }
-.chapter-card:nth-child(2) { animation-delay: 0.2s; }
-.chapter-card:nth-child(3) { animation-delay: 0.3s; }
-.chapter-card:nth-child(4) { animation-delay: 0.4s; }
-.chapter-card:nth-child(5) { animation-delay: 0.5s; }
-.chapter-card:nth-child(6) { animation-delay: 0.6s; }
+.chapter-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.chapter-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.chapter-card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.chapter-card:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+.chapter-card:nth-child(5) {
+  animation-delay: 0.5s;
+}
+
+.chapter-card:nth-child(6) {
+  animation-delay: 0.6s;
+}
 
 /* Tab Transition Animations */
 .tab-content-enter {
@@ -809,6 +857,7 @@ body,
   0% {
     left: -100%;
   }
+
   100% {
     left: 100%;
   }
@@ -827,9 +876,11 @@ body,
   0% {
     box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
   }
+
   50% {
     box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
   }
+
   100% {
     box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
   }
@@ -883,10 +934,10 @@ body,
 
 /* Loading State Enhancements */
 .loading-shimmer {
-  background: linear-gradient(90deg, 
-    rgba(139, 92, 246, 0.1) 0%, 
-    rgba(139, 92, 246, 0.2) 50%, 
-    rgba(139, 92, 246, 0.1) 100%);
+  background: linear-gradient(90deg,
+      rgba(139, 92, 246, 0.1) 0%,
+      rgba(139, 92, 246, 0.2) 50%,
+      rgba(139, 92, 246, 0.1) 100%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
@@ -895,6 +946,7 @@ body,
   0% {
     background-position: -200% 0;
   }
+
   100% {
     background-position: 200% 0;
   }
@@ -907,9 +959,16 @@ body,
   border-radius: 8px;
 }
 
-/* Smooth Scroll Behavior */
+/* Disable smooth scroll temporarily to fix jumping issues */
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
+}
+
+/* Re-enable smooth scroll only for users who don't prefer reduced motion */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 /* Custom Scrollbar for Modern Look */
@@ -936,4 +995,76 @@ html {
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--purple-500) var(--bg-secondary);
+}
+
+* Video container optimizations */ .video-container {
+  contain: layout style;
+  transform: translateZ(0);
+}
+
+.video-container iframe {
+  contain: strict;
+  transform: translateZ(0);
+}
+
+/* Aspect ratio containers for better layout stability */
+.aspect-ratio-16-9 {
+  aspect-ratio: 16 / 9;
+  contain: layout size;
+}
+
+/* Reduce layout thrashing during scroll */
+.scroll-section {
+  contain: layout style;
+  transform: translateZ(0);
+}
+
+/* Optimize transition performance */
+.transition-optimized {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+.transition-optimized.transition-complete {
+  will-change: auto;
+}
+
+/* Fix 
+for scroll jumping issues */
+.landing-page-container {
+  contain: layout style;
+  transform: translateZ(0);
+}
+
+/* Prevent layout shifts in video containers */
+.video-container-stable {
+  min-height: 450px;
+  /* Fixed height to prevent layout shifts */
+  contain: layout size;
+}
+
+/* Disable problematic animations during scroll */
+@media (prefers-reduced-motion: no-preference) {
+  .scroll-safe-animation {
+    animation-play-state: running;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-safe-animation {
+    animation: none !important;
+  }
+}
+
+/* Force hardware acceleration for smooth scrolling */
+.scroll-container {
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Optimize iframe rendering */
+iframe {
+  transform: translateZ(0);
+  will-change: auto;
 }

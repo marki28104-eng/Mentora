@@ -385,6 +385,9 @@ const useStyles = createStyles((theme) => ({
     filter: 'blur(60px)',
     opacity: theme.colorScheme === 'dark' ? 0.15 : 0.08,
     zIndex: 0,
+    contain: 'layout style paint',
+    transform: 'translateZ(0)', // Force GPU acceleration
+    backfaceVisibility: 'hidden',
   },
 
   shape1: {
@@ -443,19 +446,20 @@ const useStyles = createStyles((theme) => ({
     position: 'relative',
     overflow: 'hidden',
     width: '100%',
-    paddingTop: '56.25%', // 16:9 Aspect Ratio
+    height: '450px', // Fixed height instead of aspect ratio to prevent layout shifts
     borderRadius: theme.radius.xl,
     boxShadow: theme.colorScheme === 'dark'
       ? '0 25px 50px -12px rgba(139, 92, 246, 0.25)'
       : '0 25px 50px -12px rgba(139, 92, 246, 0.15)',
     border: `1px solid ${theme.colorScheme === 'dark' ? 'rgba(139, 92, 246, 0.2)' : 'rgba(139, 92, 246, 0.1)'}`,
     marginTop: theme.spacing.xl * 2,
-    transition: 'all 0.4s ease',
-    '&:hover': {
-      transform: 'translateY(-8px)',
-      boxShadow: theme.colorScheme === 'dark'
-        ? '0 35px 70px -12px rgba(139, 92, 246, 0.35)'
-        : '0 35px 70px -12px rgba(139, 92, 246, 0.25)',
+    contain: 'layout size', // Prevent layout shifts
+    transform: 'translateZ(0)', // Force GPU acceleration
+    [theme.fn.smallerThan('md')]: {
+      height: '300px', // Smaller height on mobile
+    },
+    [theme.fn.smallerThan('sm')]: {
+      height: '250px', // Even smaller on small screens
     },
   },
 
@@ -504,7 +508,6 @@ function LandingPage() {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
-  const [scrollY, setScrollY] = useState(0);
   const [visibleSections, setVisibleSections] = useState(new Set());
   const isMobile = useMediaQuery('(max-width: 768px)');
 
@@ -514,81 +517,72 @@ function LandingPage() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Scroll animations and parallax effect
+  // Minimal scroll handling - only for essential functionality
   useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-
-      // Check which sections are visible
-      const sections = ['features', 'award', 'how-it-works', 'demo', 'testimonials', 'cta'];
-      const newVisibleSections = new Set();
-
-      sections.forEach(sectionId => {
-        const element = document.getElementById(sectionId);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          const isVisible = rect.top < window.innerHeight * 0.8 && rect.bottom > 0;
-          if (isVisible) {
-            newVisibleSections.add(sectionId);
-          }
-        }
-      });
-
-      setVisibleSections(newVisibleSections);
+    // Simple intersection observer - no scroll-based animations
+    const observerOptions = {
+      root: null,
+      rootMargin: '0px 0px -20% 0px',
+      threshold: 0.1
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Check initial state
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const sectionId = entry.target.id;
+        if (entry.isIntersecting) {
+          setVisibleSections(prev => new Set([...prev, sectionId]));
+        }
+      });
+    }, observerOptions);
 
-    return () => window.removeEventListener('scroll', handleScroll);
+    // Observe sections
+    const sections = ['features', 'award', 'how-it-works', 'demo', 'testimonials', 'cta'];
+    sections.forEach(sectionId => {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        observer.observe(element);
+      }
+    });
+
+    return () => {
+      observer.disconnect();
+    };
   }, []);
 
-  // Scroll to section helper with enhanced smooth scrolling
+  // Optimized scroll to section with reduced motion support
   const scrollToSection = (id) => {
     const element = document.getElementById(id);
     if (element) {
-      const headerOffset = 80; // Account for fixed header
+      const headerOffset = 80;
       const elementPosition = element.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
+      // Check for reduced motion preference
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
       window.scrollTo({
         top: offsetPosition,
-        behavior: 'smooth'
+        behavior: prefersReducedMotion ? 'auto' : 'smooth'
       });
     }
   };
 
   return (
-    <Box style={{ position: 'relative', overflowX: 'hidden' }}>
-      {/* Scroll progress indicator */}
-      <Box
-        className={classes.scrollIndicator}
-        style={{
-          transform: `scaleX(${Math.min(scrollY / (document.documentElement.scrollHeight - window.innerHeight), 1)})`
-        }}
-      />
+    <Box
+      className="landing-page-container scroll-container"
+      style={{
+        position: 'relative',
+        overflowX: 'hidden'
+      }}
+    >
 
-      {/* Floating shapes for visual interest with parallax */}
-      <Box
-        className={cx(classes.floatingShape, classes.shape1)}
-        style={{ transform: `translateY(${scrollY * 0.1}px)` }}
-      />
-      <Box
-        className={cx(classes.floatingShape, classes.shape2)}
-        style={{ transform: `translateY(${scrollY * -0.05}px)` }}
-      />
-      <Box
-        className={cx(classes.floatingShape, classes.shape3)}
-        style={{ transform: `translate(-50%, -50%) translateY(${scrollY * 0.08}px)` }}
-      />
-      <Box
-        className={cx(classes.floatingShape, classes.shape4)}
-        style={{ transform: `translateY(${scrollY * -0.12}px)` }}
-      />
-      <Box
-        className={cx(classes.floatingShape, classes.shape5)}
-        style={{ transform: `translateY(${scrollY * 0.06}px)` }}
-      />
+
+      {/* Static floating shapes - no parallax to prevent scroll jumping */}
+      <Box className={cx(classes.floatingShape, classes.shape1)} />
+      <Box className={cx(classes.floatingShape, classes.shape2)} />
+      <Box className={cx(classes.floatingShape, classes.shape3)} />
+      <Box className={cx(classes.floatingShape, classes.shape4)} />
+      <Box className={cx(classes.floatingShape, classes.shape5)} />
 
       {/* Hero Section */}
       <Box
@@ -815,7 +809,7 @@ function LandingPage() {
       {/* Award Section */}
       <Box id="award" className={classes.section}>
         <Container>
-          <Transition mounted={visibleSections.has('award')} transition="scale-y" duration={800} delay={200}>
+          <Transition mounted={visibleSections.has('award')} transition="fade" duration={400} delay={200}>
             {(styles) => (
               <Box className={classes.gradient} style={styles}>
                 <Stack align="center" spacing="xl" sx={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
@@ -975,28 +969,32 @@ function LandingPage() {
             </Transition>
           </Stack>
 
-          <Transition mounted={visibleSections.has('demo')} transition="scale-y" duration={800} delay={300}>
-            {(styles) => (
-              <Box className={classes.videoContainer} style={styles}>
-                <iframe
-                width="100%"
-                height="100%"
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                  border: 'none'
-                }}
-                src="https://www.youtube.com/embed/JImJJ9RcCog"
-                title={t('infoSection.videoTitle', 'Introduction to Our Platform')}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-              </Box>
-            )}
-          </Transition>
+          <Box
+            className={classes.videoContainer}
+            style={{
+              opacity: visibleSections.has('demo') ? 1 : 0,
+              transition: 'opacity 0.3s ease'
+            }}
+          >
+            <iframe
+              width="100%"
+              height="100%"
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                border: 'none',
+                borderRadius: 'inherit'
+              }}
+              src="https://www.youtube.com/embed/JImJJ9RcCog"
+              title={t('infoSection.videoTitle', 'Introduction to Our Platform')}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              loading="lazy"
+            />
+          </Box>
         </Container>
       </Box>
 
@@ -1179,7 +1177,7 @@ function LandingPage() {
       {/* CTA Section */}
       <Box id="cta" py={100} className={classes.section}>
         <Container>
-          <Transition mounted={visibleSections.has('cta') || scrollY > window.innerHeight * 3} transition="scale-y" duration={800} delay={200}>
+          <Transition mounted={visibleSections.has('cta')} transition="fade" duration={400} delay={200}>
             {(styles) => (
               <Stack align="center" spacing="xl" style={styles}>
                 <Title order={2} align="center">
