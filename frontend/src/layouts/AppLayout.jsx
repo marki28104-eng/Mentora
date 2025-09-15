@@ -388,7 +388,7 @@ function AppLayout() {
                   style={{ textDecoration: "none", cursor: "pointer" }}
                 >
                   <img
-                    src="/mentora_schrift_türk_2.svg"
+                    src="/mentora_schrift_türk.png"
                     alt="Mentora"
                     style={{
                       height: 40,
@@ -524,7 +524,7 @@ function AppLayout() {
             >
               {opened && (
                 <img
-                  src="/mentora_schrift_türk_2.svg"
+                  src="/mentora_schrift_türk.png"
                   alt="Mentora"
                   component={RouterLink}
                   to="/dashboard"

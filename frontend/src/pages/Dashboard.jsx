@@ -1104,7 +1104,7 @@ function Dashboard() {
         )}
       </Box>
 
-      {/* Learning Analytics Section */}
+      {/* Learning Analytics Section 
       {user && courses.length > 0 && (
         <motion.div
           variants={item}
@@ -1116,7 +1116,8 @@ function Dashboard() {
           />
         </motion.div>
       )}
-
+        */}
+        
       {/* Info Section - MOVED INSIDE THE MAIN CONTAINER */}
       <motion.div
         variants={item}

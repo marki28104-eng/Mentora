@@ -25,6 +25,7 @@ Please ONLY output the part of the component that I indicated, in particular do 
 - the <start of your output> and <end of your output> tags
 - any explanation of your code or text around the code
 Your code will be parsed and displayed immediately to the user without review so prevent syntax errors at all costs!!
+Note: If "Kiro" is mentioned, the AI-IDE developed by AWS is meant. In this case please use the google search tool every time to get more infos.
 
 ----
 Style Guidelines:

@@ -110,7 +110,7 @@ function MainLayout() {
               className="transition-transform hover:scale-105"
             >
               <img
-                src="/mentora_schrift_türk_2.svg"
+                src="/mentora_schrift_türk.png"
                 alt="Mentora"
                 style={{
                   height: 40,

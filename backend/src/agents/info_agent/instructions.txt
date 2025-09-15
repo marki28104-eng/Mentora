@@ -20,3 +20,4 @@ Example of your expected JSON output:
 {"title": "Introduction to Quantum Physics: Entanglement and Computing", "description": "Explore the fundamentals of quantum physics, with a special focus on the principles of quantum entanglement and the basics of quantum computing. This course provides a foundational understanding for further study."}
 
 Ensure your output is ONLY the JSON string, with no other text before or after it.
+Note: If the query mentions "Kiro", they mean the AI-IDE with spec-driven development developed by Amazon Web Services
