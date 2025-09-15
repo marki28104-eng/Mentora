@@ -599,28 +599,6 @@ function ChapterView() {
                       </Group>
                     )}
                   </Group>
-
-                  <Title
-                    order={1}
-                    mb="sm"
-                    sx={(theme) => ({
-                      fontSize: '2.25rem',
-                      fontWeight: 800,
-                      background: theme.colorScheme === 'dark'
-                        ? 'linear-gradient(135deg, var(--purple-400) 0%, var(--purple-300) 100%)'
-                        : 'linear-gradient(135deg, var(--purple-700) 0%, var(--purple-500) 100%)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      backgroundClip: 'text',
-                      lineHeight: 1.2,
-                    })}
-                  >
-                    {chapter?.caption || 'Chapter'}
-                  </Title>
-
-                  <Text size="md" color="dimmed" sx={{ maxWidth: '600px', lineHeight: 1.6 }}>
-                    Continue your learning journey with this comprehensive chapter.
-                  </Text>
                 </Box>
 
                 <Group spacing="sm" sx={{ flexShrink: 0 }}>
