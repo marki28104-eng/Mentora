@@ -25,7 +25,6 @@ MAX_CHAT_USAGE = 100
 MAX_PRESENT_COURSES = 5
 
 
-
 # JWT settings
 ALGORITHM = "HS256"
 SECRET_KEY = os.getenv("SECRET_KEY", "a_very_secret_key_please_change_me")
