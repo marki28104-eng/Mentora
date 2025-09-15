@@ -93,8 +93,13 @@ export const MainLink = ({
         padding: collapsed ? `16px 0` : `16px 16px 16px 16px`, // Adjust padding when collapsed
         borderRadius: theme.radius.md,
         marginBottom: theme.spacing.xs,
-        color:
-          theme.colorScheme === "dark" ? theme.colors.dark[0] : theme.black,
+        color: isActive
+          ? theme.colorScheme === "dark"
+            ? theme.white
+            : 'rgba(0, 0, 0, 0.9)'
+          : theme.colorScheme === "dark"
+          ? theme.colors.dark[1]
+          : 'rgba(0, 0, 0, 0.9)',
         backgroundColor: isActive
           ? theme.colorScheme === "dark"
             ? theme.colors.dark[5]
@@ -102,9 +107,9 @@ export const MainLink = ({
           : "transparent",
         border: `1px solid ${
           isActive
-            ? theme.colorScheme === "dark"
-              ? theme.colors.dark[4]
-              : theme.colors.gray[3]
+            ? (theme.colorScheme === "dark"
+                ? theme.colors.dark[4]
+                : theme.colors.gray[3])
             : "transparent"
         }`,
         transition: "all 0.2s ease",

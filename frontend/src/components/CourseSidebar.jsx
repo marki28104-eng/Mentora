@@ -126,7 +126,7 @@ const ChapterLink = ({ chapter, activeChapter, index, handleChapterClick, handle
             : '1px solid transparent',
           color: chapterId === chapter.id.toString()
             ? 'var(--purple-600)'
-            : 'var(--text-primary)',
+            : theme.colorScheme === 'dark' ? 'var(--text-primary)' : 'rgba(0, 0, 0, 0.9)',
         }}
         icon={
           <ThemeIcon
@@ -166,11 +166,11 @@ const ChapterLink = ({ chapter, activeChapter, index, handleChapterClick, handle
               margin: '2px 8px',
               '&:hover': {
                 backgroundColor: 'rgba(139, 92, 246, 0.08)',
-                color: 'var(--purple-600)',
+                color: theme.colorScheme === 'dark' ? 'var(--purple-400)' : 'rgba(0, 0, 0, 0.9)',
               },
               '&[data-active]': {
                 backgroundColor: 'rgba(139, 92, 246, 0.15)',
-                color: 'var(--purple-600)',
+                color: theme.colorScheme === 'dark' ? 'var(--purple-400)' : 'rgba(0, 0, 0, 0.9)',
                 borderLeft: '3px solid var(--purple-500)',
               },
             },
@@ -192,11 +192,11 @@ const ChapterLink = ({ chapter, activeChapter, index, handleChapterClick, handle
                 margin: '2px 8px',
                 '&:hover': {
                   backgroundColor: 'rgba(139, 92, 246, 0.08)',
-                  color: 'var(--purple-600)',
+                  color: theme.colorScheme === 'dark' ? 'var(--purple-400)' : 'rgba(0, 0, 0, 0.9)',
                 },
                 '&[data-active]': {
                   backgroundColor: 'rgba(139, 92, 246, 0.15)',
-                  color: 'var(--purple-600)',
+                  color: theme.colorScheme === 'dark' ? 'var(--purple-400)' : 'rgba(0, 0, 0, 0.9)',
                   borderLeft: '3px solid var(--purple-500)',
                 },
               },
@@ -219,11 +219,11 @@ const ChapterLink = ({ chapter, activeChapter, index, handleChapterClick, handle
                 margin: '2px 8px',
                 '&:hover': {
                   backgroundColor: 'rgba(139, 92, 246, 0.08)',
-                  color: 'var(--purple-600)',
+                  color: theme.colorScheme === 'dark' ? 'var(--purple-400)' : 'rgba(0, 0, 0, 0.9)',
                 },
                 '&[data-active]': {
                   backgroundColor: 'rgba(139, 92, 246, 0.15)',
-                  color: 'var(--purple-600)',
+                  color: theme.colorScheme === 'dark' ? 'var(--purple-400)' : 'rgba(0, 0, 0, 0.9)',
                   borderLeft: '3px solid var(--purple-500)',
                 },
               },
@@ -387,7 +387,17 @@ const CourseSidebar = ({ opened, setopen }) => {
 
   if (loading) {
     return (
-      <Box p="md" className="glass-card" style={{ textAlign: 'center', margin: '16px' }}>
+      <Box 
+    p="md" 
+    sx={(theme) => ({
+      textAlign: 'center', 
+      margin: '16px',
+      backgroundColor: theme.colorScheme === 'dark' ? 'rgba(30, 32, 54, 0.8)' : '#ffffff',
+      borderRadius: theme.radius.md,
+      padding: theme.spacing.md,
+      boxShadow: theme.shadows.sm
+    })}
+  >
         <LoadingSpinner size="md" variant="purple" text="Loading Course..." />
       </Box>
     );
@@ -396,7 +406,19 @@ const CourseSidebar = ({ opened, setopen }) => {
   const link = { icon: <IconHome2 size={20} />, color: 'violet', label: t('home', { ns: 'navigation' }), to: '/dashboard' }
 
   return (
-    <Box className="nav-sidebar glass-nav">
+    <Box 
+      className="nav-sidebar"
+      sx={(theme) => ({
+        backgroundColor: theme.colorScheme === 'dark' ? 'rgba(30, 32, 54, 0.8)' : '#ffffff',
+        backdropFilter: 'blur(20px)',
+        borderRight: theme.colorScheme === 'dark' 
+          ? '1px solid rgba(139, 92, 246, 0.2)' 
+          : '1px solid rgba(0, 0, 0, 0.06)',
+        height: '100%',
+        padding: '16px',
+        overflowY: 'auto'
+      })}
+    >
       <MainLink
         {...link}
         key={link.label}
@@ -405,56 +427,45 @@ const CourseSidebar = ({ opened, setopen }) => {
         onNavigate={handleNavigate}
       />
 
-      {opened ? (
+      {opened && (
         <Button
           variant="light"
           color="violet"
           fullWidth
           onClick={handleCourseTitleClick}
-          className="transition-all hover:-translate-y-1 hover:shadow-purple-md"
           styles={(theme) => ({
             root: {
-              padding: `${theme.spacing.md}px`,
+              textAlign: 'left',
+              padding: theme.spacing.md,
               height: 'auto',
               marginBottom: theme.spacing.md,
               marginTop: 30,
-              background: 'rgba(139, 92, 246, 0.08)',
-              border: '1px solid rgba(139, 92, 246, 0.2)',
+              background: theme.colorScheme === 'dark' ? 'rgba(139, 92, 246, 0.15)' : 'rgba(255, 255, 255, 0.95)',
+              border: theme.colorScheme === 'dark' 
+                ? '1px solid rgba(139, 92, 246, 0.2)'
+                : '1px solid rgba(0, 0, 0, 0.1)',
               borderRadius: theme.radius.lg,
               '&:hover': {
-                background: 'rgba(139, 92, 246, 0.12)',
-                borderColor: 'rgba(139, 92, 246, 0.3)',
+                background: theme.colorScheme === 'dark' 
+                  ? 'rgba(139, 92, 246, 0.2)' 
+                  : 'rgba(0, 0, 0, 0.03)',
+                borderColor: theme.colorScheme === 'dark' 
+                  ? 'rgba(139, 92, 246, 0.3)'
+                  : 'rgba(0, 0, 0, 0.15)'
               }
             },
             label: {
               whiteSpace: 'normal',
               fontSize: theme.fontSizes.lg,
               fontWeight: 700,
-              color: 'var(--purple-600)'
+              color: theme.colorScheme === 'dark' 
+                ? 'var(--purple-400)' 
+                : 'rgba(0, 0, 0, 0.9)'
             },
           })}
         >
-          {course?.title && course?.title != "None" ? course?.title : 'Course Overview'}
+          {course?.title && course?.title !== "None" ? course?.title : 'Course Overview'}
         </Button>
-      ) : (
-        <ActionIcon
-          variant="light"
-          color="violet"
-          size="xl"
-          onClick={handleCourseTitleClick}
-          className="transition-all hover:-translate-y-1 hover:shadow-purple-md"
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            width: '100%',
-            margin: '30px 0',
-            background: 'rgba(139, 92, 246, 0.08)',
-            border: '1px solid rgba(139, 92, 246, 0.2)',
-          }}
-          title={course?.title || 'Course Overview'}
-        >
-          <IconSchool size={24} />
-        </ActionIcon>
       )}
 
       {chapters.map((chapter, index) =>
