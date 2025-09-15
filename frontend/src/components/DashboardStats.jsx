@@ -68,97 +68,109 @@ function DashboardStats({ stats, theme }) {
       animate="visible"
     >
       <Paper
-        p="xl"
-        radius="xl"
+        p="md"
+        radius="md"
         withBorder
-        shadow="lg"
+        shadow="none"
         mb="xl"
-        className="glass-card card-hoverable transition-all duration-300"
-        sx={{
-          background: 'var(--bg-card)',
+        className="transition-all duration-300"
+        style={{ width: '100%' }}
+        sx={(theme) => ({
+          background: theme.colorScheme === 'dark' ? 'rgba(30, 32, 54, 0.8)' : 'rgba(255, 255, 255, 0.95)',
           backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(139, 92, 246, 0.2)',
+          border: theme.colorScheme === 'dark' 
+            ? '1px solid rgba(139, 92, 246, 0.2)' 
+            : '1px solid rgba(0, 0, 0, 0.06)',
+          borderRadius: '16px',
           position: 'relative',
           overflow: 'hidden',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%)',
-            opacity: 0,
-            transition: 'opacity 0.4s ease',
-            borderRadius: 'inherit',
-          },
-          '&:hover::before': {
-            opacity: 1,
-          },
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          boxShadow: 'none',
           '&:hover': {
             transform: 'translateY(-4px)',
-            boxShadow: '0 25px 50px -12px rgba(139, 92, 246, 0.25)',
-            borderColor: 'rgba(139, 92, 246, 0.4)',
+            borderColor: theme.colorScheme === 'dark' 
+              ? 'rgba(139, 92, 246, 0.3)' 
+              : 'rgba(0, 0, 0, 0.1)'
           }
-        }}
+        })}
       >
-        <Group position="apart" spacing="xl" noWrap>
+        <Group position="apart" spacing="md" noWrap style={{ width: '100%', justifyContent: 'space-between' }}>
           {statItems.map((stat, index) => (
             <motion.div
               key={index}
               variants={itemVariants}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              style={{ width: '100%' }}
             >
-              <Group spacing="md" noWrap>
+              <Group spacing="md" noWrap style={{ flex: 1 }}>
                 <Box
                   sx={{
                     position: 'relative',
                     zIndex: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginRight: theme.spacing.sm,
                   }}
                 >
                   <ThemeIcon
-                    size={isMobile ? 44 : 52}
-                    radius="xl"
+                    size={isMobile ? 40 : 48}
+                    radius="md"
                     variant="light"
-                    sx={{
+                    sx={(theme) => ({
                       minWidth: isMobile ? 44 : 52,
-                      background: `linear-gradient(135deg, ${stat.purpleColor}15, ${stat.purpleColor}25)`,
-                      border: `1px solid ${stat.purpleColor}30`,
-                      color: stat.purpleColor,
-                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      background: theme.colorScheme === 'dark'
+                        ? 'rgba(139, 92, 246, 0.2)'
+                        : 'rgba(139, 92, 246, 0.1)',
+                      border: theme.colorScheme === 'dark'
+                        ? '1px solid rgba(139, 92, 246, 0.3)'
+                        : '1px solid rgba(139, 92, 246, 0.1)',
+                      color: theme.colorScheme === 'dark' 
+                        ? theme.colors.violet[4]
+                        : theme.colors.violet[6],
+                      transition: 'all 0.3s ease',
                       '&:hover': {
-                        background: `linear-gradient(135deg, ${stat.purpleColor}25, ${stat.purpleColor}35)`,
-                        transform: 'scale(1.1)',
-                        boxShadow: `0 8px 25px ${stat.purpleColor}40`,
+                        transform: 'scale(1.05)'
                       }
-                    }}
+                    })}
                   >
                     {stat.icon}
                   </ThemeIcon>
                 </Box>
-                <Box sx={{ position: 'relative', zIndex: 1 }}>
+                <Box sx={{ 
+                  position: 'relative', 
+                  zIndex: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  minWidth: '100px'
+                }}>
                   <Text
                     size={isMobile ? 'xs' : 'sm'}
-                    color="dimmed"
                     weight={500}
-                    sx={{
+                    sx={(theme) => ({
                       marginBottom: 4,
+                      color: theme.colorScheme === 'dark' 
+                        ? theme.colors.gray[5]
+                        : theme.colors.gray[7],
                       transition: 'color 0.3s ease',
-                    }}
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    })}
                   >
                     {stat.label}
                   </Text>
                   <Text
                     size={isMobile ? 'lg' : 'xl'}
                     weight={700}
-                    sx={{
-                      background: `linear-gradient(135deg, ${stat.purpleColor}, var(--purple-300))`,
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      backgroundClip: 'text',
+                    sx={(theme) => ({
+                      color: theme.colorScheme === 'dark' 
+                        ? theme.colors[stat.color][4]
+                        : theme.colors[stat.color][7],
                       transition: 'all 0.3s ease',
-                    }}
+                      whiteSpace: 'nowrap',
+                      lineHeight: 1.2
+                    })}
                   >
                     {stat.value}
                     {stat.suffix || ''}

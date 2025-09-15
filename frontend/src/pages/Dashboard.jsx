@@ -192,6 +192,17 @@ const useStyles = createStyles((theme) => ({
   statsContainer: {
     marginBottom: theme.spacing.xl,
     width: '100%',
+    '& .mantine-Paper-root': {
+      background: theme.colorScheme === 'dark' ? 'rgba(15, 15, 35, 0.98)' : '#ffffff',
+      border: theme.colorScheme === 'dark' 
+        ? '1px solid rgba(139, 92, 246, 0.2)' 
+        : '1px solid rgba(0, 0, 0, 0.06)',
+      '&:hover': {
+        borderColor: theme.colorScheme === 'dark' 
+          ? 'rgba(139, 92, 246, 0.4)' 
+          : 'rgba(0, 0, 0, 0.1)'
+      }
+    }
   },
   sectionTitle: {
     marginBottom: theme.spacing.md,

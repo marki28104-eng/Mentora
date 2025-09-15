@@ -237,7 +237,7 @@ function MyCourses() {
       />
 
       {filteredCourses.length === 0 && !loading ? (
-        <Paper withBorder radius="md" p="xl" mt="xl" bg={theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0]}>
+        <Paper withBorder radius="md" p="xl" mt="xl" bg={theme.colorScheme === 'dark' ? 'rgba(30, 32, 54, 0.8)' : 'rgba(255, 255, 255, 0.95)'}>
           <Stack align="center" spacing="md" py="xl">
             <IconBook size={60} color={theme.colors.gray[6]} stroke={1.5} />
             <Title order={3} align="center">
@@ -277,16 +277,22 @@ function MyCourses() {
                   className="card-modern card-glass card-hoverable transition-all duration-300"
                   style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
                   sx={(theme) => ({
-                    background: 'var(--bg-card)',
+                    background: theme.colorScheme === 'dark' ? 'rgba(30, 32, 54, 0.8)' : 'rgba(255, 255, 255, 0.95)',
                     backdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(139, 92, 246, 0.2)',
+                    border: theme.colorScheme === 'dark' 
+                      ? '1px solid rgba(139, 92, 246, 0.2)' 
+                      : '1px solid rgba(0, 0, 0, 0.06)',
                     position: 'relative',
                     overflow: 'hidden',
                     minHeight: '400px',
                     '&:hover': {
-                      transform: 'translateY(-8px)',
-                      boxShadow: '0 25px 50px -12px rgba(139, 92, 246, 0.25)',
-                      borderColor: 'rgba(139, 92, 246, 0.4)',
+                      transform: 'translateY(-4px)',
+                      borderColor: theme.colorScheme === 'dark' 
+                        ? 'rgba(139, 92, 246, 0.3)' 
+                        : 'rgba(0, 0, 0, 0.1)',
+                      boxShadow: theme.colorScheme === 'dark'
+                        ? '0 12px 40px rgba(139, 92, 246, 0.15)'
+                        : '0 8px 30px rgba(0, 0, 0, 0.08)',
                     },
                     '&::before': {
                       content: '""',
@@ -295,7 +301,9 @@ function MyCourses() {
                       left: 0,
                       right: 0,
                       bottom: 0,
-                      background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%)',
+                      background: theme.colorScheme === 'dark' 
+                        ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%)' 
+                        : 'linear-gradient(135deg, rgba(139, 92, 246, 0.02) 0%, rgba(168, 85, 247, 0.02) 100%)',
                       opacity: 0,
                       transition: 'opacity 0.4s ease',
                       zIndex: 0,
