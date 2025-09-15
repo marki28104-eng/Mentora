@@ -352,7 +352,7 @@ function CourseView() {
             <iframe
               width="100%"
               height="100%"
-              src="https://www.youtube.com/embed/uRXTp_C2jYk?autoplay=1&rel=0"
+              src="https://www.youtube.com/embed/I0Nb0O1pSxM"
               title="Welcome Video"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
